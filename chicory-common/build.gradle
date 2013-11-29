@@ -1,0 +1,15 @@
+    dependencies {
+        compile(group: 'javax.mail', name: 'mail', version: '1.4')
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                pom {
+                    project {
+                        description 'Basic data-types, algorithms and data-structures'
+                    }
+                }
+            }
+        }
+    }

@@ -1,0 +1,14 @@
+    dependencies {
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                pom {
+                    project {
+                        description 'Library to support multi-task programming. Allows composition and control of tasks.'
+                    }
+                }
+            }
+        }
+    }

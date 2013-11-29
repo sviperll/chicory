@@ -1,0 +1,15 @@
+    dependencies {
+        compile(project(':chicory-common'))
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                pom {
+                    project {
+                        description 'Library supporting an implementation of command line interface for Java applications'
+                    }
+                }
+            }
+        }
+    }

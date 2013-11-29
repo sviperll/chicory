@@ -1,0 +1,15 @@
+    dependencies {
+        compile(project(':chicory-common'))
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                pom {
+                    project {
+                        description 'Library to support stateless, batch operations on collections A.K.A. stream-processing.'
+                    }
+                }
+            }
+        }
+    }
