@@ -11,7 +11,7 @@ public class Function<T, R> implements Applicable<T, R> {
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static Function ID = new Function(new IdApplicable());
 
-    public static <T> Function<T, T> id() {
+    public static <T> Function<T, T> identity() {
         return typedIdentity();
     }
 

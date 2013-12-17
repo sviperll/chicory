@@ -12,7 +12,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     private static Isomorphism ID = new Isomorphism(new IdIsomorphismDefinition());
 
     @SuppressWarnings({"unchecked"})
-    public static <T> Isomorphism<T, T> id() {
+    public static <T> Isomorphism<T, T> identity() {
         return (Isomorphism<T, T>)ID;
     }
 

@@ -172,7 +172,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).mapping(Function.<T>id()).filtering(predicate));
+                streamable.forEach(SaturableConsumer.valueOf(consumer).mapping(Function.<T>identity()).filtering(predicate));
             }
 
         });
