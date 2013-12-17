@@ -20,8 +20,15 @@ public class Function<T, R> implements Applicable<T, R> {
         return (Function<T, R>)ID;
     }
 
+    public static <T, R> Function<T, R> valueOf(Applicable<T, R> function) {
+        if (function instanceof Function)
+            return (Function<T, R>)function;
+        else
+            return new Function<>(function);
+    }
+
     private final Applicable<T, R> function;
-    public Function(Applicable<T, R> function) {
+    private Function(Applicable<T, R> function) {
         this.function = function;
     }
 

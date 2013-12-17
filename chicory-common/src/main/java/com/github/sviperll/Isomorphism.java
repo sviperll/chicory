@@ -8,8 +8,16 @@ package com.github.sviperll;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
-    public static <T, U> Isomorphism<T, U> createInstance(final Applicable<T, U> forward, final Applicable<U, T> backward) {
-        return createInstance(new IsomorphismDefinition<T, U>() {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static Isomorphism ID = new Isomorphism(new IdIsomorphismDefinition());
+
+    @SuppressWarnings({"unchecked"})
+    public static <T> Isomorphism<T, T> id() {
+        return (Isomorphism<T, T>)ID;
+    }
+
+    public static <T, U> Isomorphism<T, U> of(final Applicable<T, U> forward, final Applicable<U, T> backward) {
+        return valueOf(new IsomorphismDefinition<T, U>() {
             @Override
             public U forward(T object) {
                 return forward.apply(object);
@@ -22,7 +30,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
         });
     }
 
-    public static <T, U> Isomorphism<T, U> createInstance(IsomorphismDefinition<T, U> isomorphism) {
+    public static <T, U> Isomorphism<T, U> valueOf(IsomorphismDefinition<T, U> isomorphism) {
         return new Isomorphism<>(isomorphism);
     }
 
@@ -124,7 +132,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public Function<T, U> forwardFunction() {
-        return new Function<>(new Applicable<T, U>() {
+        return Function.valueOf(new Applicable<T, U>() {
             @Override
             public U apply(T t) {
                 return isomorphism.forward(t);
@@ -133,11 +141,23 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public Function<U, T> backwardFunction() {
-        return new Function<>(new Applicable<U, T>() {
+        return Function.valueOf(new Applicable<U, T>() {
             @Override
             public T apply(U t) {
                 return isomorphism.backward(t);
             }
         });
+    }
+
+    private static class IdIsomorphismDefinition<T> implements IsomorphismDefinition<T, T> {
+        @Override
+        public T forward(T object) {
+            return object;
+        }
+
+        @Override
+        public T backward(T object) {
+            return object;
+        }
     }
 }

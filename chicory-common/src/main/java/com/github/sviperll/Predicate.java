@@ -30,7 +30,7 @@ public class Predicate<T> implements Evaluatable<T> {
     }
 
     public Function<T, Boolean> asFunction() {
-        return new Function<>(new EvaluatableApplicable<>(predicate));
+        return Function.valueOf(new EvaluatableApplicable<>(predicate));
     }
 
     public Predicate<T> not() {
