@@ -137,7 +137,7 @@ public class Stream<T> implements Streamable<T> {
     }
 
     public CloseableIterator<T> openIterator() {
-        return StreamableDrainer.createIterator(streamable);
+        return StreamIterator.createInstance(streamable);
     }
 
     @Override
