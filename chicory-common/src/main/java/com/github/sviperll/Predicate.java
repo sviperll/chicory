@@ -19,8 +19,24 @@ public class Predicate<T> implements Evaluatable<T> {
         return new Predicate<>(new OrEvaluatable<>(predicates));
     }
 
+    public static <T> Predicate<T> valueOf(final Function<T, Boolean> function) {
+        return valueOf(new Evaluatable<T>() {
+            @Override
+            public boolean evaluate(T t) {
+                return function.apply(t);
+            }
+        });
+    }
+
+    public static <T> Predicate<T> valueOf(Evaluatable<T> evaluatable) {
+        if (evaluatable instanceof Predicate)
+            return (Predicate<T>)evaluatable;
+        else
+            return new Predicate<>(evaluatable);
+    }
+
     private final Evaluatable<T> predicate;
-    public Predicate(Evaluatable<T> predicate) {
+    private Predicate(Evaluatable<T> predicate) {
         this.predicate = predicate;
     }
 
