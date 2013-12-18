@@ -5,7 +5,7 @@ subprojects {
 
     compileJava.options.compilerArgs = ['-Xlint'] 
 
-    version = '0.6-SNAPSHOT'
+    version = '0.7'
     group = 'com.github.sviperll'
     sourceCompatibility = 1.7
 
