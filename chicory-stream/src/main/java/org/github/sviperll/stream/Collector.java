@@ -9,7 +9,6 @@ import com.github.sviperll.BinaryOperatorDefinition;
 import com.github.sviperll.Evaluatable;
 import com.github.sviperll.OptionalVisitor;
 import com.github.sviperll.Supplier;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,11 +49,35 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         });
     }
 
-    public static <T> Collector<T, ArrayList<T>, RuntimeException> toList() {
-        return new Collector<>(new Supplier<Collecting<T, ArrayList<T>, RuntimeException>>() {
+    public static <T> Collector<T, List<T>, RuntimeException> toList() {
+        return new Collector<>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
             @Override
-            public Collecting<T, ArrayList<T>, RuntimeException> get() {
+            public Collecting<T, List<T>, RuntimeException> get() {
                 return CollectorState.toList();
+            }
+        });
+    }
+
+    public static <T extends Comparable<? super T>> Collector<T, List<T>, RuntimeException> toSortedList() {
+        return new Collector<>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
+            @Override
+            public Collecting<T, List<T>, RuntimeException> get() {
+                return CollectorState.toSortedList();
+            }
+        });
+    }
+
+    /**
+     * @param limit limit on the size of resulting list.
+     *        If stream contains more than limit elements only first limit elements are returned
+     *
+     * @return the list of several first minimal elements
+     */
+    public static <T extends Comparable<? super T>> Collector<T, List<T>, RuntimeException> toSortedList(final int limit) {
+        return new Collector<>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
+            @Override
+            public Collecting<T, List<T>, RuntimeException> get() {
+                return CollectorState.toSortedList(limit);
             }
         });
     }

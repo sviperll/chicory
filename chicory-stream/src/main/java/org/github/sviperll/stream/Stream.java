@@ -163,7 +163,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<U>() {
             @Override
             public void forEach(SaturableConsuming<? super U> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).mapping(function));
+                streamable.forEach(SaturableConsumers.valueOf(consumer).mapping(function));
             }
         });
     }
@@ -172,7 +172,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).mapping(Function.<T>identity()).filtering(predicate));
+                streamable.forEach(SaturableConsumers.valueOf(consumer).mapping(Function.<T>identity()).filtering(predicate));
             }
 
         });
@@ -194,7 +194,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).skipping(offset));
+                streamable.forEach(SaturableConsumers.valueOf(consumer).skipping(offset));
             }
         });
     }
@@ -203,7 +203,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).limiting(size));
+                streamable.forEach(SaturableConsumers.valueOf(consumer).limiting(size));
             }
         });
     }

@@ -37,11 +37,11 @@ public class Function<T, R> implements Applicable<T, R> {
         return function.apply(t);
     }
 
-    public <U> Function<U, R> composeWith(Applicable<U, T> thatFunction) {
+    public <U> Function<U, R> composeWith(Applicable<U, ? extends T> thatFunction) {
         return new Function<>(new ComposedApplicable<>(this.function, thatFunction));
     }
 
-    public <U> Function<T, U> andThen(Applicable<R, U> thatFunction) {
+    public <U> Function<T, U> andThen(Applicable<? super R, U> thatFunction) {
         return new Function<>(new ComposedApplicable<>(thatFunction, this.function));
     }
 

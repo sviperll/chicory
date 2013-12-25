@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -44,8 +45,55 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
         return optional(stateFactory, visitor);
     }
 
-    public static <T> CollectorState<T, ArrayList<T>, RuntimeException> toList() {
-        return toCollection(new ArrayList<T>());
+    public static <T> CollectorState<T, List<T>, RuntimeException> toList() {
+        return CollectorState.<T, List<T>>toCollection(new ArrayList<T>());
+    }
+
+    public static <T extends Comparable<? super T>> CollectorState<T, List<T>, RuntimeException> toSortedList() {
+        Collecting<T, List<T>, RuntimeException> state = new Collecting<T, List<T>, RuntimeException>() {
+            private ArrayList<T> list = new ArrayList<>();
+            @Override
+            public List<T> get() throws RuntimeException {
+                java.util.Collections.sort(list);
+                return list;
+            }
+
+            @Override
+            public void accept(T value) {
+                list.add(value);
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+        };
+        return new CollectorState<>(state, state);
+    }
+
+    public static <T extends Comparable<? super T>> CollectorState<T, List<T>, RuntimeException> toSortedList(final int limit) {
+        Collecting<T, List<T>, RuntimeException> state = new Collecting<T, List<T>, RuntimeException>() {
+            private TreeSet<T> set = new TreeSet<>();
+            @Override
+            public List<T> get() throws RuntimeException {
+                ArrayList<T> list = new ArrayList<>();
+                list.addAll(set);
+                return list;
+            }
+
+            @Override
+            public void accept(T value) {
+                set.add(value);
+                while (set.size() > limit)
+                    set.remove(set.last());
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+        };
+        return new CollectorState<>(state, state);
     }
 
     public static <T> CollectorState<T, HashSet<T>, RuntimeException> toHashSet() {
@@ -201,19 +249,19 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
     }
 
     public CollectorState<T, R, E> limiting(final int limit) {
-        return new CollectorState<>(SaturableConsumer.valueOf(consumer).limiting(limit), supplier);
+        return new CollectorState<>(SaturableConsumers.valueOf(consumer).limiting(limit), supplier);
     }
 
     public CollectorState<T, R, E> skipping(final int offset) {
-        return new CollectorState<>(SaturableConsumer.valueOf(consumer).skipping(offset), supplier);
+        return new CollectorState<>(SaturableConsumers.valueOf(consumer).skipping(offset), supplier);
     }
 
     public CollectorState<T, R, E> filtering(final Evaluatable<? super T> predicate) {
-        return new CollectorState<>(SaturableConsumer.valueOf(consumer).filtering(predicate), supplier);
+        return new CollectorState<>(SaturableConsumers.valueOf(consumer).filtering(predicate), supplier);
     }
 
     public <U> CollectorState<U, R, E> mapping(final Applicable<U, ? extends T> function) {
-        return new CollectorState<>(SaturableConsumer.valueOf(consumer).mapping(function), supplier);
+        return new CollectorState<>(SaturableConsumers.valueOf(consumer).mapping(function), supplier);
     }
 
     public <U> CollectorState<T, U, E> finallyTransforming(final Applicable<? super R, U> function) {
