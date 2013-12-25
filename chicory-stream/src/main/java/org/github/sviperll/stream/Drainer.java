@@ -22,7 +22,15 @@ class Drainer<T> implements Runnable, SaturableConsuming<T> {
 
     @Override
     public void run() {
-        streamable.forEach(this);
+        try {
+            streamable.forEach(this);
+        } catch (RuntimeException ex) {
+            if (!isIteratorClosed) {
+                takeRequest();
+                putResponse(DrainerResponse.<T>error(ex));
+                isIteratorClosed = true;
+            }
+        }
         if (!isIteratorClosed) {
             takeRequest();
             putResponse(DrainerResponse.<T>closed());
@@ -51,6 +59,7 @@ class Drainer<T> implements Runnable, SaturableConsuming<T> {
             } catch (RuntimeException ex) {
                 putResponse(DrainerResponse.<T>error(ex));
                 isIteratorClosed = true;
+                throw ex;
             }
         }
     }
