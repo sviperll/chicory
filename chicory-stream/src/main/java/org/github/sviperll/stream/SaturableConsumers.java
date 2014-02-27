@@ -34,7 +34,7 @@ class SaturableConsumers {
             return new SaturableConsumer<T>() {
                 @Override
                 public SaturableConsumer<T> filtering(Evaluatable<? super T> predicate2) {
-                    return new FusingSaturableConsumer<>(consuming).filtering(Predicate.and(predicate2, predicate));
+                    return new FusingSaturableConsumer<>(consuming).filtering(Predicate.and(predicate, predicate2));
                 }
 
                 @Override
