@@ -26,7 +26,6 @@
  */
 package com.github.sviperll.io;
 
-import com.github.sviperll.io.TruncatedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
