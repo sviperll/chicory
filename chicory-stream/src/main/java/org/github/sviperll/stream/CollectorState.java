@@ -11,6 +11,7 @@ import com.github.sviperll.OptionalVisitor;
 import com.github.sviperll.Supplier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -104,7 +105,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
         return toCollection(new TreeSet<T>());
     }
 
-    static <T, R, E extends Exception> CollectorState<T, R, E> findFirst(OptionalVisitor<? super T, R, E> visitor) {
+    public static <T, R, E extends Exception> CollectorState<T, R, E> findFirst(OptionalVisitor<? super T, R, E> visitor) {
         Applicable<T, Collecting<? super T, T, E>> stateFactory = new Applicable<T, Collecting<? super T, T, E>>() {
             @Override
             public Collecting<T, T, E> apply(final T firstElement) {
@@ -219,6 +220,246 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
         return new CollectorState<>(state, state);
     }
 
+    public static CollectorState<Integer, Integer, RuntimeException> summingInt() {
+        Collecting<Integer, Integer, RuntimeException> state = new Collecting<Integer, Integer, RuntimeException>() {
+            private int sum = 0;
+
+            @Override
+            public void accept(Integer value) {
+                sum += value;
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+
+            @Override
+            public Integer get() throws RuntimeException {
+                return sum;
+            }
+        };
+        return new CollectorState<>(state, state);
+    }
+
+    public static CollectorState<Long, Long, RuntimeException> summingLong() {
+        Collecting<Long, Long, RuntimeException> state = new Collecting<Long, Long, RuntimeException>() {
+            private long sum = 0;
+
+            @Override
+            public void accept(Long value) {
+                sum += value;
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+
+            @Override
+            public Long get() throws RuntimeException {
+                return sum;
+            }
+        };
+        return new CollectorState<>(state, state);
+    }
+
+    public static CollectorState<Double, Double, RuntimeException> summingDouble() {
+        Collecting<Double, Double, RuntimeException> state = new Collecting<Double, Double, RuntimeException>() {
+            private double sum = 0.0;
+
+            @Override
+            public void accept(Double value) {
+                sum += value;
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+
+            @Override
+            public Double get() throws RuntimeException {
+                return sum;
+            }
+        };
+        return new CollectorState<>(state, state);
+    }
+
+    public static CollectorState<Integer, Integer, RuntimeException> productingInt() {
+        Collecting<Integer, Integer, RuntimeException> state = new Collecting<Integer, Integer, RuntimeException>() {
+            private Integer product = 1;
+
+            @Override
+            public void accept(Integer value) {
+                product *= value;
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+
+            @Override
+            public Integer get() throws RuntimeException {
+                return product;
+            }
+        };
+        return new CollectorState<>(state, state);
+    }
+
+    public static CollectorState<Long, Long, RuntimeException> productingLong() {
+        Collecting<Long, Long, RuntimeException> state = new Collecting<Long, Long, RuntimeException>() {
+            private long product = 1;
+
+            @Override
+            public void accept(Long value) {
+                product *= value;
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+
+            @Override
+            public Long get() throws RuntimeException {
+                return product;
+            }
+        };
+        return new CollectorState<>(state, state);
+    }
+
+    public static CollectorState<Double, Double, RuntimeException> productingDouble() {
+        Collecting<Double, Double, RuntimeException> state = new Collecting<Double, Double, RuntimeException>() {
+            private double product = 1;
+
+            @Override
+            public void accept(Double value) {
+                product *= value;
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+
+            @Override
+            public Double get() throws RuntimeException {
+                return product;
+            }
+        };
+        return new CollectorState<>(state, state);
+    }
+
+    public static <T extends Comparable<? super T>, R, E extends Exception> CollectorState<T, R, E> maximum(OptionalVisitor<? super T, R, E> visitor) {
+        Applicable<T, Collecting<? super T, T, E>> stateFactory = new Applicable<T, Collecting<? super T, T, E>>() {
+            @Override
+            public Collecting<T, T, E> apply(final T firstElement) {
+                return new Collecting<T, T, E>() {
+                    private T maximum = firstElement;
+                    @Override
+                    public T get() throws E {
+                        return maximum;
+                    }
+
+                    @Override
+                    public void accept(T value) {
+                        if (value.compareTo(maximum) > 0)
+                            maximum = value;
+                    }
+
+                    @Override
+                    public boolean needsMore() {
+                        return true;
+                    }
+                };
+            }
+        };
+        return optional(stateFactory, visitor);
+    }
+
+    public static <T, R, E extends Exception> CollectorState<T, R, E> maximum(final Comparator<? super T> comparator, OptionalVisitor<? super T, R, E> visitor) {
+        Applicable<T, Collecting<? super T, T, E>> stateFactory = new Applicable<T, Collecting<? super T, T, E>>() {
+            @Override
+            public Collecting<T, T, E> apply(final T firstElement) {
+                return new Collecting<T, T, E>() {
+                    private T maximum = firstElement;
+                    @Override
+                    public T get() throws E {
+                        return maximum;
+                    }
+
+                    @Override
+                    public void accept(T value) {
+                        if (comparator.compare(value, maximum) > 0)
+                            maximum = value;
+                    }
+
+                    @Override
+                    public boolean needsMore() {
+                        return true;
+                    }
+                };
+            }
+        };
+        return optional(stateFactory, visitor);
+    }
+
+    public static <T extends Comparable<? super T>, R, E extends Exception> CollectorState<T, R, E> minimum(OptionalVisitor<? super T, R, E> visitor) {
+        Applicable<T, Collecting<? super T, T, E>> stateFactory = new Applicable<T, Collecting<? super T, T, E>>() {
+            @Override
+            public Collecting<T, T, E> apply(final T firstElement) {
+                return new Collecting<T, T, E>() {
+                    private T minimum = firstElement;
+                    @Override
+                    public T get() throws E {
+                        return minimum;
+                    }
+
+                    @Override
+                    public void accept(T value) {
+                        if (value.compareTo(minimum) < 0)
+                            minimum = value;
+                    }
+
+                    @Override
+                    public boolean needsMore() {
+                        return true;
+                    }
+                };
+            }
+        };
+        return optional(stateFactory, visitor);
+    }
+
+    public static <T, R, E extends Exception> CollectorState<T, R, E> minimum(final Comparator<? super T> comparator, OptionalVisitor<? super T, R, E> visitor) {
+        Applicable<T, Collecting<? super T, T, E>> stateFactory = new Applicable<T, Collecting<? super T, T, E>>() {
+            @Override
+            public Collecting<T, T, E> apply(final T firstElement) {
+                return new Collecting<T, T, E>() {
+                    private T minimum = firstElement;
+                    @Override
+                    public T get() throws E {
+                        return minimum;
+                    }
+
+                    @Override
+                    public void accept(T value) {
+                        if (comparator.compare(value, minimum) < 0)
+                            minimum = value;
+                    }
+
+                    @Override
+                    public boolean needsMore() {
+                        return true;
+                    }
+                };
+            }
+        };
+        return optional(stateFactory, visitor);
+    }
+
     public static <T, R, E extends Exception> CollectorState<T, R, E> valueOf(Collecting<T, R, E> collecting) {
         if (collecting instanceof CollectorState)
             return (CollectorState<T, R, E>)collecting;
@@ -249,19 +490,19 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
     }
 
     public CollectorState<T, R, E> limiting(final int limit) {
-        return new CollectorState<>(SaturableConsumers.valueOf(consumer).limiting(limit), supplier);
+        return new CollectorState<>(SaturableConsumer.valueOf(consumer).limiting(limit), supplier);
     }
 
     public CollectorState<T, R, E> skipping(final int offset) {
-        return new CollectorState<>(SaturableConsumers.valueOf(consumer).skipping(offset), supplier);
+        return new CollectorState<>(SaturableConsumer.valueOf(consumer).skipping(offset), supplier);
     }
 
     public CollectorState<T, R, E> filtering(final Evaluatable<? super T> predicate) {
-        return new CollectorState<>(SaturableConsumers.valueOf(consumer).filtering(predicate), supplier);
+        return new CollectorState<>(SaturableConsumer.valueOf(consumer).filtering(predicate), supplier);
     }
 
     public <U> CollectorState<U, R, E> mapping(final Applicable<U, ? extends T> function) {
-        return new CollectorState<>(SaturableConsumers.valueOf(consumer).mapping(function), supplier);
+        return new CollectorState<>(SaturableConsumer.valueOf(consumer).mapping(function), supplier);
     }
 
     public <U> CollectorState<T, U, E> finallyTransforming(final Applicable<? super R, U> function) {

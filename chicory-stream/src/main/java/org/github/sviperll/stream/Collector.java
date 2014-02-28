@@ -10,6 +10,7 @@ import com.github.sviperll.Evaluatable;
 import com.github.sviperll.OptionalVisitor;
 import com.github.sviperll.Supplier;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -100,7 +101,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         });
     }
 
-    static <T, R, E extends Exception> Collector<T, R, E> findFirst(final OptionalVisitor<? super T, R, E> visitor) {
+    public static <T, R, E extends Exception> Collector<T, R, E> findFirst(final OptionalVisitor<? super T, R, E> visitor) {
         return new Collector<>(new Supplier<Collecting<T, R, E>>() {
             @Override
             public Collecting<T, R, E> get() {
@@ -150,6 +151,96 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
             @Override
             public Collecting<T, Integer, RuntimeException> get() {
                 return CollectorState.counting();
+            }
+        });
+    }
+
+    public static <T extends Comparable<? super T>, R, E extends Exception> Collector<T, R, E> maximum(final OptionalVisitor<T, R, E> optionalVisitor) {
+        return new Collector<>(new Supplier<Collecting<T, R, E>>() {
+            @Override
+            public Collecting<T, R, E> get() {
+                return CollectorState.maximum(optionalVisitor);
+            }
+        });
+    }
+
+    public static <T extends Comparable<? super T>, R, E extends Exception> Collector<T, R, E> minimum(final OptionalVisitor<T, R, E> optionalVisitor) {
+        return new Collector<>(new Supplier<Collecting<T, R, E>>() {
+            @Override
+            public Collecting<T, R, E> get() {
+                return CollectorState.minimum(optionalVisitor);
+            }
+        });
+    }
+
+    public static <T, R, E extends Exception> Collector<T, R, E> maximum(final Comparator<? super T> comparator, final OptionalVisitor<T, R, E> optionalVisitor) {
+        return new Collector<>(new Supplier<Collecting<T, R, E>>() {
+            @Override
+            public Collecting<T, R, E> get() {
+                return CollectorState.maximum(comparator, optionalVisitor);
+            }
+        });
+    }
+
+    public static <T, R, E extends Exception> Collector<T, R, E> minimum(final Comparator<? super T> comparator, final OptionalVisitor<T, R, E> optionalVisitor) {
+        return new Collector<>(new Supplier<Collecting<T, R, E>>() {
+            @Override
+            public Collecting<T, R, E> get() {
+                return CollectorState.minimum(comparator, optionalVisitor);
+            }
+        });
+    }
+
+    public static Collector<Integer, Integer, RuntimeException> summingInt() {
+        return new Collector<>(new Supplier<Collecting<Integer, Integer, RuntimeException>>() {
+            @Override
+            public Collecting<Integer, Integer, RuntimeException> get() {
+                return CollectorState.summingInt();
+            }
+        });
+    }
+
+    public static Collector<Long, Long, RuntimeException> summingLong() {
+        return new Collector<>(new Supplier<Collecting<Long, Long, RuntimeException>>() {
+            @Override
+            public Collecting<Long, Long, RuntimeException> get() {
+                return CollectorState.summingLong();
+            }
+        });
+    }
+
+    public static Collector<Double, Double, RuntimeException> summingDouble() {
+        return new Collector<>(new Supplier<Collecting<Double, Double, RuntimeException>>() {
+            @Override
+            public Collecting<Double, Double, RuntimeException> get() {
+                return CollectorState.summingDouble();
+            }
+        });
+    }
+
+    public static Collector<Integer, Integer, RuntimeException> productingInt() {
+        return new Collector<>(new Supplier<Collecting<Integer, Integer, RuntimeException>>() {
+            @Override
+            public Collecting<Integer, Integer, RuntimeException> get() {
+                return CollectorState.productingInt();
+            }
+        });
+    }
+
+    public static Collector<Long, Long, RuntimeException> productingLong() {
+        return new Collector<>(new Supplier<Collecting<Long, Long, RuntimeException>>() {
+            @Override
+            public Collecting<Long, Long, RuntimeException> get() {
+                return CollectorState.productingLong();
+            }
+        });
+    }
+
+    public static Collector<Double, Double, RuntimeException> productingDouble() {
+        return new Collector<>(new Supplier<Collecting<Double, Double, RuntimeException>>() {
+            @Override
+            public Collecting<Double, Double, RuntimeException> get() {
+                return CollectorState.productingDouble();
             }
         });
     }
