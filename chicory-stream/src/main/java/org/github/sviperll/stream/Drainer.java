@@ -14,7 +14,7 @@ class Drainer<T> implements Runnable, SaturableConsuming<T> {
     private final Streamable<T> streamable;
     private final BlockingQueue<DrainerRequest> requestQueue = new SynchronousQueue<>();
     private final BlockingQueue<DrainerResponse<T>> responseQueue = new SynchronousQueue<>();
-    private boolean isIteratorClosed = false;
+    private DrainerState<T> state = new CommunicatingState();
 
     Drainer(Streamable<T> streamable) {
         this.streamable = streamable;
@@ -25,48 +25,27 @@ class Drainer<T> implements Runnable, SaturableConsuming<T> {
         try {
             streamable.forEach(this);
         } catch (RuntimeException ex) {
-            if (!isIteratorClosed) {
-                takeRequest();
-                putResponse(DrainerResponse.<T>error(ex));
-                isIteratorClosed = true;
-            }
+            state.setException(ex);
         }
-        if (!isIteratorClosed) {
-            takeRequest();
-            putResponse(DrainerResponse.<T>closed());
-        }
+        state.finish();
     }
 
     @Override
-    public void accept(final T value) {
-        if (!isIteratorClosed) {
-            DrainerRequest request = takeRequest();
-            try {
-                request.accept(new DrainerRequestVisitor<Void>() {
-                    @Override
-                    public Void fetch() {
-                        putResponse(DrainerResponse.<T>fetched(value));
-                        return null;
-                    }
-
-                    @Override
-                    public Void close() {
-                        putResponse(DrainerResponse.<T>closed());
-                        isIteratorClosed = true;
-                        return null;
-                    }
-                });
-            } catch (RuntimeException ex) {
-                putResponse(DrainerResponse.<T>error(ex));
-                isIteratorClosed = true;
-                throw ex;
-            }
-        }
+    public void accept(T value) {
+        state.accept(value);
     }
 
     @Override
     public boolean needsMore() {
-        return !isIteratorClosed;
+        return state.needsMore();
+    }
+
+    private void setExceptionCaughtState(RuntimeException ex) {
+        state = new ExceptionCaughtState(ex);
+    }
+
+    private void setClosedState() {
+        state = new ClosedState();
     }
 
     public DrainerResponse<T> fetch() {
@@ -96,7 +75,8 @@ class Drainer<T> implements Runnable, SaturableConsuming<T> {
     private DrainerRequest takeRequest() {
         for (;;) {
             try {
-                return requestQueue.take();
+                DrainerRequest request = requestQueue.take();
+                return request;
             } catch (InterruptedException ex) {
             }
         }
@@ -109,6 +89,102 @@ class Drainer<T> implements Runnable, SaturableConsuming<T> {
                 return;
             } catch (InterruptedException ex) {
             }
+        }
+    }
+
+    private interface DrainerState<T> extends SaturableConsuming<T> {
+        void finish();
+        void setException(RuntimeException ex);
+    }
+
+    private class CommunicatingState implements DrainerState<T> {
+        @Override
+        public void accept(final T value) {
+            DrainerRequest request = takeRequest();
+            try {
+                request.accept(new DrainerRequestVisitor<Void>() {
+                    @Override
+                    public Void fetch() {
+                        putResponse(DrainerResponse.<T>fetched(value));
+                        return null;
+                    }
+
+                    @Override
+                    public Void close() {
+                        setClosedState();
+                        return null;
+                    }
+                });
+            } catch (RuntimeException ex) {
+                setExceptionCaughtState(ex);
+                throw ex;
+            }
+        }
+
+        @Override
+        public boolean needsMore() {
+            return true;
+        }
+
+        @Override
+        public void finish() {
+            takeRequest();
+            putResponse(DrainerResponse.<T>closed());
+        }
+
+        @Override
+        public void setException(RuntimeException ex) {
+            takeRequest();
+            setExceptionCaughtState(ex);
+        }
+    }
+
+    private class ClosedState implements DrainerState<T> {
+        @Override
+        public void accept(T value) {
+        }
+
+        @Override
+        public boolean needsMore() {
+            return false;
+        }
+
+        @Override
+        public void finish() {
+            putResponse(DrainerResponse.<T>closed());
+        }
+
+        @Override
+        public void setException(RuntimeException ex) {
+            setExceptionCaughtState(ex);
+        }
+    }
+
+
+    private class ExceptionCaughtState implements DrainerState<T> {
+        private final RuntimeException exception;
+
+        private ExceptionCaughtState(RuntimeException exception) {
+            this.exception = exception;
+        }
+
+        @Override
+        public void accept(T value) {
+        }
+
+        @Override
+        public boolean needsMore() {
+            return false;
+        }
+
+        @Override
+        public void finish() {
+            putResponse(DrainerResponse.<T>error(exception));
+        }
+
+        @Override
+        public void setException(RuntimeException ex) {
+            setExceptionCaughtState(ex);
         }
     }
 }

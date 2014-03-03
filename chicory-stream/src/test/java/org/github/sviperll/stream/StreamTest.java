@@ -4,7 +4,6 @@
 package org.github.sviperll.stream;
 
 import com.github.sviperll.Applicable;
-import com.github.sviperll.Consumer;
 import com.github.sviperll.Evaluatable;
 import com.github.sviperll.Function;
 import com.github.sviperll.Predicate;
@@ -21,7 +20,7 @@ import static org.junit.Assert.*;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 public class StreamTest {
-    private boolean isOpened = false;
+    private volatile boolean isOpened = false;
 
     public StreamTest() {
     }
@@ -74,6 +73,8 @@ public class StreamTest {
                 consumer.accept(1);
                 consumer.accept(2);
                 consumer.accept(3);
+                consumer.accept(4);
+                consumer.accept(5);
                 isOpened = false;
             }
         });
@@ -82,6 +83,7 @@ public class StreamTest {
         assert(isOpened);
         assertEquals(1, iterator.next().intValue());
         assertEquals(2, iterator.next().intValue());
+        assert(isOpened); // Should not be closed before all values are read
         iterator.close();
         assert(!isOpened); // Should close stream as soon as requested
     }

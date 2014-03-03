@@ -95,7 +95,8 @@ class StreamIterator<T> implements CloseableIterator<T> {
         @Override
         public T next() {
             T result = value;
-            drainer.fetch().accept(new DrainerResponseVisitor<T, Void>() {
+            DrainerResponse<T> response = drainer.fetch();
+            response.accept(new DrainerResponseVisitor<T, Void>() {
                 @Override
                 public Void fetched(T newValue) {
                     value = newValue;
@@ -124,7 +125,8 @@ class StreamIterator<T> implements CloseableIterator<T> {
 
         @Override
         public void close() throws IOException {
-            drainer.close().accept(new DrainerResponseVisitor<T, Void>() {
+            DrainerResponse<T> response = drainer.close();
+            response.accept(new DrainerResponseVisitor<T, Void>() {
                 @Override
                 public Void fetched(T value) {
                     throw new IllegalStateException("Stream not closed in response to CLOSE request");
