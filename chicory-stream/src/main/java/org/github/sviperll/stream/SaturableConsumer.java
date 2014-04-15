@@ -75,7 +75,7 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
 
         @Override
         SaturableConsumer<T> filtering(Evaluatable<? super T> predicate2) {
-            return new FilteringSaturableConsumer<>(original, Predicate.convert(predicate1).and(Predicate.convert(predicate2)));
+            return new FilteringSaturableConsumer<>(original, Predicate.and(predicate1, predicate2));
         }
 
         @Override

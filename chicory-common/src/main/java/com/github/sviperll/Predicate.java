@@ -26,23 +26,33 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         return (Predicate<T>)FALSE;
     }
 
-    public static <T> Predicate<T> and(List<Evaluatable<? super T>> predicates) {
+    public static <T> Predicate<T> and(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
+        Predicate<T> predicate = valueOf(predicate1);
+        return predicate.and(predicate2);
+    }
+
+    public static <T> Predicate<T> or(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
+        Predicate<T> predicate = valueOf(predicate1);
+        return predicate.or(predicate2);
+    }
+
+    public static <T> Predicate<T> and(List<? extends Evaluatable<? super T>> predicates) {
         Predicate<T> result = truePredicate();
         for (Evaluatable<? super T> e: predicates) {
-            result = result.and(convert(e));
+            result = Predicate.and(result, e);
         }
         return result;
     }
 
-    public static <T> Predicate<T> or(List<Evaluatable<? super T>> predicates) {
+    public static <T> Predicate<T> or(List<? extends Evaluatable<? super T>> predicates) {
         Predicate<T> result = falsePredicate();
         for (Evaluatable<? super T> e: predicates) {
-            result = result.or(convert(e));
+            result = Predicate.or(result, e);
         }
         return result;
     }
 
-    public static <T> Predicate<T> valueOf(final Function<T, Boolean> function) {
+    public static <T> Predicate<T> valueOf(final Function<? super T, Boolean> function) {
         return valueOf(new Evaluatable<T>() {
             @Override
             public boolean evaluate(T t) {
@@ -51,17 +61,11 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         });
     }
 
-    public static <T> Predicate<T> valueOf(final Evaluatable<T> evaluatable) {
-        if (evaluatable instanceof Predicate)
-            return (Predicate<T>)evaluatable;
-        else {
-            return new SimplePredicate<>(evaluatable);
-        }
-    }
-
     @SuppressWarnings("unchecked")
-    public static <T> Predicate<T> convert(final Evaluatable<? super T> evaluatable) {
+    public static <T> Predicate<T> valueOf(final Evaluatable<? super T> evaluatable) {
         if (evaluatable instanceof Predicate)
+            // Predicate is covariant in it's type argument,
+            // so this cast is safe!
             return (Predicate<T>)evaluatable;
         else {
             return new SimplePredicate<>(evaluatable);
@@ -72,8 +76,8 @@ public abstract class Predicate<T> implements Evaluatable<T> {
     }
 
     public abstract Predicate<T> not();
-    public abstract Predicate<T> and(Evaluatable<T> that);
-    public abstract Predicate<T> or(Evaluatable<T> that);
+    public abstract Predicate<T> and(Evaluatable<? super T> that);
+    public abstract Predicate<T> or(Evaluatable<? super T> that);
     public Function<T, Boolean> asFunction() {
         return Function.valueOf(new Applicable<T, Boolean>() {
             @Override
@@ -95,12 +99,12 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         }
 
         @Override
-        public Predicate<T> and(Evaluatable<T> that) {
+        public Predicate<T> and(Evaluatable<? super T> that) {
             return new AndPredicate<>(this, that);
         }
 
         @Override
-        public Predicate<T> or(Evaluatable<T> that) {
+        public Predicate<T> or(Evaluatable<? super T> that) {
             return new OrPredicate<>(this, that);
         }
 
@@ -117,12 +121,12 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         }
 
         @Override
-        public Predicate<T> and(Evaluatable<T> that) {
+        public Predicate<T> and(Evaluatable<? super T> that) {
             return new AndPredicate<>(this, that);
         }
 
         @Override
-        public Predicate<T> or(Evaluatable<T> that) {
+        public Predicate<T> or(Evaluatable<? super T> that) {
             return new OrPredicate<>(this, that);
         }
 
@@ -139,12 +143,12 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         }
 
         @Override
-        public Predicate<T> and(Evaluatable<T> that) {
+        public Predicate<T> and(Evaluatable<? super T> that) {
             return new AndPredicate<>(this, that);
         }
 
         @Override
-        public Predicate<T> or(Evaluatable<T> that) {
+        public Predicate<T> or(Evaluatable<? super T> that) {
             return new OrPredicate<>(this, that);
         }
 
@@ -155,8 +159,8 @@ public abstract class Predicate<T> implements Evaluatable<T> {
     }
 
     private static class NotPredicate<T> extends Predicate<T> {
-        private final Evaluatable<T> original;
-        public NotPredicate(Evaluatable<T> original) {
+        private final Evaluatable<? super T> original;
+        public NotPredicate(Evaluatable<? super T> original) {
             this.original = original;
         }
 
@@ -166,12 +170,12 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         }
 
         @Override
-        public Predicate<T> and(Evaluatable<T> that) {
+        public Predicate<T> and(Evaluatable<? super T> that) {
             return new AndPredicate<>(this, that);
         }
 
         @Override
-        public Predicate<T> or(Evaluatable<T> that) {
+        public Predicate<T> or(Evaluatable<? super T> that) {
             return new OrPredicate<>(this, that);
         }
 
@@ -182,9 +186,9 @@ public abstract class Predicate<T> implements Evaluatable<T> {
     }
 
     private static class AndPredicate<T> extends Predicate<T> {
-        private final Evaluatable<T> predicate1;
-        private final Evaluatable<T> predicate2;
-        public AndPredicate(Evaluatable<T> predicate1, Evaluatable<T> predicate2) {
+        private final Evaluatable<? super T> predicate1;
+        private final Evaluatable<? super T> predicate2;
+        public AndPredicate(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
             this.predicate1 = predicate1;
             this.predicate2 = predicate2;
         }
@@ -195,12 +199,12 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         }
 
         @Override
-        public Predicate<T> and(Evaluatable<T> predicate3) {
+        public Predicate<T> and(Evaluatable<? super T> predicate3) {
             return new AndPredicate<>(predicate1, valueOf(predicate2).and(predicate3));
         }
 
         @Override
-        public Predicate<T> or(Evaluatable<T> that) {
+        public Predicate<T> or(Evaluatable<? super T> that) {
             return new OrPredicate<>(this, that);
         }
 
@@ -211,9 +215,9 @@ public abstract class Predicate<T> implements Evaluatable<T> {
     }
 
     private static class OrPredicate<T> extends Predicate<T> {
-        private final Evaluatable<T> predicate1;
-        private final Evaluatable<T> predicate2;
-        public OrPredicate(Evaluatable<T> predicate1, Evaluatable<T> predicate2) {
+        private final Evaluatable<? super T> predicate1;
+        private final Evaluatable<? super T> predicate2;
+        public OrPredicate(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
             this.predicate1 = predicate1;
             this.predicate2 = predicate2;
         }
@@ -224,12 +228,12 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         }
 
         @Override
-        public Predicate<T> and(Evaluatable<T> that) {
+        public Predicate<T> and(Evaluatable<? super T> that) {
             return new AndPredicate<>(this, that);
         }
 
         @Override
-        public Predicate<T> or(Evaluatable<T> predicate3) {
+        public Predicate<T> or(Evaluatable<? super T> predicate3) {
             return new OrPredicate<>(predicate1, valueOf(predicate2).or(predicate3));
         }
 
