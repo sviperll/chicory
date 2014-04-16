@@ -16,7 +16,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
         return (Isomorphism<T, T>)ID;
     }
 
-    public static <T, U> Isomorphism<T, U> of(final Applicable<T, U> forward, final Applicable<U, T> backward) {
+    public static <T, U> Isomorphism<T, U> of(final Applicable<? super T, U> forward, final Applicable<? super U, T> backward) {
         return valueOf(new IsomorphismDefinition<T, U>() {
             @Override
             public U forward(T object) {
@@ -31,7 +31,10 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public static <T, U> Isomorphism<T, U> valueOf(IsomorphismDefinition<T, U> isomorphism) {
-        return new Isomorphism<>(isomorphism);
+        if (isomorphism instanceof Isomorphism)
+            return (Isomorphism<T, U>)isomorphism;
+        else
+            return new Isomorphism<>(isomorphism);
     }
 
     private final IsomorphismDefinition<T, U> isomorphism;

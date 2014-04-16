@@ -20,15 +20,18 @@ public class Function<T, R> implements Applicable<T, R> {
         return (Function<T, R>)ID;
     }
 
-    public static <T, R> Function<T, R> valueOf(Applicable<T, R> function) {
-        if (function instanceof Function)
+    @SuppressWarnings({"unchecked"})
+    public static <T, R> Function<T, R> valueOf(Applicable<? super T, R> function) {
+        if (function instanceof Function) {
+            // Applicable is covariant in it's first argument
+            // so this cast is safe
             return (Function<T, R>)function;
-        else
+        } else
             return new Function<>(function);
     }
 
-    private final Applicable<T, R> function;
-    private Function(Applicable<T, R> function) {
+    private final Applicable<? super T, R> function;
+    private Function(Applicable<? super T, R> function) {
         this.function = function;
     }
 
@@ -75,8 +78,8 @@ public class Function<T, R> implements Applicable<T, R> {
     }
 
     private static class PassingNullThroughApplicable<T, R> implements Applicable<T, R> {
-        private final Applicable<T, R> function;
-        public PassingNullThroughApplicable(Applicable<T, R> function) {
+        private final Applicable<? super T, R> function;
+        public PassingNullThroughApplicable(Applicable<? super T, R> function) {
             this.function = function;
         }
 
@@ -90,8 +93,8 @@ public class Function<T, R> implements Applicable<T, R> {
     }
 
     private static class ThrowingOnNullApplicable<T, R> implements Applicable<T, R> {
-        private final Applicable<T, R> function;
-        public ThrowingOnNullApplicable(Applicable<T, R> function) {
+        private final Applicable<? super T, R> function;
+        public ThrowingOnNullApplicable(Applicable<? super T, R> function) {
             this.function = function;
         }
 
