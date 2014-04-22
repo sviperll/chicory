@@ -26,12 +26,12 @@
  */
 package com.github.sviperll.io;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import org.junit.Test;
+import java.io.IOException;
+import java.io.InputStream;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class TruncatedInputStreamTest {
     @Test

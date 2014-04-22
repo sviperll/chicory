@@ -15,11 +15,11 @@ public class SlicingQueries {
     private static final UnlimitedQuery UNLIMITED_REPOSITORY_SLICING = new UnlimitedQuery();
 
     public static <T> SlicingQuery<T> firstN(final int limit) {
-        return new FirstNQuery<T>(limit);
+        return new FirstNQuery<>(limit);
     }
 
     public static <T> SlicingQuery<T> lastN(final int limit) {
-        return new LastNQuery<T>(limit);
+        return new LastNQuery<>(limit);
     }
 
     @SuppressWarnings("unchecked")
@@ -28,11 +28,11 @@ public class SlicingQueries {
     }
 
     public static <T> SlicingQuery<T> firstNAfter(final int limit, final T value) {
-        return new FirstNAfterSomeQuery<T>(limit, value);
+        return new FirstNAfterSomeQuery<>(limit, value);
     }
 
     public static <T> SlicingQuery<T> lastNBefore(final int limit, final T value) {
-        return new LastNBeforeSomeQuery<T>(limit, value);
+        return new LastNBeforeSomeQuery<>(limit, value);
     }
 
     private SlicingQueries() {

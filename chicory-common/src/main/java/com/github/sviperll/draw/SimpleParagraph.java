@@ -26,6 +26,7 @@
  */
 package com.github.sviperll.draw;
 
+import com.github.sviperll.draw.TextLine.TextAlignment;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.font.FontRenderContext;
@@ -36,7 +37,6 @@ import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.Map;
 import java.util.TreeMap;
-import com.github.sviperll.draw.TextLine.TextAlignment;
 
 public class SimpleParagraph implements Drawable {
     private final TextLine lines;
@@ -51,7 +51,7 @@ public class SimpleParagraph implements Drawable {
 
     @Override
     public void draw(Graphics2D graphics, Point location) {
-        Map<TextAttribute, Object> attrs = new TreeMap<TextAttribute, Object>();
+        Map<TextAttribute, Object> attrs = new TreeMap<>();
         attrs.put(TextAttribute.FONT, graphics.getFont());
 
         AttributedString as = new AttributedString(lines.text(), attrs);

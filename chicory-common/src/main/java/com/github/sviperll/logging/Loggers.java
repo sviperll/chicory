@@ -27,13 +27,13 @@
 
 package com.github.sviperll.logging;
 
+import com.github.sviperll.DateFormats;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import com.github.sviperll.DateFormats;
 
 /**
  * Loggers is a facade-class. With methods to create loggers for common use-patterns.

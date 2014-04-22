@@ -33,11 +33,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class CLISpecification {
-    private final Map<String, String> usage = new TreeMap<String, String>();
-    private final Map<Character, CLIFlagHandler> shortFlagHandlers = new TreeMap<Character, CLIFlagHandler>();
-    private final Map<String, CLIFlagHandler> longFlagHandlers = new TreeMap<String, CLIFlagHandler>();
-    private final Map<Character, CLIParameterHandler> shortParameterHandlers = new TreeMap<Character, CLIParameterHandler>();
-    private final Map<String, CLIParameterHandler> longParameterHandlers = new TreeMap<String, CLIParameterHandler>();
+    private final Map<String, String> usage = new TreeMap<>();
+    private final Map<Character, CLIFlagHandler> shortFlagHandlers = new TreeMap<>();
+    private final Map<String, CLIFlagHandler> longFlagHandlers = new TreeMap<>();
+    private final Map<Character, CLIParameterHandler> shortParameterHandlers = new TreeMap<>();
+    private final Map<String, CLIParameterHandler> longParameterHandlers = new TreeMap<>();
 
     public void add(char c, String s, String description, CLIFlagHandler handler) {
         newFlagOpt(c, description);
@@ -83,7 +83,7 @@ public class CLISpecification {
     }
 
     public String[] run(String[] args) throws CLIException {
-        List<String> unprocessed = new ArrayList<String>();
+        List<String> unprocessed = new ArrayList<>();
         Parser p = new Parser(args);
         for (;;) {
             if (p.isEndOfArgs()) {

@@ -27,8 +27,6 @@
 
 package com.github.sviperll;
 
-import com.github.sviperll.SimpleDateFormatFactory;
-
 /**
  * DateFormats facade-class provides constants for common date formats.
  */

@@ -4,9 +4,9 @@
 
 package com.github.sviperll.repository;
 
-import com.github.sviperll.ClassStructure4;
-import com.github.sviperll.ClassStructure3;
 import com.github.sviperll.ClassStructure2;
+import com.github.sviperll.ClassStructure3;
+import com.github.sviperll.ClassStructure4;
 import com.github.sviperll.IsomorphismDefinition;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,7 +67,7 @@ public class StorableClasses {
         return new StorableClass<T>() {
             @Override
             public List<? extends AtomicStorableClassComponent<T, ?>> getAtomicComponents() {
-                List<AtomicStorableClassComponent<T, ?>> list = new ArrayList<AtomicStorableClassComponent<T, ?>>();
+                List<AtomicStorableClassComponent<T, ?>> list = new ArrayList<>();
                 list.add(new AtomicStorableClassComponent<T, U>() {
                     @Override
                     public TableColumn<U> getColumn() {
@@ -104,7 +104,7 @@ public class StorableClasses {
         return new StorableClass<T>() {
             @Override
             public List<? extends AtomicStorableClassComponent<T, ?>> getAtomicComponents() {
-                List<AtomicStorableClassComponent<T, ?>> list = new ArrayList<AtomicStorableClassComponent<T, ?>>();
+                List<AtomicStorableClassComponent<T, ?>> list = new ArrayList<>();
                 list.add(new AtomicStorableClassComponent<T, U>() {
                     @Override
                     public TableColumn<U> getColumn() {
@@ -155,7 +155,7 @@ public class StorableClasses {
         return new StorableClass<T>() {
             @Override
             public List<? extends AtomicStorableClassComponent<T, ?>> getAtomicComponents() {
-                List<AtomicStorableClassComponent<T, ?>> list = new ArrayList<AtomicStorableClassComponent<T, ?>>();
+                List<AtomicStorableClassComponent<T, ?>> list = new ArrayList<>();
                 list.add(new AtomicStorableClassComponent<T, U>() {
                     @Override
                     public TableColumn<U> getColumn() {
@@ -215,7 +215,7 @@ public class StorableClasses {
     }
 
     public static <T, U> StorableClass<T> create(final StorableClass<U> baseTuple, final IsomorphismDefinition<T, U> structure) {
-        final List<AtomicStorableClassComponent<T, ?>> elements = new ArrayList<AtomicStorableClassComponent<T, ?>>();
+        final List<AtomicStorableClassComponent<T, ?>> elements = new ArrayList<>();
         for (AtomicStorableClassComponent<U, ?> element: baseTuple.getAtomicComponents()) {
             elements.add(convertElement(element, structure));
         }
@@ -233,7 +233,7 @@ public class StorableClasses {
     }
 
     public static <T, U, V> StorableClass<T> create(final StorableClass<U> baseTuple1, final StorableClass<V> baseTuple2, final ClassStructure2<T, U, V> structure) {
-        final List<AtomicStorableClassComponent<T, ?>> elements = new ArrayList<AtomicStorableClassComponent<T, ?>>();
+        final List<AtomicStorableClassComponent<T, ?>> elements = new ArrayList<>();
         for (AtomicStorableClassComponent<U, ?> element: baseTuple1.getAtomicComponents()) {
             elements.add(convertElement1(element, structure));
         }
@@ -256,7 +256,7 @@ public class StorableClasses {
     }
 
     public static <T, U, V, W> StorableClass<T> create(final StorableClass<U> baseTuple1, final StorableClass<V> baseTuple2, final StorableClass<W> baseTuple3, final ClassStructure3<T, U, V, W> structure) {
-        final List<AtomicStorableClassComponent<T, ?>> elements = new ArrayList<AtomicStorableClassComponent<T, ?>>();
+        final List<AtomicStorableClassComponent<T, ?>> elements = new ArrayList<>();
         for (AtomicStorableClassComponent<U, ?> element: baseTuple1.getAtomicComponents()) {
             elements.add(convertElement1(element, structure));
         }
@@ -283,7 +283,7 @@ public class StorableClasses {
     }
 
     public static <T, U, V, W, X> StorableClass<T> create(final StorableClass<U> baseTuple1, final StorableClass<V> baseTuple2, final StorableClass<W> baseTuple3, final StorableClass<X> baseTuple4, final ClassStructure4<T, U, V, W, X> structure) {
-        final List<AtomicStorableClassComponent<T, ?>> elements = new ArrayList<AtomicStorableClassComponent<T, ?>>();
+        final List<AtomicStorableClassComponent<T, ?>> elements = new ArrayList<>();
         for (AtomicStorableClassComponent<U, ?> element: baseTuple1.getAtomicComponents())
             elements.add(convertElement1(element, structure));
         for (AtomicStorableClassComponent<V, ?> element: baseTuple2.getAtomicComponents())

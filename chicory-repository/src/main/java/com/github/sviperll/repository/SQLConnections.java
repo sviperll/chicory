@@ -14,4 +14,7 @@ public class SQLConnections {
     public static SQLConnection createInstance(Connection connection) {
         return SimpleSQLConnection.createInstance(connection);
     }
+
+    private SQLConnections() {
+    }
 }

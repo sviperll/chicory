@@ -3,13 +3,13 @@
  */
 package org.github.sviperll.stream;
 
+import com.github.sviperll.Applicable;
 import com.github.sviperll.BiApplicable;
 import com.github.sviperll.BinaryOperatorDefinition;
 import com.github.sviperll.Consumer;
-import com.github.sviperll.Applicable;
-import com.github.sviperll.OptionalVisitor;
 import com.github.sviperll.Evaluatable;
 import com.github.sviperll.Function;
+import com.github.sviperll.OptionalVisitor;
 import com.github.sviperll.Supplier;
 import com.github.sviperll.UnaryOperatorDefinition;
 

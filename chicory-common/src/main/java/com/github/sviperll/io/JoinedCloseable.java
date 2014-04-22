@@ -41,9 +41,7 @@ public class JoinedCloseable implements Closeable {
         for (Closeable closeable: closeables) {
             try {
                 closeable.close();
-            } catch (IOException ex) {
-                exception = ex;
-            } catch (RuntimeException ex) {
+            } catch (    IOException | RuntimeException ex) {
                 exception = ex;
             }
         }

@@ -26,7 +26,6 @@
  */
 package com.github.sviperll;
 
-import com.github.sviperll.ByteArray;
 import java.util.Arrays;
 import org.junit.Test;
 import static org.junit.Assert.*;

@@ -47,11 +47,8 @@ public class Base64 {
     public static byte[] encode(byte[] bytes) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            OutputStream os = createOneLineEncoderOutputStream(baos);
-            try {
+            try (OutputStream os = createOneLineEncoderOutputStream(baos)) {
                 os.write(bytes);
-            } finally {
-                os.close();
             }
             return baos.toByteArray();
         } catch (IOException ex) {
@@ -75,11 +72,8 @@ public class Base64 {
     public static byte[] encodeIntoMultipleLines(byte[] bytes) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            OutputStream os = createEncoderOutputStream(baos);
-            try {
+            try (OutputStream os = createEncoderOutputStream(baos)) {
                 os.write(bytes);
-            } finally {
-                os.close();
             }
             return baos.toByteArray();
         } catch (IOException ex) {
@@ -101,11 +95,8 @@ public class Base64 {
     public static byte[] encodeIntoMultipleLines(byte[] bytes, int splitLinesAt) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            OutputStream os = createEncoderOutputStream(baos, splitLinesAt);
-            try {
+            try (OutputStream os = createEncoderOutputStream(baos, splitLinesAt)) {
                 os.write(bytes);
-            } finally {
-                os.close();
             }
             return baos.toByteArray();
         } catch (IOException ex) {

@@ -42,7 +42,7 @@ public class ByteBufferPool {
       * Every allocated buffer is cached and is never freed.
       */
     private static class HardByteBufferPool implements ByteBufferAllocator {
-        private final Deque<HardCachedByteBuffer> cache = new ArrayDeque<HardCachedByteBuffer>();
+        private final Deque<HardCachedByteBuffer> cache = new ArrayDeque<>();
         private final int size;
         public HardByteBufferPool(int size) {
             this.size = size;
@@ -92,7 +92,7 @@ public class ByteBufferPool {
      * Byte buffers are freed using the "soft" policy of JVM.
      */
     private static class SoftByteBufferPool implements ByteBufferAllocator {
-        private final Deque<SoftReference<SoftCachedByteBuffer>> cache = new ArrayDeque<SoftReference<SoftCachedByteBuffer>>();
+        private final Deque<SoftReference<SoftCachedByteBuffer>> cache = new ArrayDeque<>();
         private final int size;
         public SoftByteBufferPool(int size) {
             this.size = size;
@@ -134,7 +134,7 @@ public class ByteBufferPool {
 
             @Override
             public void free() {
-                offerCache(new SoftReference<SoftCachedByteBuffer>(this));
+                offerCache(new SoftReference<>(this));
             }
         }
     }
@@ -144,7 +144,7 @@ public class ByteBufferPool {
      * Byte buffers are freed using the "weak" policy of JVM.
      */
     private static class WeakByteBufferPool implements ByteBufferAllocator {
-        private final Deque<WeakReference<WeakCachedByteBuffer>> cache = new ArrayDeque<WeakReference<WeakCachedByteBuffer>>();
+        private final Deque<WeakReference<WeakCachedByteBuffer>> cache = new ArrayDeque<>();
         private final int size;
         public WeakByteBufferPool(int size) {
             this.size = size;
@@ -186,7 +186,7 @@ public class ByteBufferPool {
 
             @Override
             public void free() {
-                offerCache(new WeakReference<WeakCachedByteBuffer>(this));
+                offerCache(new WeakReference<>(this));
             }
         }
     }

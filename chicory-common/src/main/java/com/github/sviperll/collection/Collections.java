@@ -38,32 +38,32 @@ import java.util.TreeSet;
 public class Collections {
     /** Created new mobifieble TreeMap instance */
     public static <K, V> Map<K, V> newTreeMap() {
-        return new TreeMap<K, V>();
+        return new TreeMap<>();
     }
 
     /** Created new mobifieble HashMap instance */
     public static <K, V> Map<K, V> newHashMap() {
-        return new HashMap<K, V>();
+        return new HashMap<>();
     }
 
     /** Created new mobifieble TreeSet instance */
     public static <E> Set<E> newTreeSet() {
-        return new TreeSet<E>();
+        return new TreeSet<>();
     }
 
     /** Created new mobifieble HashSet instance */
     public static <E> Set<E> newHashSet() {
-        return new HashSet<E>();
+        return new HashSet<>();
     }
 
     /** Created new mobifieble ArrayList instance */
     public static <E> List<E> newArrayList() {
-        return new ArrayList<E>();
+        return new ArrayList<>();
     }
 
     /** Created new mobifieble ArrayList instance of given capacity */
     public static <E> List<E> newArrayList(int capacity) {
-        return new ArrayList<E>(capacity);
+        return new ArrayList<>(capacity);
     }
 
     /** Created new mobifieble ArrayList instance with one given element */

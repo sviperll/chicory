@@ -1,10 +1,10 @@
 package com.github.sviperll.repository;
 
+import com.github.sviperll.repository.SlicingQuery.SlicingQueryCondition;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
-import com.github.sviperll.repository.SlicingQuery.SlicingQueryCondition;
 
 class SQLBuilder implements Appendable, CharSequence {
     private final StringBuilder stringBuilder = new StringBuilder();

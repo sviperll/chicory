@@ -20,8 +20,7 @@ import java.nio.charset.Charset;
 
 public class Files {
     public static String read(File passwordFile, Charset charset) throws FileNotFoundException, IOException {
-        InputStream stream = new BufferedInputStream(new FileInputStream(passwordFile));
-        try {
+        try (InputStream stream = new BufferedInputStream(new FileInputStream(passwordFile))) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, charset));
             StringBuilder builder = new StringBuilder();
             char[] buffer = new char[2048];
@@ -29,22 +28,17 @@ public class Files {
             while ((bytesRead = reader.read(buffer)) >= 0)
                 builder.append(buffer, 0, bytesRead);
             return builder.toString();
-        } finally {
-            stream.close();
         }
     }
 
     public static void write(File file, String contents, Charset charset) throws IOException {
-        BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
-        try {
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, charset));
             try {
                 writer.write(contents);
             } finally {
                 writer.flush();
             }
-        } finally {
-            outputStream.close();
         }
     }
 

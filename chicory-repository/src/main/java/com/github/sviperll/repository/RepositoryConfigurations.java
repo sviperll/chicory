@@ -96,4 +96,7 @@ public class RepositoryConfigurations {
             }
         };
     }
+
+    private RepositoryConfigurations() {
+    }
 }

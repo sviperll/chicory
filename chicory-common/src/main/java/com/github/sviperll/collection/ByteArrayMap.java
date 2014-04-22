@@ -26,11 +26,11 @@
  */
 package com.github.sviperll.collection;
 
+import com.github.sviperll.ByteArray;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import com.github.sviperll.ByteArray;
 
 public class ByteArrayMap<V> implements Map<ByteArray, V> {
     private final Map<ByteArray, V> map;

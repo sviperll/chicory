@@ -10,10 +10,10 @@ import com.github.sviperll.Predicate;
 import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -55,13 +55,13 @@ public class StreamTest {
             }
         });
         assert(!isOpened);
-        CloseableIterator<Integer> iterator = test.openIterator();
-        assert(isOpened);
-        assertEquals(1, iterator.next().intValue());
-        assertEquals(2, iterator.next().intValue());
-        assertEquals(3, iterator.next().intValue());
-        assert(!isOpened); // Should close stream as soon as all elements are read
-        iterator.close();
+        try (CloseableIterator<Integer> iterator = test.openIterator()) {
+            assert(isOpened);
+            assertEquals(1, iterator.next().intValue());
+            assertEquals(2, iterator.next().intValue());
+            assertEquals(3, iterator.next().intValue());
+            assert(!isOpened);
+        }
     }
 
     @Test
@@ -79,12 +79,12 @@ public class StreamTest {
             }
         });
         assert(!isOpened);
-        CloseableIterator<Integer> iterator = test.openIterator();
-        assert(isOpened);
-        assertEquals(1, iterator.next().intValue());
-        assertEquals(2, iterator.next().intValue());
-        assert(isOpened); // Should not be closed before all values are read
-        iterator.close();
+        try (CloseableIterator<Integer> iterator = test.openIterator()) {
+            assert(isOpened);
+            assertEquals(1, iterator.next().intValue());
+            assertEquals(2, iterator.next().intValue());
+            assert(isOpened);
+        }
         assert(!isOpened); // Should close stream as soon as requested
     }
 
@@ -105,19 +105,19 @@ public class StreamTest {
             }
         });
         assert(!isOpened);
-        CloseableIterator<Integer> iterator = test.openIterator();
-        assert(isOpened);
-        assertEquals(1, iterator.next().intValue());
-        assertEquals(2, iterator.next().intValue());
+        try (CloseableIterator<Integer> iterator = test.openIterator()) {
+            assert(isOpened);
+            assertEquals(1, iterator.next().intValue());
+            assertEquals(2, iterator.next().intValue());
 
-        try {
-            iterator.next();
-            assert(false); // Should never be reached
-        } catch (ExpectedException ex) {
-            assert(true); // Exception should be thrown
+            try {
+                iterator.next();
+                assert(false); // Should never be reached
+            } catch (ExpectedException ex) {
+                assert(true); // Exception should be thrown
+                assert(!isOpened); // Should close stream as soon as exception is thrown
+            }
         }
-        assert(!isOpened); // Should close stream as soon as exception is thrown
-        iterator.close();
     }
 
     @Test

@@ -10,7 +10,7 @@ package com.github.sviperll.repository;
  */
 public class Changed<T> {
     public static <T> Changed<T> fromTo(T oldValue, T newValue) {
-        return new Changed<T>(oldValue, newValue);
+        return new Changed<>(oldValue, newValue);
     }
 
     private final T oldValue;

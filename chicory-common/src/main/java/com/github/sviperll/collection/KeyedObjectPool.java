@@ -27,11 +27,11 @@ public class KeyedObjectPool {
     public static <K, V> KeyedObjectFactory<K, V> createInstance(KeyedObjectFactory<K, V> factory, RetainPolicy policy) {
         switch(policy) {
             case HARD:
-                return new HardKeyedObjectPool<K, V>(factory);
+                return new HardKeyedObjectPool<>(factory);
             case SOFT:
-                return new SoftKeyedObjectPool<K, V>(factory);
+                return new SoftKeyedObjectPool<>(factory);
             case WEAK:
-                return new WeakKeyedObjectPool<K, V>(factory);
+                return new WeakKeyedObjectPool<>(factory);
             default:
                 throw new IllegalArgumentException("Unsupported retain policy: " + policy);
         }
@@ -47,7 +47,7 @@ public class KeyedObjectPool {
       * Every keyed oject instance is cached and is never freed.
       */
     private static class HardKeyedObjectPool<K, V> implements KeyedObjectFactory<K, V> {
-        private final Map<K, V> map = new HashMap<K, V>();
+        private final Map<K, V> map = new HashMap<>();
         private final KeyedObjectFactory<K, V> factory;
         public HardKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
             this.factory = factory;
@@ -72,10 +72,10 @@ public class KeyedObjectPool {
      */
     private static class SoftKeyedObjectPool<K, V> implements KeyedObjectFactory<K, V> {
         private final Object lock = new Object();
-        private final ReferenceQueue<V> queue = new ReferenceQueue<V>();
-        private final Map<K, KeyedSoftReference<K, V>> map = new HashMap<K, KeyedSoftReference<K, V>>();
+        private final ReferenceQueue<V> queue = new ReferenceQueue<>();
+        private final Map<K, KeyedSoftReference<K, V>> map = new HashMap<>();
         private final KeyedObjectFactory<K, V> factory;
-        private WeakReference<SoftKeyedObjectPoolGarbageCollector> garbageCollector = new WeakReference<SoftKeyedObjectPoolGarbageCollector>(new SoftKeyedObjectPoolGarbageCollector());
+        private WeakReference<SoftKeyedObjectPoolGarbageCollector> garbageCollector = new WeakReference<>(new SoftKeyedObjectPoolGarbageCollector());
         public SoftKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
             this.factory = factory;
         }
@@ -88,13 +88,13 @@ public class KeyedObjectPool {
                 V instance;
                 if (ref == null) {
                     instance = factory.createKeyedInstance(key);
-                    ref = new KeyedSoftReference<K, V>(key, instance, queue);
+                    ref = new KeyedSoftReference<>(key, instance, queue);
                     map.put(key, ref);
                 } else {
                     instance = ref.get();
                     if (instance == null) {
                         instance = factory.createKeyedInstance(key);
-                        ref = new KeyedSoftReference<K, V>(key, instance, queue);
+                        ref = new KeyedSoftReference<>(key, instance, queue);
                         map.put(key, ref);
                     }
                 }
@@ -110,7 +110,7 @@ public class KeyedObjectPool {
                     map.remove(ref.key);
                 }
                 if (garbageCollector.get() == null)
-                    garbageCollector = new WeakReference<SoftKeyedObjectPoolGarbageCollector>(new SoftKeyedObjectPoolGarbageCollector());
+                    garbageCollector = new WeakReference<>(new SoftKeyedObjectPoolGarbageCollector());
             }
         }
 
@@ -140,10 +140,10 @@ public class KeyedObjectPool {
      */
     private static class WeakKeyedObjectPool<K, V> implements KeyedObjectFactory<K, V> {
         private final Object lock = new Object();
-        private final ReferenceQueue<V> queue = new ReferenceQueue<V>();
-        private final Map<K, KeyedWeakReference<K, V>> map = new HashMap<K, KeyedWeakReference<K, V>>();
+        private final ReferenceQueue<V> queue = new ReferenceQueue<>();
+        private final Map<K, KeyedWeakReference<K, V>> map = new HashMap<>();
         private final KeyedObjectFactory<K, V> factory;
-        private WeakReference<WeakKeyedObjectPoolGarbageCollector> garbageCollector = new WeakReference<WeakKeyedObjectPoolGarbageCollector>(new WeakKeyedObjectPoolGarbageCollector());
+        private WeakReference<WeakKeyedObjectPoolGarbageCollector> garbageCollector = new WeakReference<>(new WeakKeyedObjectPoolGarbageCollector());
         public WeakKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
             this.factory = factory;
         }
@@ -156,13 +156,13 @@ public class KeyedObjectPool {
                 V instance;
                 if (ref == null) {
                     instance = factory.createKeyedInstance(key);
-                    ref = new KeyedWeakReference<K, V>(key, instance, queue);
+                    ref = new KeyedWeakReference<>(key, instance, queue);
                     map.put(key, ref);
                 } else {
                     instance = ref.get();
                     if (instance == null) {
                         instance = factory.createKeyedInstance(key);
-                        ref = new KeyedWeakReference<K, V>(key, instance, queue);
+                        ref = new KeyedWeakReference<>(key, instance, queue);
                         map.put(key, ref);
                     }
                 }
@@ -178,7 +178,7 @@ public class KeyedObjectPool {
                     map.remove(ref.key);
                 }
                 if (garbageCollector.get() == null)
-                    garbageCollector = new WeakReference<WeakKeyedObjectPoolGarbageCollector>(new WeakKeyedObjectPoolGarbageCollector());
+                    garbageCollector = new WeakReference<>(new WeakKeyedObjectPoolGarbageCollector());
             }
         }
 

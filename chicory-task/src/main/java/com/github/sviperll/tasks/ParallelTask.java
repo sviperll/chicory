@@ -25,7 +25,7 @@ public class ParallelTask implements TaskDefinition {
 
     @Override
     public void run() {
-        List<Thread> threads = new ArrayList<Thread>(tasks.length);
+        List<Thread> threads = new ArrayList<>(tasks.length);
         try {
             for (final TaskDefinition task: tasks) {
                 Thread thread = new Thread(new Runnable() {
