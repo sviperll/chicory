@@ -44,7 +44,7 @@ public class StreamTest {
 
     @Test
     public void testDrainingAll() throws IOException {
-        Stream<Integer> test = Stream.valueOf(new Streamable<Integer>() {
+        Stream<Integer> test = Stream.of(new Streamable<Integer>() {
             @Override
             public void forEach(SaturableConsuming<? super Integer> consumer) {
                 isOpened = true;
@@ -66,7 +66,7 @@ public class StreamTest {
 
     @Test
     public void testDrainingPart() throws IOException {
-        Stream<Integer> test = Stream.valueOf(new Streamable<Integer>() {
+        Stream<Integer> test = Stream.of(new Streamable<Integer>() {
             @Override
             public void forEach(SaturableConsuming<? super Integer> consumer) {
                 isOpened = true;
@@ -90,7 +90,7 @@ public class StreamTest {
 
     @Test
     public void testDrainingWithException() throws IOException {
-        Stream<Integer> test = Stream.valueOf(new Streamable<Integer>() {
+        Stream<Integer> test = Stream.of(new Streamable<Integer>() {
             @Override
             public void forEach(SaturableConsuming<? super Integer> consumer) {
                 isOpened = true;
@@ -122,21 +122,21 @@ public class StreamTest {
 
     @Test
     public void testBasicPipeline() throws IOException {
-        Predicate<Integer> mod2 = Predicate.valueOf(new Evaluatable<Integer>() {
+        Predicate<Integer> mod2 = Predicate.of(new Evaluatable<Integer>() {
             @Override
             public boolean evaluate(Integer t) {
                 return t % 2 == 0;
             }
         });
 
-        Predicate<Integer> mod3 = Predicate.valueOf(new Evaluatable<Integer>() {
+        Predicate<Integer> mod3 = Predicate.of(new Evaluatable<Integer>() {
             @Override
             public boolean evaluate(Integer t) {
                 return t % 3 == 0;
             }
         });
 
-        Function<Integer, Integer> doubleIt = Function.valueOf(new Applicable<Integer, Integer>() {
+        Function<Integer, Integer> doubleIt = Function.of(new Applicable<Integer, Integer>() {
             @Override
             public Integer apply(Integer t) {
                 return t * 2;

@@ -33,7 +33,7 @@ public class StreamableTextFile {
     }
 
     public Stream<String> lines() {
-        return Stream.valueOf(new Streamable<String>() {
+        return Stream.of(new Streamable<String>() {
             @Override
             public void forEach(SaturableConsuming<? super String> consumer) {
                 try {
@@ -53,7 +53,7 @@ public class StreamableTextFile {
     }
 
     public Stream<Character> characters() {
-        return Stream.valueOf(new Streamable<Character>() {
+        return Stream.of(new Streamable<Character>() {
             @Override
             public void forEach(SaturableConsuming<? super Character> consumer) {
                 try {

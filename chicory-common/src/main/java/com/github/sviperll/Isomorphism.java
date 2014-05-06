@@ -17,7 +17,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public static <T, U> Isomorphism<T, U> of(final Applicable<? super T, U> forward, final Applicable<? super U, T> backward) {
-        return valueOf(new IsomorphismDefinition<T, U>() {
+        return of(new IsomorphismDefinition<T, U>() {
             @Override
             public U forward(T object) {
                 return forward.apply(object);
@@ -30,7 +30,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
         });
     }
 
-    public static <T, U> Isomorphism<T, U> valueOf(IsomorphismDefinition<T, U> isomorphism) {
+    public static <T, U> Isomorphism<T, U> of(IsomorphismDefinition<T, U> isomorphism) {
         if (isomorphism instanceof Isomorphism)
             return (Isomorphism<T, U>)isomorphism;
         else
@@ -135,7 +135,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public Function<T, U> forwardFunction() {
-        return Function.valueOf(new Applicable<T, U>() {
+        return Function.of(new Applicable<T, U>() {
             @Override
             public U apply(T t) {
                 return isomorphism.forward(t);
@@ -144,7 +144,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public Function<U, T> backwardFunction() {
-        return Function.valueOf(new Applicable<U, T>() {
+        return Function.of(new Applicable<U, T>() {
             @Override
             public T apply(U t) {
                 return isomorphism.backward(t);

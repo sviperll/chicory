@@ -21,7 +21,7 @@ public class Function<T, R> implements Applicable<T, R> {
     }
 
     @SuppressWarnings({"unchecked"})
-    public static <T, R> Function<T, R> valueOf(Applicable<? super T, R> function) {
+    public static <T, R> Function<T, R> of(Applicable<? super T, R> function) {
         if (function instanceof Function) {
             // Applicable is covariant in it's first argument
             // so this cast is safe

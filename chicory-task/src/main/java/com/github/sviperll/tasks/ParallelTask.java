@@ -31,7 +31,7 @@ public class ParallelTask implements TaskDefinition {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Task.valueOf(task).run();
+                        Task.of(task).run();
                     }
                 });
                 threads.add(thread);

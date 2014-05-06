@@ -9,7 +9,7 @@ package org.github.sviperll.stream;
  */
 public class Arrays {
     public static <T> Stream<T> asStream(final T[] array) {
-        return Stream.valueOf(new Streamable<T>() {
+        return Stream.of(new Streamable<T>() {
 
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {

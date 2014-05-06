@@ -28,7 +28,7 @@ public class StreamableFile {
     }
 
     public Stream<Byte> bytes() {
-        return Stream.valueOf(new Streamable<Byte>() {
+        return Stream.of(new Streamable<Byte>() {
             @Override
             public void forEach(SaturableConsuming<? super Byte> consumer) {
                 try {

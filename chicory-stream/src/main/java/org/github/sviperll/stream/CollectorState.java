@@ -460,7 +460,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
         return optional(stateFactory, visitor);
     }
 
-    public static <T, R, E extends Exception> CollectorState<T, R, E> valueOf(Collecting<T, R, E> collecting) {
+    public static <T, R, E extends Exception> CollectorState<T, R, E> of(Collecting<T, R, E> collecting) {
         if (collecting instanceof CollectorState)
             return (CollectorState<T, R, E>)collecting;
         else
@@ -490,19 +490,19 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
     }
 
     public CollectorState<T, R, E> limiting(final int limit) {
-        return new CollectorState<>(SaturableConsumer.valueOf(consumer).limiting(limit), supplier);
+        return new CollectorState<>(SaturableConsumer.of(consumer).limiting(limit), supplier);
     }
 
     public CollectorState<T, R, E> skipping(final int offset) {
-        return new CollectorState<>(SaturableConsumer.valueOf(consumer).skipping(offset), supplier);
+        return new CollectorState<>(SaturableConsumer.of(consumer).skipping(offset), supplier);
     }
 
     public CollectorState<T, R, E> filtering(final Evaluatable<? super T> predicate) {
-        return new CollectorState<>(SaturableConsumer.valueOf(consumer).filtering(predicate), supplier);
+        return new CollectorState<>(SaturableConsumer.of(consumer).filtering(predicate), supplier);
     }
 
     public <U> CollectorState<U, R, E> mapping(final Applicable<U, ? extends T> function) {
-        return new CollectorState<>(SaturableConsumer.valueOf(consumer).mapping(function), supplier);
+        return new CollectorState<>(SaturableConsumer.of(consumer).mapping(function), supplier);
     }
 
     public <U> CollectorState<T, U, E> finallyTransforming(final Applicable<? super R, U> function) {

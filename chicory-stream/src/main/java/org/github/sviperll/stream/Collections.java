@@ -9,7 +9,7 @@ package org.github.sviperll.stream;
  */
 public class Collections {
     public static <T> Stream<T> asStream(final Iterable<T> collection) {
-        return Stream.valueOf(new Streamable<T>() {
+        return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
                 for (T value: collection) {

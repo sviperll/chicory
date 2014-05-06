@@ -13,7 +13,7 @@ import com.github.sviperll.Predicate;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
-    public static <T> SaturableConsumer<T> valueOf(final SaturableConsuming<T> consuming) {
+    public static <T> SaturableConsumer<T> of(final SaturableConsuming<T> consuming) {
         if (consuming instanceof SaturableConsumer)
             return (SaturableConsumer<T>)consuming;
         else
@@ -171,7 +171,7 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
 
         @Override
         <U> SaturableConsumer<U> mapping(Applicable<U, ? extends T> function2) {
-            return new MappedSaturableConsumer<>(original, Function.valueOf(function1).composeWith(function2));
+            return new MappedSaturableConsumer<>(original, Function.of(function1).composeWith(function2));
         }
 
         @Override

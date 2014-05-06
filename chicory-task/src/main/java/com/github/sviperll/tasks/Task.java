@@ -88,7 +88,7 @@ public class Task implements TaskDefinition {
         return new Task(new FactoryTask(factory));
     }
 
-    public static Task valueOf(TaskDefinition task) {
+    public static Task of(TaskDefinition task) {
         if (task instanceof Task)
             return (Task)task;
         else

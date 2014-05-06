@@ -260,7 +260,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<>(new Supplier<Collecting<T, R, E>>() {
             @Override
             public Collecting<T, R, E> get() {
-                return CollectorState.valueOf(collector.get()).limiting(limit);
+                return CollectorState.of(collector.get()).limiting(limit);
             }
         });
     }
@@ -269,7 +269,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<>(new Supplier<Collecting<T, R, E>>() {
             @Override
             public Collecting<T, R, E> get() {
-                return CollectorState.valueOf(collector.get()).skipping(offset);
+                return CollectorState.of(collector.get()).skipping(offset);
             }
         });
     }
@@ -278,7 +278,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<>(new Supplier<Collecting<T, R, E>>() {
             @Override
             public Collecting<T, R, E> get() {
-                return CollectorState.valueOf(collector.get()).filtering(predicate);
+                return CollectorState.of(collector.get()).filtering(predicate);
             }
         });
     }
@@ -287,7 +287,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<>(new Supplier<Collecting<U, R, E>>() {
             @Override
             public Collecting<U, R, E> get() {
-                return CollectorState.valueOf(collector.get()).mapping(function);
+                return CollectorState.of(collector.get()).mapping(function);
             }
         });
     }
@@ -296,7 +296,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<>(new Supplier<Collecting<T, U, E>>() {
             @Override
             public Collecting<T, U, E> get() {
-                return CollectorState.valueOf(collector.get()).finallyTransforming(function);
+                return CollectorState.of(collector.get()).finallyTransforming(function);
             }
         });
     }

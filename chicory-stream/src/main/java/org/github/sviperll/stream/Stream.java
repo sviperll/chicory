@@ -18,7 +18,7 @@ import com.github.sviperll.UnaryOperatorDefinition;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 public class Stream<T> implements Streamable<T> {
-    public static <T> Stream<T> valueOf(final Streamable<T> streamable) {
+    public static <T> Stream<T> of(final Streamable<T> streamable) {
         if (streamable instanceof Stream)
             return (Stream<T>)streamable;
         else
@@ -69,7 +69,7 @@ public class Stream<T> implements Streamable<T> {
     }
 
     public static <T> Stream<T> empty() {
-        return Stream.valueOf(new Streamable<T>() {
+        return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
             }
@@ -77,7 +77,7 @@ public class Stream<T> implements Streamable<T> {
     }
 
     public static <T> Stream<T> of(final T element1) {
-        return Stream.valueOf(new Streamable<T>() {
+        return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
                 consumer.accept(element1);
@@ -86,7 +86,7 @@ public class Stream<T> implements Streamable<T> {
     }
 
     public static <T> Stream<T> of(final T element1, final T element2) {
-        return Stream.valueOf(new Streamable<T>() {
+        return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
                 consumer.accept(element1);
@@ -96,7 +96,7 @@ public class Stream<T> implements Streamable<T> {
     }
 
     public static <T> Stream<T> of(final T element1, final T element2, final T element3) {
-        return Stream.valueOf(new Streamable<T>() {
+        return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
                 consumer.accept(element1);
@@ -107,7 +107,7 @@ public class Stream<T> implements Streamable<T> {
     }
 
     public static <T> Stream<T> of(final T element1, final T element2, final T element3, final T element4) {
-        return Stream.valueOf(new Streamable<T>() {
+        return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
                 consumer.accept(element1);
@@ -119,7 +119,7 @@ public class Stream<T> implements Streamable<T> {
     }
 
     public static <T> Stream<T> of(final T element1, final T element2, final T element3, final T element4, final T element5) {
-        return Stream.valueOf(new Streamable<T>() {
+        return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
                 consumer.accept(element1);
@@ -163,7 +163,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<U>() {
             @Override
             public void forEach(SaturableConsuming<? super U> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).mapping(function));
+                streamable.forEach(SaturableConsumer.of(consumer).mapping(function));
             }
         });
     }
@@ -172,7 +172,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).mapping(Function.<T>identity()).filtering(predicate));
+                streamable.forEach(SaturableConsumer.of(consumer).mapping(Function.<T>identity()).filtering(predicate));
             }
 
         });
@@ -194,7 +194,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).skipping(offset));
+                streamable.forEach(SaturableConsumer.of(consumer).skipping(offset));
             }
         });
     }
@@ -203,7 +203,7 @@ public class Stream<T> implements Streamable<T> {
         return new Stream<>(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.valueOf(consumer).limiting(size));
+                streamable.forEach(SaturableConsumer.of(consumer).limiting(size));
             }
         });
     }
