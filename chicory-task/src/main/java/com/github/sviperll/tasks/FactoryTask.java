@@ -15,6 +15,7 @@ package com.github.sviperll.tasks;
  * Main task is used in #run method.
  * Cleanup task is used in #close method.
  */
+@Deprecated
 class FactoryTask implements TaskDefinition {
     private final TaskFactory factory;
     private volatile TaskDefinition task = Task.doNothing();

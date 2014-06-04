@@ -10,6 +10,7 @@ package com.github.sviperll.tasks;
  * <li> Closing task to perform cleanup for main task
  * </ol>
  */
+@Deprecated
 public interface TaskFactory {
     /**
      * @return "main" task to perform actual work

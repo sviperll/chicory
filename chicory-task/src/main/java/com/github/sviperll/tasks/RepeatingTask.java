@@ -9,7 +9,8 @@ package com.github.sviperll.tasks;
  * Stop method breaks repeating cycle
  */
 public class RepeatingTask implements TaskDefinition {
-    private volatile boolean doExit = false;
+    private final Object lock = new Object();
+    private boolean doExit = false;
     private final TaskDefinition task;
     private final long pause;
 
@@ -29,7 +30,9 @@ public class RepeatingTask implements TaskDefinition {
      */
     @Override
     public void stop() {
-        doExit = true;
+        synchronized (lock) {
+            doExit = true;
+        }
         task.stop();
     }
 
@@ -38,7 +41,13 @@ public class RepeatingTask implements TaskDefinition {
      */
     @Override
     public void run() {
-        while (!doExit) {
+        for (;;) {
+            synchronized (lock) {
+                if (doExit) {
+                    doExit = false;
+                    break;
+                }
+            }
             task.run();
             try {
                 Thread.sleep(pause);

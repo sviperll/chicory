@@ -84,8 +84,13 @@ public class Task implements TaskDefinition {
      * @param factory to create "main" and "cleanup" tasks
      * @return new task
      */
+    @Deprecated
     public static Task factory(TaskFactory factory) {
         return new Task(new FactoryTask(factory));
+    }
+
+    public static Task of(TaskGeneratorFactory factory) {
+        return new Task(new GeneratorFactoryTask(factory));
     }
 
     public static Task of(TaskDefinition task) {
