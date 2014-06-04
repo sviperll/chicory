@@ -27,6 +27,18 @@
 
 package com.github.sviperll.time;
 
+import static com.github.sviperll.time.Month.APRIL;
+import static com.github.sviperll.time.Month.AUGUST;
+import static com.github.sviperll.time.Month.DECEMBER;
+import static com.github.sviperll.time.Month.FEBRUARY;
+import static com.github.sviperll.time.Month.JANUARY;
+import static com.github.sviperll.time.Month.JULY;
+import static com.github.sviperll.time.Month.JUNE;
+import static com.github.sviperll.time.Month.MARCH;
+import static com.github.sviperll.time.Month.MAY;
+import static com.github.sviperll.time.Month.NOVEMBER;
+import static com.github.sviperll.time.Month.OCTOBER;
+import static com.github.sviperll.time.Month.SEPTEMBER;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,6 +54,25 @@ public class Times {
     public static HumanTime getHumanTime(UnixTime instant, TimeZoneOffset offset) {
         Calendar calendar = createCalendarInstance(offset);
         calendar.setTimeInMillis(instant.millis());
+        return getHumanTime(calendar, offset);
+    }
+
+    private static GregorianCalendar createCalendarInstance(TimeZoneOffset offset) {
+        long hours = offset.minutes() / 60;
+        long minutes = offset.minutes() % 60;
+        if (minutes < 0) {
+            minutes += 60;
+            hours -= 1;
+        }
+        Formatter formatter = new Formatter();
+        formatter.format("GMT%+03d%02d", hours, minutes);
+        TimeZone timeZone = TimeZone.getTimeZone(formatter.toString());
+        GregorianCalendar calendar = new GregorianCalendar(timeZone);
+        calendar.clear();
+        return calendar;
+    }
+
+    private static HumanTime getHumanTime(Calendar calendar, TimeZoneOffset offset) {
         int millis = calendar.get(Calendar.MILLISECOND);
         int seconds = calendar.get(Calendar.SECOND);
         int minutes = calendar.get(Calendar.MINUTE);
@@ -123,20 +154,8 @@ public class Times {
         return new HumanTime(day, clockTime, offset);
     }
 
-    private static Calendar createCalendarInstance(TimeZoneOffset offset) {
-        long hours = offset.minutes() / 60;
-        long minutes = offset.minutes() % 60;
-        if (minutes < 0) {
-            minutes += 60;
-            hours -= 1;
-        }
-        Formatter formatter = new Formatter();
-        formatter.format("GMT%+03d%02d", hours, minutes);
-        TimeZone timeZone = TimeZone.getTimeZone(formatter.toString());
-        return new GregorianCalendar(timeZone);
-    }
-
-    public static UnixTime getUnixTime(HumanTime humanTime) {
+    private static GregorianCalendar createCalendarInstanceInitializedWith(HumanTime humanTime) {
+        GregorianCalendar calendar = createCalendarInstance(humanTime.offset());
         int monthIndex;
         switch (humanTime.day().yearDay().month()) {
             case JANUARY:
@@ -178,10 +197,66 @@ public class Times {
             default:
                 throw new IllegalStateException("Unsupported month value: " + humanTime.day().yearDay().month());
         }
-        Calendar calendar = createCalendarInstance(humanTime.offset());
-        calendar.clear();
         calendar.set(humanTime.day().year(), monthIndex, humanTime.day().yearDay().monthDay(), humanTime.clockTime().hour(), humanTime.clockTime().minute(), humanTime.clockTime().second());
         calendar.set(Calendar.MILLISECOND, humanTime.clockTime().millis());
+        return calendar;
+    }
+
+    public static HumanTime endOfHour(HumanTime time) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(time);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        return getHumanTime(calendar, time.offset());
+    }
+
+    public static HumanTime startOfHour(HumanTime time) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(time);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return getHumanTime(calendar, time.offset());
+    }
+
+    public static HumanTime endOfDay(HumanTime time) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(time);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        return getHumanTime(calendar, time.offset());
+    }
+    
+    public static HumanTime startOfDay(HumanTime time) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(time);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return getHumanTime(calendar, time.offset());
+    }
+
+    public static HumanTime endOfMonth(HumanTime time) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(startOfMonth(time));
+
+        calendar.add(Calendar.MONTH, 1);
+        calendar.add(Calendar.MILLISECOND, -1);
+
+        return getHumanTime(calendar, time.offset());
+    }
+
+    public static HumanTime startOfMonth(HumanTime time) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(time);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return getHumanTime(calendar, time.offset());
+    }
+
+    public static UnixTime getUnixTime(HumanTime humanTime) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(humanTime);
         return new UnixTime(calendar.getTimeInMillis());
     }
 
