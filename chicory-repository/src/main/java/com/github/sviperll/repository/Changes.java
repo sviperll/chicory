@@ -8,14 +8,14 @@ package com.github.sviperll.repository;
  *
  * @author vir
  */
-public class Changed<T> {
-    public static <T> Changed<T> fromTo(T oldValue, T newValue) {
-        return new Changed<>(oldValue, newValue);
+public class Changes<T> {
+    public static <T> Changes<T> fromTo(T oldValue, T newValue) {
+        return new Changes<>(oldValue, newValue);
     }
 
     private final T oldValue;
     private final T newValue;
-    public Changed(T oldValue, T newValue) {
+    public Changes(T oldValue, T newValue) {
         this.oldValue = oldValue;
         this.newValue = newValue;
     }

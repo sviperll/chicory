@@ -19,7 +19,7 @@ public interface IndexedRepository<K, V> {
 
     boolean remove(K key) throws SQLException;
 
-    boolean putIfExists(K key, Changed<V> attributes) throws SQLException;
+    boolean putIfExists(K key, Changes<V> attributes) throws SQLException;
 
     void putNewEntry(K key, V attributes) throws SQLException;
 

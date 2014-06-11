@@ -7,7 +7,7 @@ import java.sql.SQLException;
 /**
  * @param <U> column value data-type
  */
-public interface TableColumn<U> {
+public interface TableColumnDefinition<U> {
     String getColumnName();
 
     PreparedStatementParameterSetter<U> createStatementSetter(PreparedStatement statement);

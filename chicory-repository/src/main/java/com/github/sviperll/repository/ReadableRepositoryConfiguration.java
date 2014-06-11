@@ -10,8 +10,8 @@ package com.github.sviperll.repository;
  */
 public interface ReadableRepositoryConfiguration<V, O> extends RepositoryConfiguration {
 
-    public StorableClass<V> getEntryDefinition();
+    public StorableTypeDefinition<V> getEntryDefinition();
 
-    public StorableClass<O> getOrderingDefinition();
+    public StorableTypeDefinition<O> getOrderingDefinition();
 
 }

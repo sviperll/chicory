@@ -14,10 +14,10 @@ class SQLBuilder implements Appendable, CharSequence {
         return this;
     }
 
-    public SQLBuilder appendJoinedTupleElements(String joinedWith, String format, List<? extends AtomicStorableClassComponent<?, ?>> elements) {
-        Iterator<? extends AtomicStorableClassComponent<?, ?>> iterator = elements.iterator();
+    public SQLBuilder appendJoinedTupleElements(String joinedWith, String format, List<? extends AtomicStorableValueComponent<?, ?>> elements) {
+        Iterator<? extends AtomicStorableValueComponent<?, ?>> iterator = elements.iterator();
         if (iterator.hasNext()) {
-            AtomicStorableClassComponent<?, ?> element = iterator.next();
+            AtomicStorableValueComponent<?, ?> element = iterator.next();
             String columnName = element.getColumn().getColumnName();
             stringBuilder.append(MessageFormat.format(format, columnName));
             while (iterator.hasNext()) {
@@ -44,7 +44,7 @@ class SQLBuilder implements Appendable, CharSequence {
         return this;
     }
 
-    public <T> SQLBuilder appendConditionForColumn(SlicingQueryCondition<T> condition, AtomicStorableClassComponent<T, ?> element) {
+    public <T> SQLBuilder appendConditionForColumn(SlicingQueryCondition<T> condition, AtomicStorableValueComponent<T, ?> element) {
         String columnName = element.getColumn().getColumnName();
         stringBuilder.append(columnName);
         if (condition.isLess()) {

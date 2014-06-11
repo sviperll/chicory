@@ -10,6 +10,6 @@ package com.github.sviperll.repository;
  */
 public interface RepositoryIndex<K> extends RepositoryConfiguration {
 
-    StorableClass<K> getKeyDefinition();
+    StorableTypeDefinition<K> getKeyDefinition();
 
 }
