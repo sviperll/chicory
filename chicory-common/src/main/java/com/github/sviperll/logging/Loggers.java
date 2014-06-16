@@ -28,35 +28,65 @@
 package com.github.sviperll.logging;
 
 import com.github.sviperll.DateFormats;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.StreamHandler;
 
 /**
  * Loggers is a facade-class. With methods to create loggers for common use-patterns.
  */
 public class Loggers {
 
-    /**
-     * Creates new console logger. Each log-message occupies one line.
-     *
-     * @return new Logger instance, not null
-     */
-    public static Logger createConsoleLogger() {
-        Logger logger = Logger.getAnonymousLogger();
-        logger.setUseParentHandlers(false);
+    public static java.util.logging.Formatter createDefaultFormatter() {
         DateFormat dateFormat = DateFormats.ISO8601.createDateFormatInstance();
-        java.util.logging.Formatter formatter = new LoggingFormatter(dateFormat);
-        java.util.logging.StreamHandler handler = new java.util.logging.StreamHandler(System.out, formatter);
-        Thread thread = new Thread(new HandlerFlusher(handler));
+        return new LoggingFormatter(dateFormat);
+    }
+
+    public static java.util.logging.Handler createFlushingHandler(OutputStream stream) {
+        return createFlushingHandler(stream, createDefaultFormatter());
+    }
+
+    public static java.util.logging.Handler createFlushingHandler(OutputStream stream, java.util.logging.Formatter formatter) {
+        FlushingHandler handler = new FlushingHandler(stream, formatter);
+        return handler;
+    }
+
+    public static java.util.logging.Handler createPeriodicallyFlushingHandler(OutputStream stream, long time, TimeUnit unit) {
+        return createPeriodicallyFlushingHandler(stream, time, unit, createDefaultFormatter());
+    }
+
+    public static java.util.logging.Handler createPeriodicallyFlushingHandler(OutputStream stream, long time, TimeUnit unit, java.util.logging.Formatter formatter) {
+        PeriodicallyFlushingHandler handler = new PeriodicallyFlushingHandler(stream, time, unit, formatter);
+        Thread thread = new Thread(handler);
         thread.setDaemon(true);
         thread.start();
-        handler.setLevel(java.util.logging.Level.ALL);
+        return handler;
+    }
+
+    public static java.util.logging.Handler createAsynchronousHandler(java.util.logging.Handler handler, int queueSize) {
+        BlockingQueue<LogRecord> queue = new ArrayBlockingQueue<>(queueSize);
+        AsynchronousHandler aynchrohous = new AsynchronousHandler(handler, queue);
+        Thread thread = new Thread(aynchrohous);
+        thread.setDaemon(true);
+        thread.start();
+        return aynchrohous;
+    }
+
+    public static Logger createAnonymousLogger(java.util.logging.Handler handler) {
+        Logger logger = Logger.getAnonymousLogger();
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
         logger.addHandler(handler);
         return logger;
     }
@@ -65,19 +95,6 @@ public class Loggers {
         Logger logger = Logger.getAnonymousLogger();
         logger.setParent(baseLogger);
         logger.setLevel(level);
-        return logger;
-    }
-
-    public static Logger asynchronous(Logger baseLogger, int queueSize) {
-        BlockingQueue<LogRecord> queue = new ArrayBlockingQueue<>(queueSize);
-        Logger logger = Logger.getAnonymousLogger();
-        logger.setParent(baseLogger);
-        QueueWriter writer = new QueueWriter(baseLogger, queue);
-        logger.addHandler(writer);
-        logger.setUseParentHandlers(false);
-        Thread thread = new Thread(writer);
-        thread.setDaemon(true);
-        thread.start();
         return logger;
     }
 
@@ -161,12 +178,62 @@ public class Loggers {
         }
     }
 
-    private static class QueueWriter extends Handler implements Runnable {
+    private static class FlushingHandler extends StreamHandler {
+        public FlushingHandler(OutputStream stream, java.util.logging.Formatter formatter) {
+            super(stream, formatter);
+            setLevel(Level.ALL);
+        }
+
+        @Override
+        public void publish(LogRecord record) {
+            super.publish(record);
+            super.flush();
+        }
+    }
+
+    private static class PeriodicallyFlushingHandler extends StreamHandler implements Runnable {
         private volatile boolean doExit = false;
-        private final Logger baseLogger;
+        private final long time;
+        private final TimeUnit unit;
+        public PeriodicallyFlushingHandler(OutputStream stream, long time, TimeUnit unit, Formatter formatter) {
+            super(stream, formatter);
+            setLevel(Level.ALL);
+            this.time = time;
+            this.unit = unit;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (!doExit) {
+                    try {
+                        Thread.sleep(unit.toMillis(time));
+                    } catch (InterruptedException ex) {
+                    }
+                    super.flush();
+                }
+            } finally {
+                doExit = false;
+            }
+        }
+
+        @Override
+        public void close() {
+            doExit = true;
+            super.close();
+        }
+    }
+
+    private static class AsynchronousHandler extends Handler implements Runnable {
+        private static final LogRecord EXIT = new LogRecord(Level.OFF, null);
+        private volatile boolean doExit = false;
+        private volatile boolean isRunning = false;
+        private final Handler handler;
         private final BlockingQueue<LogRecord> queue;
-        public QueueWriter(Logger baseLogger, BlockingQueue<LogRecord> queue) {
-            this.baseLogger = baseLogger;
+        private final BlockingQueue<Boolean> exitQueue = new SynchronousQueue<>();
+
+        public AsynchronousHandler(Handler handler, BlockingQueue<LogRecord> queue) {
+            this.handler = handler;
             this.queue = queue;
         }
 
@@ -177,64 +244,64 @@ public class Loggers {
                     queue.put(record);
                     break;
                 } catch (InterruptedException ex) {
+                    continue;
                 }
             }
         }
 
         @Override
-        public void flush() {
-        }
-
-        @Override
-        public void close() throws SecurityException {
-            doExit = true;
-        }
-
-        @Override
         public void run() {
+            isRunning = true;
             try {
-                while (!doExit) {
+                for (;;) {
                     LogRecord record;
                     try {
                         record = queue.take();
                     } catch (InterruptedException ex) {
                         continue;
                     }
-                    baseLogger.log(record);
+                    if (record == EXIT)
+                        break;
+                    handler.publish(record);
                 }
             } finally {
-                LogRecord record;
-                while ((record = queue.poll()) != null) {
-                    baseLogger.log(record);
+                isRunning = false;
+                for (;;) {
+                    try {
+                        exitQueue.put(true);
+                        break;
+                    } catch (InterruptedException ex) {
+                        continue;
+                    }
                 }
             }
-        }
-    }
-
-    private static class HandlerFlusher implements Runnable {
-        private final java.util.logging.Handler handler;
-        public HandlerFlusher(java.util.logging.Handler handler) {
-            this.handler = handler;
         }
 
         @Override
-        public void run() {
-            try {
-                for(;;) {
+        public void flush() {
+            handler.flush();
+        }
+
+        @Override
+        public void close() throws SecurityException {
+            if (!doExit && isRunning) {
+                doExit = true;
+                publish(EXIT);
+                for (;;) {
                     try {
-                        Thread.sleep(1000);
+                        exitQueue.take();
+                        break;
                     } catch (InterruptedException ex) {
+                        continue;
                     }
-                    handler.flush();
                 }
-            } finally {
-                handler.flush();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                }
-                handler.close();
+                doExit = false;
             }
+            LogRecord record;
+            while ((record = queue.poll()) != null) {
+                handler.publish(record);
+            }
+            handler.close();
         }
     }
 }
