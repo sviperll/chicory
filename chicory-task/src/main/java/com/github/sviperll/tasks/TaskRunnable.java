@@ -14,6 +14,10 @@ class TaskRunnable implements Runnable {
 
     @Override
     public void run() {
-        task.run();
+        try {
+            task.run();
+        } finally {
+            task.close();
+        }
     }
 }

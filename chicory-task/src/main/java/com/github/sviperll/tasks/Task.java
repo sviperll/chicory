@@ -68,27 +68,6 @@ public class Task implements TaskDefinition {
         return parallel(taskArray);
     }
 
-    /**
-     * Creates task for given factory
-     * <p>
-     * When TaskDefinition#run method of created task is called
-     * TaskFactory#createWorkTask method of factory is called
-     * and resulting task is runned. Cleanup for resulting task
-     * is performed after.
-     * <p>
-     * When TaskDefinition#close method of created task is called
-     * TaskFactory#createClosingTask method of factory is called
-     * and resulting task is runned. Cleanup for resulting task
-     * is performed after.
-     * 
-     * @param factory to create "main" and "cleanup" tasks
-     * @return new task
-     */
-    @Deprecated
-    public static Task factory(TaskFactory factory) {
-        return new Task(new FactoryTask(factory));
-    }
-
     public static Task of(TaskGeneratorFactory factory) {
         return new Task(new GeneratorFactoryTask(factory));
     }
@@ -253,15 +232,6 @@ public class Task implements TaskDefinition {
     }
 
     public Runnable asRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    task.run();
-                } finally {
-                    task.close();
-                }
-            }
-        };
+        return new TaskRunnable(task);
     }
 }

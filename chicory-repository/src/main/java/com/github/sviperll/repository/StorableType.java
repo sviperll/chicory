@@ -24,8 +24,8 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
     public static <T> StorableType<T> of(final TableColumnDefinition<T> column) {
         return new StorableType<>(new StorableTypeDefinition<T>() {
             @Override
-            public List<? extends AtomicStorableValueComponent<T, ?>> getAtomicComponents() {
-                return Collections.singletonList(new AtomicStorableValueComponent<T, T>() {
+            public List<? extends AtomicStorableComponent<T, ?>> getAtomicComponents() {
+                return Collections.singletonList(new AtomicStorableComponent<T, T>() {
                     @Override
                     public TableColumnDefinition<T> getColumn() {
                         return column;
@@ -85,7 +85,7 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
     }
 
     @Override
-    public List<? extends AtomicStorableValueComponent<T, ?>> getAtomicComponents() {
+    public List<? extends AtomicStorableComponent<T, ?>> getAtomicComponents() {
         return definition.getAtomicComponents();
     }
 

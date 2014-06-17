@@ -15,9 +15,9 @@ import java.util.List;
  */
 public class StorableTypeBuilder1<T, U> {
 
-    private static <T, U, V> AtomicStorableValueComponent<T, V> convertElement(final AtomicStorableValueComponent<U, V> element,
+    private static <T, U, V> AtomicStorableComponent<T, V> convertElement(final AtomicStorableComponent<U, V> element,
                                                                                final IsomorphismDefinition<T, U> isomorphism) {
-        return new AtomicStorableValueComponent<T, V>() {
+        return new AtomicStorableComponent<T, V>() {
             @Override
             public TableColumnDefinition<V> getColumn() {
                 return element.getColumn();
@@ -36,13 +36,13 @@ public class StorableTypeBuilder1<T, U> {
     }
 
     public StorableType<T> build(final StorableTypeDefinition<U> base) {
-        final List<AtomicStorableValueComponent<T, ?>> elements = new ArrayList<>();
-        for (AtomicStorableValueComponent<U, ?> element : base.getAtomicComponents()) {
+        final List<AtomicStorableComponent<T, ?>> elements = new ArrayList<>();
+        for (AtomicStorableComponent<U, ?> element : base.getAtomicComponents()) {
             elements.add(convertElement(element, isomorphism));
         }
         return StorableType.of(new StorableTypeDefinition<T>() {
             @Override
-            public List<? extends AtomicStorableValueComponent<T, ?>> getAtomicComponents() {
+            public List<? extends AtomicStorableComponent<T, ?>> getAtomicComponents() {
                 return elements;
             }
 
