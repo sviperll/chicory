@@ -27,11 +27,13 @@
 
 package com.github.sviperll.logging;
 
+import com.github.sviperll.Consumer;
 import com.github.sviperll.DateFormats;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
@@ -81,6 +83,43 @@ public class Loggers {
         thread.setDaemon(true);
         thread.start();
         return aynchrohous;
+    }
+
+    public static void withRootHandler(Handler handler, Runnable action) {
+        Logger logger = Logger.getLogger("");
+        Logger parentLogger = logger.getParent();
+        while (parentLogger != null) {
+            logger = parentLogger;
+            parentLogger = logger.getParent();
+        }
+        Handler[] handlers = logger.getHandlers();
+        handlers = Arrays.copyOf(handlers, handlers.length, Handler[].class);
+        for (Handler registred: handlers) {
+            logger.removeHandler(registred);
+        }
+        logger.addHandler(handler);
+        action.run();
+        logger.removeHandler(handler);
+        for (Handler registred: handlers) {
+            logger.addHandler(registred);
+        }
+    }
+
+    public static void withRootHandler(HandlerProvider handlerProvider, final Runnable action) {
+        handlerProvider.provideHandler(new Consumer<Handler>() {
+            @Override
+            public void accept(Handler handler) {
+                withRootHandler(handler, action);
+            }
+        });
+    }
+
+    public static Logger createConsoleAnonymousLogger() {
+        Logger logger = Logger.getAnonymousLogger();
+        logger.setLevel(Level.ALL);
+        logger.setUseParentHandlers(false);
+        logger.addHandler(createFlushingHandler(System.out));
+        return logger;
     }
 
     public static Logger createAnonymousLogger(java.util.logging.Handler handler) {
