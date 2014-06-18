@@ -38,64 +38,68 @@ public class CLISpecification {
     private final Map<String, CLIFlagHandler> longFlagHandlers = new TreeMap<>();
     private final Map<Character, CLIParameterHandler> shortParameterHandlers = new TreeMap<>();
     private final Map<String, CLIParameterHandler> longParameterHandlers = new TreeMap<>();
+    private final Appendable usageWriter;
+
+    public CLISpecification(Appendable usageWriter) {
+        this.usageWriter = usageWriter;
+    }
 
     public void add(char c, String s, String description, CLIFlagHandler handler) {
-        newFlagOpt(c, description);
-        newFlagOpt(s, description);
+        addFlagUsageEntry(c, description);
+        addFlagUsageEntry(s, description);
         shortFlagHandlers.put(c, handler);
         longFlagHandlers.put(s, handler);
     }
     public void add(String s, String description, CLIFlagHandler handler) {
-        newFlagOpt(s, description);
+        addFlagUsageEntry(s, description);
         longFlagHandlers.put(s, handler);
     }
     public void add(char c, String s, String description, CLIParameterHandler handler) {
-        newParamOpt(c, description);
-        newParamOpt(s, description);
+        addParameterUsageEntry(c, description);
+        addParameterUsageEntry(s, description);
         shortParameterHandlers.put(c, handler);
         longParameterHandlers.put(s, handler);
     }
     public void add(String s, String description, CLIParameterHandler handler) {
-        newParamOpt(s, description);
+        addParameterUsageEntry(s, description);
         longParameterHandlers.put(s, handler);
     }
 
-    private void newFlagOpt(char c, String description) {
+    private void addFlagUsageEntry(char c, String description) {
         String s = new String(new char[] {c});
         if (usage.put(s, "\t\t -" + s + "\t\t" + description) != null)
             throw new IllegalArgumentException("Option " + s + " already defined!");
     }
 
-    private void newFlagOpt(String s, String description) {
+    private void addFlagUsageEntry(String s, String description) {
         if (usage.put(s, "\t\t--" + s + "\t\t" + description) != null)
             throw new IllegalArgumentException("Option " + s + " already defined!");
     }
 
-    private void newParamOpt(char c, String description) {
+    private void addParameterUsageEntry(char c, String description) {
         String s = new String(new char[] {c});
         if (usage.put(s, "\t\t -" + s + " OPTION\t" + description) != null)
             throw new IllegalArgumentException("Option " + s + " already defined!");
     }
 
-    private void newParamOpt(String s, String description) {
+    private void addParameterUsageEntry(String s, String description) {
         if (usage.put(s, "\t\t--" + s + "=OPTION\t" + description) != null)
             throw new IllegalArgumentException("Option " + s + " already defined!");
     }
 
     public String[] run(String[] args) throws CLIException {
         List<String> unprocessed = new ArrayList<>();
-        Parser p = new Parser(args);
+        Processor p = new Processor(new Parser(args));
         for (;;) {
             if (p.isEndOfArgs()) {
                 break;
-            } else if (p.current().equals("-")) {
+            } else if (p.isSingleDash()) {
                 unprocessed.add(p.current());
                 p.next();
-            } else if (p.current().startsWith("-")) {
-                if (p.current().startsWith("--"))
-                    processLongOpts(p);
-                else
-                    processShortOpts(p);
+            } else if (p.isLongOption()) {
+                p.processLongOption();
+            } else if (p.isShortOptions()) {
+                p.processShortOptions();
             } else {
                 unprocessed.add(p.current());
                 p.next();
@@ -105,74 +109,105 @@ public class CLISpecification {
         return unprocessed.toArray(res);
     }
 
-    public void usage(Appendable pw) throws IOException {
+    public void usage() throws IOException {
         for (Map.Entry<String, String> e: usage.entrySet()) {
-            pw.append(e.getValue());
-            pw.append("\n");
+            usageWriter.append(e.getValue());
+            usageWriter.append("\n");
         }
     }
 
-    private void processLongOpts(Parser p) throws CLIException {
-        for (Map.Entry<String, CLIFlagHandler> e: longFlagHandlers.entrySet()) {
-            if (p.current().equals("--" + e.getKey())) {
-                e.getValue().handleCLIFlag();
-                p.next();
-                return;
-            }
+    private class Processor {
+        private final Parser parser;
+        Processor(Parser parser) {
+            this.parser = parser;
         }
-        for (Map.Entry<String, CLIParameterHandler> e: longParameterHandlers.entrySet()) {
-            String option = "--" + e.getKey();
-            String prefix = option + "=";
-            if (p.current().startsWith(prefix)) {
-                try {
-                    e.getValue().handleCLIParameter(p.current().substring(prefix.length()));
-                } catch (CLIParameterFormatException ex) {
-                    throw new CLIException("Error reading option: " + option + ": " + ex.getMessage(), ex);
-                }
-                p.next();
-                return;
-            } else if (p.current().equals(option)) {
-                p.next();
-                try {
-                    e.getValue().handleCLIParameter(p.readParameter(e.getKey()));
-                } catch (CLIParameterFormatException ex) {
-                    throw new CLIException("Error reading option: " + option + ": " + ex.getMessage(), ex);
-                }
-                return;
-            }
-        }
-        throw new CLIException("Unknown option " + p.current());
-    }
 
-    private void processShortOpts(Parser p) throws CLIException {
-        char[] c = p.current().toCharArray();
-        Map.Entry<Character, CLIParameterHandler> handler = null;
-        for (int i = 1; i < c.length; i++) {
-            boolean found = false;
-            for (Map.Entry<Character, CLIFlagHandler> e: shortFlagHandlers.entrySet()) {
-                if (e.getKey().equals(c[i])) {
+        private boolean isEndOfArgs() {
+            return parser.isEndOfArgs();
+        }
+
+        private boolean isSingleDash() throws CLIException {
+            return current().equals("-");
+        }
+
+        private String current() throws CLIException {
+            return parser.current();
+        }
+
+        private void next() {
+            parser.next();
+        }
+
+        private boolean isLongOption() throws CLIException {
+            return current().startsWith("--");
+        }
+
+        private boolean isShortOptions() throws CLIException {
+            return current().startsWith("-") && !isLongOption();
+        }
+
+        private void processLongOption() throws CLIException {
+            for (Map.Entry<String, CLIFlagHandler> e: longFlagHandlers.entrySet()) {
+                if (parser.current().equals("--" + e.getKey())) {
                     e.getValue().handleCLIFlag();
-                    found = true;
+                    parser.next();
+                    return;
                 }
             }
-            for (Map.Entry<Character, CLIParameterHandler> e: shortParameterHandlers.entrySet()) {
-                if (e.getKey().equals(c[i])) {
-                    if (handler != null)
-                        throw new CLIException("Expecting parameter for -" + handler.getKey());
-                    else
-                        handler = e;
-                    found = true;
+            for (Map.Entry<String, CLIParameterHandler> e: longParameterHandlers.entrySet()) {
+                String option = "--" + e.getKey();
+                String prefix = option + "=";
+                if (parser.current().startsWith(prefix)) {
+                    try {
+                        e.getValue().handleCLIParameter(parser.current().substring(prefix.length()));
+                    } catch (CLIParameterFormatException ex) {
+                        throw new CLIException("Error reading option: " + option + ": " + ex.getMessage(), ex);
+                    }
+                    parser.next();
+                    return;
+                } else if (parser.current().equals(option)) {
+                    parser.next();
+                    try {
+                        e.getValue().handleCLIParameter(parser.readParameter(e.getKey()));
+                    } catch (CLIParameterFormatException ex) {
+                        throw new CLIException("Error reading option: " + option + ": " + ex.getMessage(), ex);
+                    }
+                    return;
                 }
             }
-            if (!found)
-                throw new CLIException("Unknown option -" + c[i]);
+            throw new CLIException("Unknown option " + parser.current());
         }
-        if (handler != null) {
-            p.next();
-            try {
-                handler.getValue().handleCLIParameter(p.readParameter(handler.getKey()));
-            } catch (CLIParameterFormatException ex) {
-                throw new CLIException("Error reading option: -" + handler.getKey() + ": " + ex.getMessage(), ex);
+
+        private void processShortOptions() throws CLIException {
+            char[] c = parser.current().toCharArray();
+            Map.Entry<Character, CLIParameterHandler> handler = null;
+            for (int i = 1; i < c.length; i++) {
+                boolean found = false;
+                for (Map.Entry<Character, CLIFlagHandler> e: shortFlagHandlers.entrySet()) {
+                    if (e.getKey().equals(c[i])) {
+                        e.getValue().handleCLIFlag();
+                        found = true;
+                    }
+                }
+                for (Map.Entry<Character, CLIParameterHandler> e: shortParameterHandlers.entrySet()) {
+                    if (e.getKey().equals(c[i])) {
+                        if (handler != null)
+                            throw new CLIException("Expecting parameter for -" + handler.getKey());
+                        else
+                            handler = e;
+                        found = true;
+                    }
+                }
+                if (!found)
+                    throw new CLIException("Unknown option -" + c[i]);
+            }
+            if (handler != null) {
+                parser.next();
+                try {
+                    handler.getValue().handleCLIParameter(parser.readParameter(handler.getKey()));
+                } catch (CLIParameterFormatException ex) {
+                    throw new CLIException("Error reading option: -" + handler.getKey() + ": " + ex.getMessage(), ex);
+                }
             }
         }
     }
@@ -193,7 +228,7 @@ public class CLISpecification {
 
         public String current() throws CLIException {
             if (!(i < args.length))
-                throw new CLIException("Expection argument, got end of line");
+                throw new CLIException("Expecting argument, got end of line");
             return args[i];
         }
 
