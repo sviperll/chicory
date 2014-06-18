@@ -4,10 +4,10 @@
 
 package com.github.sviperll.repository;
 
+import com.github.sviperll.IsomorphismDefinition;
 import com.github.sviperll.TypeStructure2;
 import com.github.sviperll.TypeStructure3;
 import com.github.sviperll.TypeStructure4;
-import com.github.sviperll.IsomorphismDefinition;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
