@@ -93,9 +93,6 @@ public class CLISpecification {
         for (;;) {
             if (p.isEndOfArgs()) {
                 break;
-            } else if (p.isSingleDash()) {
-                unprocessed.add(p.current());
-                p.next();
             } else if (p.isLongOption()) {
                 p.processLongOption();
             } else if (p.isShortOptions()) {
@@ -126,10 +123,6 @@ public class CLISpecification {
             return parser.isEndOfArgs();
         }
 
-        private boolean isSingleDash() throws CLIException {
-            return current().equals("-");
-        }
-
         private String current() throws CLIException {
             return parser.current();
         }
@@ -143,7 +136,7 @@ public class CLISpecification {
         }
 
         private boolean isShortOptions() throws CLIException {
-            return current().startsWith("-") && !isLongOption();
+            return current().startsWith("-") && !current().equals("-") && !isLongOption();
         }
 
         private void processLongOption() throws CLIException {
