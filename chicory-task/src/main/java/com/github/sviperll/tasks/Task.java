@@ -80,12 +80,23 @@ public class Task implements TaskDefinition {
     }
 
     private final TaskDefinition task;
+    private final Object lock = new Object();
+    private Thread thread = null;
     /**
      * 
      * @param task task to inherit behaviour from
      */
     private Task(TaskDefinition task) {
         this.task = task;
+    }
+
+    public void start() {
+        synchronized (lock) {
+            if (thread == null) {
+                thread = new Thread(this.asRunnable());
+                thread.start();
+            }
+        }
     }
 
     /**
@@ -96,13 +107,27 @@ public class Task implements TaskDefinition {
         task.stop();
     }
 
+    public void join() throws InterruptedException {
+        Thread currentThread = null;
+        synchronized (lock) {
+            currentThread = thread;
+        }
+        if (currentThread != null)
+            currentThread.join();
+    }
 
     /**
      * @inheritDoc
      */
     @Override
     public void run() {
-        task.run();
+        try {
+            task.run();
+        } finally {
+            synchronized (lock) {
+                thread = null;
+            }
+        }
     }
 
 
