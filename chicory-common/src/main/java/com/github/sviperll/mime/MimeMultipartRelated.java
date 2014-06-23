@@ -34,6 +34,13 @@ import javax.mail.internet.ParameterList;
 import javax.mail.internet.ParseException;
 
 public class MimeMultipartRelated extends MimeMultipart {
+    private static String stripBrackets(String s) {
+        if (!(s.startsWith("<") && s.endsWith(">")))
+            return s;
+        else
+            return s.substring(1, s.length() - 1);
+    }
+
     private final ContentType baseContentTypeObject;
     private String rootId = null;
 
@@ -102,7 +109,7 @@ public class MimeMultipartRelated extends MimeMultipart {
             ContentType rootContentType = new ContentType(part.getDataHandler().getContentType());
             newContentType.setParameter("type", rootContentType.getBaseType());
             if (rootId != null)
-                newContentType.setParameter("start", rootId);
+                newContentType.setParameter("start", stripBrackets(rootId));
             contentType = newContentType.toString();
         }
     }
