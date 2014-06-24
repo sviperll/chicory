@@ -27,8 +27,10 @@
 
 package com.github.sviperll.logging;
 
+import com.github.sviperll.BindedConsumer;
 import com.github.sviperll.Consumer;
 import com.github.sviperll.DateFormats;
+import com.github.sviperll.SourceableResource;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -105,13 +107,14 @@ public class Loggers {
         }
     }
 
-    public static void withRootHandler(HandlerProvider handlerProvider, final Runnable action) {
-        handlerProvider.provideHandler(new Consumer<Handler>() {
+    public static void withRootHandler(SourceableResource<? extends Handler> source, final Runnable action) {
+        BindedConsumer bindedConsumer = source.bindConsumer(new Consumer<Handler>() {
             @Override
             public void accept(Handler handler) {
                 withRootHandler(handler, action);
             }
         });
+        bindedConsumer.acceptProvidedValue();
     }
 
     public static Logger createConsoleAnonymousLogger() {

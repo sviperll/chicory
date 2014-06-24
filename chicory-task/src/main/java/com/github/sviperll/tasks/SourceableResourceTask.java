@@ -3,23 +3,25 @@
  */
 package com.github.sviperll.tasks;
 
+import com.github.sviperll.BindedConsumer;
 import com.github.sviperll.Consumer;
+import com.github.sviperll.SourceableResource;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-class GeneratorFactoryTask implements TaskDefinition {
-    private final TaskGeneratorFactory factory;
+class SourceableResourceTask implements TaskDefinition {
+    private final SourceableResource<? extends TaskDefinition> source;
     private volatile TaskDefinition currentTask = Task.doNothing();
 
-    public GeneratorFactoryTask(TaskGeneratorFactory factory) {
-        this.factory = factory;
+    public SourceableResourceTask(SourceableResource<? extends TaskDefinition> factory) {
+        this.source = factory;
     }
 
     @Override
     public void run() {
-        TaskGenerator generator = factory.createTaskGenerator(new Consumer<TaskDefinition>() {
+        BindedConsumer bindedConsumer = source.bindConsumer(new Consumer<TaskDefinition>() {
             @Override
             public void accept(TaskDefinition task) {
                 currentTask = task;
@@ -27,7 +29,7 @@ class GeneratorFactoryTask implements TaskDefinition {
                 currentTask = Task.doNothing();
             }
         });
-        generator.passToConsumer();
+        bindedConsumer.acceptProvidedValue();
     }
 
     @Override
@@ -37,12 +39,12 @@ class GeneratorFactoryTask implements TaskDefinition {
 
     @Override
     public void close() {
-        TaskGenerator generator = factory.createTaskGenerator(new Consumer<TaskDefinition>() {
+        BindedConsumer bindedConsumer = source.bindConsumer(new Consumer<TaskDefinition>() {
             @Override
             public void accept(TaskDefinition task) {
                 task.close();
             }
         });
-        generator.passToConsumer();
+        bindedConsumer.acceptProvidedValue();
     }
 }

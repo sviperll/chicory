@@ -4,7 +4,10 @@
  */
 package com.github.sviperll.repository;
 
+import com.github.sviperll.BindedConsumer;
+import com.github.sviperll.Consumer;
 import com.github.sviperll.Credentials;
+import com.github.sviperll.SourceableResource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,7 +16,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 
-public class SimpleDataSource implements DataSource {
+public class SimpleDataSource implements DataSource, SourceableResource<Connection> {
     public static SimpleDataSource createInstance(String jdbcURL) {
         return new SimpleDataSource(jdbcURL, null);
     }
@@ -36,6 +39,22 @@ public class SimpleDataSource implements DataSource {
             return DriverManager.getConnection(jdbcURL);
         else
             return DriverManager.getConnection(jdbcURL, credentials.userName(), credentials.password());
+    }
+
+    @Override
+    public BindedConsumer bindConsumer(final Consumer<? super Connection> consumer) {
+        return new BindedConsumer() {
+            @Override
+            public void acceptProvidedValue() {
+                try {
+                    try (Connection connection = getConnection()) {
+                        consumer.accept(connection);
+                    }
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        };
     }
 
     @Override
