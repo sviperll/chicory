@@ -3,5 +3,6 @@ include "chicory-common",
         "chicory-repository",
         "chicory-stream",
         "chicory-task",
-        "chicory-time"
+        "chicory-time",
+        "chicory-environment"
 

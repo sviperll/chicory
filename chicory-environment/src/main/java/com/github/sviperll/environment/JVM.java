@@ -2,7 +2,7 @@
  * Copyright (C) 2013 Victor Nazarov <asviraspossible@gmail.com>
  */
 
-package com.github.sviperll;
+package com.github.sviperll.environment;
 
 import java.lang.management.ManagementFactory;
 

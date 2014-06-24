@@ -1,6 +1,4 @@
     dependencies {
-        compile(group: 'javax.mail', name: 'mail', version: '1.4')
-        compile(project(':chicory-environment'))
     }
 
     uploadArchives {
@@ -8,7 +6,7 @@
             mavenDeployer {
                 pom {
                     project {
-                        description 'Basic data-types, algorithms and data-structures'
+                        description 'Library to support an interaction with operating system'
                     }
                 }
             }
