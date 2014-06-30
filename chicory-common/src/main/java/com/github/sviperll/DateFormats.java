@@ -27,11 +27,14 @@
 
 package com.github.sviperll;
 
+import java.util.Locale;
+
 /**
  * DateFormats facade-class provides constants for common date formats.
  */
 public class DateFormats {
-    public static final SimpleDateFormatFactory ISO8601 = new SimpleDateFormatFactory("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    public static final SimpleDateFormatFactory ISO8601 = new SimpleDateFormatFactory("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+    public static final SimpleDateFormatFactory RFC822 = new SimpleDateFormatFactory("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
 
     private DateFormats() {
     }

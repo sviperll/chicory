@@ -29,15 +29,18 @@ package com.github.sviperll;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class SimpleDateFormatFactory implements DateFormatFactory {
     private final String pattern;
-    public SimpleDateFormatFactory(String pattern) {
+    private final Locale locale;
+    public SimpleDateFormatFactory(String pattern, Locale locale) {
         this.pattern = pattern;
+        this.locale = locale;
     }
 
     @Override
     public DateFormat createDateFormatInstance() {
-        return new SimpleDateFormat(pattern);
+        return new SimpleDateFormat(pattern, locale);
     }
 }
