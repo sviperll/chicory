@@ -129,12 +129,12 @@ public class SlicingQueries {
 
         @Override
         public boolean isOrdered() {
-            return false;
+            return true;
         }
 
         @Override
         public boolean isDescending() {
-            throw new UnsupportedOperationException("Is not ordered.");
+            return false;
         }
 
         @Override
