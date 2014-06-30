@@ -57,6 +57,12 @@ public class Times {
         return getHumanTime(calendar, offset);
     }
 
+    public static Day createDay(int year, Month month, int day) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(GMT_OFFSET, year, month, day);
+        WeekDay weekDay = getWeekDay(calendar);
+        return new Day(year, new YearDay(month, day), weekDay);
+    }
+
     private static GregorianCalendar createCalendarInstance(TimeZoneOffset offset) {
         long hours = offset.minutes() / 60;
         long minutes = offset.minutes() % 60;
@@ -120,33 +126,7 @@ public class Times {
             default:
                 throw new IllegalStateException("Wrong month value got from GregorianCalendar: " + monthIndex);
         }
-        int weekDayIndex = calendar.get(Calendar.DAY_OF_WEEK);
-        WeekDay weekDay;
-        switch (weekDayIndex) {
-            case Calendar.SUNDAY:
-                weekDay = WeekDay.SUNDAY;
-                break;
-            case Calendar.MONDAY:
-                weekDay = WeekDay.MONDAY;
-                break;
-            case Calendar.TUESDAY:
-                weekDay = WeekDay.TUESDAY;
-                break;
-            case Calendar.WEDNESDAY:
-                weekDay = WeekDay.WEDNESDAY;
-                break;
-            case Calendar.THURSDAY:
-                weekDay = WeekDay.THURSDAY;
-                break;
-            case Calendar.FRIDAY:
-                weekDay = WeekDay.FRIDAY;
-                break;
-            case Calendar.SATURDAY:
-                weekDay = WeekDay.SATURDAY;
-                break;
-            default:
-                throw new IllegalStateException("Wrong weekDay value got from GregorianCalendar: " + monthIndex);
-        }
+        WeekDay weekDay = getWeekDay(calendar);
         int year = calendar.get(Calendar.YEAR);
         ClockTime clockTime = new ClockTime(hours, minutes, seconds, millis);
         YearDay yearDay = new YearDay(month, monthDay);
@@ -154,10 +134,32 @@ public class Times {
         return new HumanTime(day, clockTime, offset);
     }
 
-    private static GregorianCalendar createCalendarInstanceInitializedWith(HumanTime humanTime) {
-        GregorianCalendar calendar = createCalendarInstance(humanTime.offset());
+    private static WeekDay getWeekDay(Calendar calendar) throws IllegalStateException {
+        int weekDayIndex = calendar.get(Calendar.DAY_OF_WEEK);
+        switch (weekDayIndex) {
+            case Calendar.SUNDAY:
+                return WeekDay.SUNDAY;
+            case Calendar.MONDAY:
+                return WeekDay.MONDAY;
+            case Calendar.TUESDAY:
+                return WeekDay.TUESDAY;
+            case Calendar.WEDNESDAY:
+                return WeekDay.WEDNESDAY;
+            case Calendar.THURSDAY:
+                return WeekDay.THURSDAY;
+            case Calendar.FRIDAY:
+                return WeekDay.FRIDAY;
+            case Calendar.SATURDAY:
+                return WeekDay.SATURDAY;
+            default:
+                throw new IllegalStateException("Wrong weekDay value got from GregorianCalendar: " + weekDayIndex);
+        }
+    }
+
+    private static GregorianCalendar createCalendarInstanceInitializedWith(TimeZoneOffset offset, int year, Month month, int day) {
+        GregorianCalendar calendar = createCalendarInstance(offset);
         int monthIndex;
-        switch (humanTime.day().yearDay().month()) {
+        switch (month) {
             case JANUARY:
                 monthIndex = Calendar.JANUARY;
                 break;
@@ -195,9 +197,17 @@ public class Times {
                 monthIndex = Calendar.DECEMBER;
                 break;
             default:
-                throw new IllegalStateException("Unsupported month value: " + humanTime.day().yearDay().month());
+                throw new IllegalStateException("Unsupported month value: " + month);
         }
-        calendar.set(humanTime.day().year(), monthIndex, humanTime.day().yearDay().monthDay(), humanTime.clockTime().hour(), humanTime.clockTime().minute(), humanTime.clockTime().second());
+        calendar.set(year, monthIndex, day);
+        return calendar;
+    }
+
+    private static GregorianCalendar createCalendarInstanceInitializedWith(HumanTime humanTime) {
+        GregorianCalendar calendar = createCalendarInstanceInitializedWith(humanTime.offset(), humanTime.day().year(), humanTime.day().yearDay().month(), humanTime.day().yearDay().monthDay());
+        calendar.set(Calendar.HOUR_OF_DAY, humanTime.clockTime().hour());
+        calendar.set(Calendar.MINUTE, humanTime.clockTime().minute());
+        calendar.set(Calendar.SECOND, humanTime.clockTime().second());
         calendar.set(Calendar.MILLISECOND, humanTime.clockTime().millis());
         return calendar;
     }
