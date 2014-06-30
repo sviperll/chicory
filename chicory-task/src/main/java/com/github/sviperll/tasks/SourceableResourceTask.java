@@ -3,25 +3,24 @@
  */
 package com.github.sviperll.tasks;
 
-import com.github.sviperll.BindedConsumer;
 import com.github.sviperll.Consumer;
-import com.github.sviperll.SourceableResource;
+import com.github.sviperll.ResourceProviderDefinition;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 class SourceableResourceTask implements TaskDefinition {
-    private final SourceableResource<? extends TaskDefinition> source;
+    private final ResourceProviderDefinition<? extends TaskDefinition> source;
     private volatile TaskDefinition currentTask = Task.doNothing();
 
-    public SourceableResourceTask(SourceableResource<? extends TaskDefinition> factory) {
+    public SourceableResourceTask(ResourceProviderDefinition<? extends TaskDefinition> factory) {
         this.source = factory;
     }
 
     @Override
     public void run() {
-        BindedConsumer bindedConsumer = source.bindConsumer(new Consumer<TaskDefinition>() {
+        source.provideResourceTo(new Consumer<TaskDefinition>() {
             @Override
             public void accept(TaskDefinition task) {
                 currentTask = task;
@@ -29,7 +28,6 @@ class SourceableResourceTask implements TaskDefinition {
                 currentTask = Task.doNothing();
             }
         });
-        bindedConsumer.acceptProvidedValue();
     }
 
     @Override
@@ -39,12 +37,11 @@ class SourceableResourceTask implements TaskDefinition {
 
     @Override
     public void close() {
-        BindedConsumer bindedConsumer = source.bindConsumer(new Consumer<TaskDefinition>() {
+        source.provideResourceTo(new Consumer<TaskDefinition>() {
             @Override
             public void accept(TaskDefinition task) {
                 task.close();
             }
         });
-        bindedConsumer.acceptProvidedValue();
     }
 }

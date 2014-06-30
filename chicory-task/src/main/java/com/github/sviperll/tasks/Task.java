@@ -3,7 +3,7 @@
  */
 package com.github.sviperll.tasks;
 
-import com.github.sviperll.SourceableResource;
+import com.github.sviperll.ResourceProviderDefinition;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -69,7 +69,7 @@ public class Task implements TaskDefinition {
         return parallel(taskArray);
     }
 
-    public static Task of(SourceableResource<? extends TaskDefinition> source) {
+    public static Task of(ResourceProviderDefinition<? extends TaskDefinition> source) {
         return new Task(new SourceableResourceTask(source));
     }
 

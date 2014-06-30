@@ -7,6 +7,6 @@ package com.github.sviperll;
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public interface BindedConsumer {
-    void acceptProvidedValue();
+public interface ResourceProviderDefinition<T> {
+    void provideResourceTo(Consumer<? super T> consumer);
 }
