@@ -13,17 +13,22 @@ import sun.misc.SignalHandler;
 public class SignalWaiter {
     private final Object lock = new Object();
     private final SignalWaiterHandler handler = new SignalWaiterHandler();
-    private boolean doExit = false;
+    private boolean isReceived = false;
 
     public void waitForSignal() {
         synchronized (lock) {
-            doExit = false;
-            while (!doExit) {
+            while (!isReceived) {
                 try {
                     lock.wait();
                 } catch (InterruptedException ex) {
                 }
             }
+        }
+    }
+
+    public boolean isReceived() {
+        synchronized (lock) {
+            return isReceived;
         }
     }
 
@@ -35,7 +40,7 @@ public class SignalWaiter {
         @Override
         public void handle(Signal sig) {
             synchronized (lock) {
-                doExit = true;
+                isReceived = true;
                 lock.notify();
             }
         }
