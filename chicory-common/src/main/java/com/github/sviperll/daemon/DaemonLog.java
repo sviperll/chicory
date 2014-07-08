@@ -31,7 +31,7 @@ import com.github.sviperll.Consumer;
 import com.github.sviperll.ResourceProvider;
 import com.github.sviperll.ResourceProviderDefinition;
 import com.github.sviperll.environment.HUPReopeningFileOutputStream;
-import com.github.sviperll.logging.Loggers;
+import com.github.sviperll.logging.Handlers;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +68,7 @@ public class DaemonLog {
             return ResourceProvider.of(new ResourceProviderDefinition<Handler>() {
                 @Override
                 public void provideResourceTo(Consumer<? super Handler> consumer) {
-                    Handler handler = Loggers.createFlushingHandler(stream);
+                    Handler handler = Handlers.createFlushingHandler(stream);
                     try {
                         consumer.accept(handler);
                     } finally {
