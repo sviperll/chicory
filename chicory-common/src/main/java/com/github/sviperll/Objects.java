@@ -88,7 +88,6 @@ public class Objects {
     }
 
     /** Compare objects for equality
-     * @param <T>
      * @param a
      * @param b
      * @return true if two objects are unique respecting null values
