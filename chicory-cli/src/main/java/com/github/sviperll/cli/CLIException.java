@@ -26,6 +26,15 @@
  */
 package com.github.sviperll.cli;
 
+/**
+ * This exception is thrown in every case
+ * where command line argument parsing goes wrong.
+ *
+ * For example when there is a missing argument for
+ * some command line key
+ *
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ */
 @SuppressWarnings("serial")
 public class CLIException extends Exception {
     public CLIException(String message) {

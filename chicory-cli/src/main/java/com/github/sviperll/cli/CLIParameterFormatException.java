@@ -26,6 +26,13 @@
  */
 package com.github.sviperll.cli;
 
+/**
+ * `CLIParameterHandler`'s should throw `CLIParameterFormatException`
+ * when argument doesn't follow required format or is not contained in required range.
+ *
+ * @see CLIParameterHandler
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ */
 @SuppressWarnings("serial")
 public class CLIParameterFormatException extends Exception {
     public CLIParameterFormatException(String message) {

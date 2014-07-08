@@ -27,6 +27,42 @@
 
 package com.github.sviperll.cli;
 
+/**
+ * An implementer of this interface must handle
+ * presence of keys in command line that require arguments.
+ *
+ * When application is started with following arguments
+ *
+ *     myapp -s arg1 -s arg2 -s arg3
+ *
+ * and some `CLIParameterHandler` is specified as a `-s`-handler
+ * then CLIParameterHandler#handleCLIParameter method is called three times
+ * with different arguments.
+ *
+ * `CLIParameterHandler`'s should throw `CLIParameterFormatException`
+ * when argument doesn't follow required format or is not contained in required range.
+ *
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ */
 public interface CLIParameterHandler {
+    /**
+     * Method to call for each instance of command line key
+     *
+     * @see CLIParameterHandler
+     */
     void handleCLIParameter(String param) throws CLIParameterFormatException;
+
+    /**
+     * Method returns a default value for the handler.
+     *
+     * Handler should behave exactly the same
+     *
+     *  * when it is not invoked at all, i. e. there is no key in command line
+     *  * and when it is called once with default value as an argument
+     *
+     * Above proposition holds only when default value is present, i. e. not null.
+     *
+     * @return default value
+     */
+    String getDefaultValue();
 }

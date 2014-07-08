@@ -27,6 +27,24 @@
 
 package com.github.sviperll.cli;
 
+/**
+ * An implementer of this interface must handle
+ * presence of flags in command line.
+ *
+ * When application is started with following arguments
+ *
+ *     myapp -s -s -s
+ *
+ * and some `CLIFlagHandler` is specified as a `-s`-handler
+ * then CLIFlagHandler#handleCLIFlag method is called three times.
+ *
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ */
 public interface CLIFlagHandler {
+    /**
+     * Method to call for each instance of command line flag
+     *
+     * @see CLIFlagHandler
+     */
     void handleCLIFlag();
 }
