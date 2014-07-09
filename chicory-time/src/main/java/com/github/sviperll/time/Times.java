@@ -27,18 +27,6 @@
 
 package com.github.sviperll.time;
 
-import static com.github.sviperll.time.Month.APRIL;
-import static com.github.sviperll.time.Month.AUGUST;
-import static com.github.sviperll.time.Month.DECEMBER;
-import static com.github.sviperll.time.Month.FEBRUARY;
-import static com.github.sviperll.time.Month.JANUARY;
-import static com.github.sviperll.time.Month.JULY;
-import static com.github.sviperll.time.Month.JUNE;
-import static com.github.sviperll.time.Month.MARCH;
-import static com.github.sviperll.time.Month.MAY;
-import static com.github.sviperll.time.Month.NOVEMBER;
-import static com.github.sviperll.time.Month.OCTOBER;
-import static com.github.sviperll.time.Month.SEPTEMBER;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
