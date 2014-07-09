@@ -38,17 +38,21 @@ import java.awt.image.WritableRaster;
 import java.util.Hashtable;
 
 public class GaussianBlur implements BufferedImageOp {
-    public static GaussianBlur prepare(double sigmaHor, double sigmaVer, int width, int height, RenderingHints renderingHints) {
+    public static GaussianBlur prepare(double sigmaHor, double sigmaVer, RenderingHints renderingHints) {
+        return prepare(sigmaHor, sigmaVer, (int)Math.floor(3 * sigmaHor), (int)Math.floor(3 * sigmaVer), renderingHints);
+    }
+
+    public static GaussianBlur prepare(double sigmaHor, double sigmaVer, int kernalWidth, int kernalHeight, RenderingHints renderingHints) {
         BufferedImageOp opHor = null;
         if (sigmaVer != 0) {
-            float[] kernelValuesHor = gausianKernelValues(sigmaHor, width);
+            float[] kernelValuesHor = gausianKernelValues(sigmaHor, kernalWidth);
             Kernel kernelHor = new Kernel(kernelValuesHor.length, 1, kernelValuesHor);
             opHor = new ConvolveOp(kernelHor, ConvolveOp.EDGE_NO_OP, renderingHints);
         }
 
         BufferedImageOp opVer = null;
         if (sigmaVer != 0) {
-            float[] kernelValuesVer = gausianKernelValues(sigmaVer, height);
+            float[] kernelValuesVer = gausianKernelValues(sigmaVer, kernalHeight);
             Kernel kernelVer = new Kernel(1, kernelValuesVer.length, kernelValuesVer);
             opVer = new ConvolveOp(kernelVer, ConvolveOp.EDGE_NO_OP, renderingHints);
         }
@@ -56,11 +60,25 @@ public class GaussianBlur implements BufferedImageOp {
     }
 
     private static float[] gausianKernelValues(double sigma, int n) {
+        //
+        // If we have infinite kernel we can calculate every kernel element as
+        //
+        // double v = 1.0 / Math.sqrt(2 * Math.PI * sigma * sigma) * Math.exp(- x * x / (2 * sigma * sigma));
+        //
+        // Sum of all infinite elements is garanteed to be 1.0
+        //
+        // Here we use finit kernel, so we need to explicitly scale all elements to get 1.0 as a sum
+        // In presence of explicit scaling step we can drop scaling coefficient from Gaussian expression:
+        //
+        // double v = Math.exp(- x * x / (2 * sigma * sigma));
+        //
+        // Notice that we has dropped 1.0 / Math.sqrt(2 * Math.PI * sigma * sigma) contant in the expression above.
+        //
         double[] dvs = new double[n * 2 + 1];
         double sum = 0.0;
         for (int i = 0; i < dvs.length; i++) {
             double x = i - n;
-            double v = 1.0 / Math.sqrt(2 * Math.PI * sigma * sigma) * Math.exp(- x * x / (2 * sigma * sigma));
+            double v = Math.exp(- x * x / (2 * sigma * sigma));
             dvs[i] = v;
             sum += v;
         }
@@ -71,6 +89,7 @@ public class GaussianBlur implements BufferedImageOp {
         }
         return res;
     }
+
     private final BufferedImageOp opHor;
     private final BufferedImageOp opVer;
     private final RenderingHints renderingHints;
