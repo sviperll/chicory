@@ -26,7 +26,6 @@
  */
 package com.github.sviperll.repository;
 
-import com.github.sviperll.repository.SlicingQuery.SlicingQueryCondition;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -73,12 +72,22 @@ class SQLBuilder implements Appendable, CharSequence {
     public <T> SQLBuilder appendConditionForColumn(SlicingQueryCondition<T> condition, AtomicStorableComponent<T, ?> element) {
         String columnName = element.getColumn().getColumnName();
         stringBuilder.append(columnName);
-        if (condition.isLess()) {
-            stringBuilder.append(" < ?");
-        } else if (condition.isGreater()) {
-            stringBuilder.append(" > ?");
-        } else
-            throw new IllegalStateException("Unsupported Repository condition: " + condition);
+        switch (condition.operator()) {
+            case GREATER:
+                stringBuilder.append(" > ?");
+                break;
+            case GREATER_OR_EQUAL:
+                stringBuilder.append(" >= ?");
+                break;
+            case LESS:
+                stringBuilder.append(" < ?");
+                break;
+            case LESS_OR_EQUAL:
+                stringBuilder.append(" <= ?");
+                break;
+            default:
+                throw new IllegalStateException("Unsupported SlicingQueryOperator " + condition.operator());
+        }
         return this;
     }
 

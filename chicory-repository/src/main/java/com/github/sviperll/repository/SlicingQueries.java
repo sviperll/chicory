@@ -26,15 +26,14 @@
  */
 package com.github.sviperll.repository;
 
-import com.github.sviperll.repository.SlicingQuery.SlicingQueryCondition;
-import com.github.sviperll.repository.SlicingQuery.SlicingQueryPostProcessing;
-
 public class SlicingQueries {
-    private static final SlicingQueryPostProcessing NOT_NEEDS_TO_BE_REVERESED = new NotNeededToBeReversedRepositorySlicingResult();
+    private static final SlicingQueryPostProcessing NOT_NEED_TO_BE_REVERESED = new NotNeededToBeReversedRepositorySlicingResult();
     private static final SlicingQueryPostProcessing NEEDS_TO_BE_REVERESED = new NeedsToBeReversedRepositorySlicingResult();
 
     @SuppressWarnings("rawtypes")
-    private static final UnlimitedQuery UNLIMITED_REPOSITORY_SLICING = new UnlimitedQuery();
+    private static final UnlimitedSortedQuery UNLIMITED_SORTED_REPOSITORY_SLICING = new UnlimitedSortedQuery();
+    @SuppressWarnings("rawtypes")
+    private static final UnlimitedUnsortedQuery UNLIMITED_UNSORTED_REPOSITORY_SLICING = new UnlimitedUnsortedQuery();
 
     public static <T> SlicingQuery<T> firstN(final int limit) {
         return new FirstNQuery<>(limit);
@@ -45,8 +44,13 @@ public class SlicingQueries {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> SlicingQuery<T> unlimited() {
-        return UNLIMITED_REPOSITORY_SLICING;
+    public static <T> SlicingQuery<T> unlimitedSorted() {
+        return UNLIMITED_SORTED_REPOSITORY_SLICING;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> SlicingQuery<T> unlimitedUnsorted() {
+        return UNLIMITED_UNSORTED_REPOSITORY_SLICING;
     }
 
     public static <T> SlicingQuery<T> firstNAfter(final int limit, final T value) {
@@ -99,7 +103,7 @@ public class SlicingQueries {
 
         @Override
         public SlicingQueryPostProcessing postProcessing() {
-            return NOT_NEEDS_TO_BE_REVERESED;
+            return NOT_NEED_TO_BE_REVERESED;
         }
     }
 
@@ -145,10 +149,7 @@ public class SlicingQueries {
         }
     }
 
-    private static class UnlimitedQuery<T> implements SlicingQuery<T> {
-        public UnlimitedQuery() {
-        }
-
+    private static class UnlimitedSortedQuery<T> implements SlicingQuery<T> {
         @Override
         public boolean isOrdered() {
             return true;
@@ -181,7 +182,44 @@ public class SlicingQueries {
 
         @Override
         public SlicingQueryPostProcessing postProcessing() {
-            return NOT_NEEDS_TO_BE_REVERESED;
+            return NOT_NEED_TO_BE_REVERESED;
+        }
+    }
+
+    private static class UnlimitedUnsortedQuery<T> implements SlicingQuery<T> {
+        @Override
+        public boolean isOrdered() {
+            return false;
+        }
+
+        @Override
+        public boolean isDescending() {
+            throw new UnsupportedOperationException("Is not ordered.");
+        }
+
+        @Override
+        public boolean hasLimit() {
+            return false;
+        }
+
+        @Override
+        public int limit() {
+            throw new UnsupportedOperationException("Has no limit.");
+        }
+
+        @Override
+        public boolean hasConditions() {
+            return false;
+        }
+
+        @Override
+        public SlicingQueryCondition<T> condition() {
+            throw new UnsupportedOperationException("Has no conditions.");
+        }
+
+        @Override
+        public SlicingQueryPostProcessing postProcessing() {
+            return NOT_NEED_TO_BE_REVERESED;
         }
     }
 
@@ -230,25 +268,20 @@ public class SlicingQueries {
         public SlicingQueryCondition<T> condition() {
             return new SlicingQueryCondition<T>() {
                 @Override
-                public boolean isLess() {
-                    return false;
-                }
-
-                @Override
-                public boolean isGreater() {
-                    return true;
-                }
-
-                @Override
                 public T value() {
                     return value;
+                }
+
+                @Override
+                public SlicingQueryOperator operator() {
+                    return SlicingQueryOperator.GREATER;
                 }
             };
         }
 
         @Override
         public SlicingQueryPostProcessing postProcessing() {
-            return NOT_NEEDS_TO_BE_REVERESED;
+            return NOT_NEED_TO_BE_REVERESED;
         }
     }
 
@@ -297,18 +330,13 @@ public class SlicingQueries {
         public SlicingQueryCondition<T> condition() {
             return new SlicingQueryCondition<T>() {
                 @Override
-                public boolean isLess() {
-                    return true;
-                }
-
-                @Override
-                public boolean isGreater() {
-                    return false;
-                }
-
-                @Override
                 public T value() {
                     return value;
+                }
+
+                @Override
+                public SlicingQueryOperator operator() {
+                    return SlicingQueryOperator.LESS;
                 }
             };
         }

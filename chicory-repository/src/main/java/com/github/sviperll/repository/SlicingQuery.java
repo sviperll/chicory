@@ -40,16 +40,4 @@ public interface SlicingQuery<T> {
     public SlicingQueryCondition<T> condition();
 
     public SlicingQueryPostProcessing postProcessing();
-
-    public static interface SlicingQueryCondition<T> {
-        public boolean isLess();
-
-        public boolean isGreater();
-
-        public T value();
-    }
-
-    public interface SlicingQueryPostProcessing {
-        public boolean needsToBeReveresed();
-    }
 }
