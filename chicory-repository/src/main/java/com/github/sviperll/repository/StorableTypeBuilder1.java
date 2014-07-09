@@ -42,7 +42,7 @@ public class StorableTypeBuilder1<T, U> {
                                                                                final IsomorphismDefinition<T, U> isomorphism) {
         return new AtomicStorableComponent<T, V>() {
             @Override
-            public TableColumnDefinition<V> getColumn() {
+            public ColumnStorableTypeBuilderDefinition<V> getColumn() {
                 return element.getColumn();
             }
 

@@ -31,7 +31,7 @@ import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
 
-class SQLBuilder implements Appendable, CharSequence {
+public class SQLBuilder implements Appendable, CharSequence {
     private final StringBuilder stringBuilder = new StringBuilder();
 
     public SQLBuilder append(String s) {

@@ -27,7 +27,7 @@
 package com.github.sviperll.repository;
 
 import com.github.sviperll.IsomorphismDefinition;
-import com.github.sviperll.repository.TableColumnDefinition.PreparedStatementParameterSetter;
+import com.github.sviperll.repository.ColumnStorableTypeBuilderDefinition.PreparedStatementParameterSetter;
 import com.github.sviperll.time.Times;
 import com.github.sviperll.time.UnixTime;
 import java.sql.PreparedStatement;
@@ -38,32 +38,32 @@ import java.sql.SQLException;
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public class TableColumn<T> implements TableColumnDefinition<T> {
-    public static TableColumn<Integer> integer(String columnName) {
-        return new TableColumn<>(new IntegerColumn(columnName));
+public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDefinition<T> {
+    public static ColumnStorableTypeBuilder<Integer> integer(String columnName) {
+        return new ColumnStorableTypeBuilder<>(new IntegerColumn(columnName));
     }
 
-    public static TableColumn<String> string(String columnName) {
-        return new TableColumn<>(new StringColumn(columnName));
+    public static ColumnStorableTypeBuilder<String> string(String columnName) {
+        return new ColumnStorableTypeBuilder<>(new StringColumn(columnName));
     }
 
-    public static TableColumn<UnixTime> unixTime(String columnName) {
-        return new TableColumn<>(new UnixTimeColumn(columnName));
+    public static ColumnStorableTypeBuilder<UnixTime> unixTime(String columnName) {
+        return new ColumnStorableTypeBuilder<>(new UnixTimeColumn(columnName));
     }
 
-    public static TableColumn<Boolean> booleanColumn(final String columnName) {
-        return new TableColumn<>(new BooleanColumn(columnName));
+    public static ColumnStorableTypeBuilder<Boolean> booleanColumn(final String columnName) {
+        return new ColumnStorableTypeBuilder<>(new BooleanColumn(columnName));
     }
 
-    public static <T> TableColumn<T> of(TableColumnDefinition<T> column) {
-        if (column instanceof TableColumn)
-            return (TableColumn<T>)column;
+    public static <T> ColumnStorableTypeBuilder<T> of(ColumnStorableTypeBuilderDefinition<T> column) {
+        if (column instanceof ColumnStorableTypeBuilder)
+            return (ColumnStorableTypeBuilder<T>)column;
         else
-            return new TableColumn<>(column);
+            return new ColumnStorableTypeBuilder<>(column);
     }
 
-    private final TableColumnDefinition<T> column;
-    private TableColumn(TableColumnDefinition<T> column) {
+    private final ColumnStorableTypeBuilderDefinition<T> column;
+    private ColumnStorableTypeBuilder(ColumnStorableTypeBuilderDefinition<T> column) {
         this.column = column;
     }
 
@@ -92,19 +92,19 @@ public class TableColumn<T> implements TableColumnDefinition<T> {
         return column.retrieveValue(resultSet, index);
     }
 
-    public <U> TableColumn<U> isomorphic(IsomorphismDefinition<U, T> structure) {
-        return new TableColumn<>(new IsomorphicColumn<>(column, structure));
+    public <U> ColumnStorableTypeBuilder<U> isomorphic(IsomorphismDefinition<U, T> structure) {
+        return new ColumnStorableTypeBuilder<>(new IsomorphicColumn<>(column, structure));
     }
 
-    public TableColumn<T> retrievedByIndex(int index) {
-        return new TableColumn<>(new RetrievedByIndexColumn<>(column, index));
+    public ColumnStorableTypeBuilder<T> retrievedByIndex(int index) {
+        return new ColumnStorableTypeBuilder<>(new RetrievedByIndexColumn<>(column, index));
     }
 
-    public StorableType<T> storable() {
+    public StorableType<T> build() {
         return StorableType.of(column);
     }
 
-    private static class IntegerColumn implements TableColumnDefinition<Integer> {
+    private static class IntegerColumn implements ColumnStorableTypeBuilderDefinition<Integer> {
         private final String name;
         public IntegerColumn(String name) {
             this.name = name;
@@ -161,7 +161,7 @@ public class TableColumn<T> implements TableColumnDefinition<T> {
 
     }
 
-    private static class StringColumn implements TableColumnDefinition<String> {
+    private static class StringColumn implements ColumnStorableTypeBuilderDefinition<String> {
         private final String name;
         public StringColumn(String name) {
             this.name = name;
@@ -209,7 +209,7 @@ public class TableColumn<T> implements TableColumnDefinition<T> {
         }
     }
 
-    private static class UnixTimeColumn implements TableColumnDefinition<UnixTime> {
+    private static class UnixTimeColumn implements ColumnStorableTypeBuilderDefinition<UnixTime> {
         private final String name;
         public UnixTimeColumn(String name) {
             this.name = name;
@@ -254,10 +254,10 @@ public class TableColumn<T> implements TableColumnDefinition<T> {
         }
     }
 
-    private static class IsomorphicColumn<T, U> implements TableColumnDefinition<T> {
-        private final TableColumnDefinition<U> columnDefinition;
+    private static class IsomorphicColumn<T, U> implements ColumnStorableTypeBuilderDefinition<T> {
+        private final ColumnStorableTypeBuilderDefinition<U> columnDefinition;
         private final IsomorphismDefinition<T, U> structure;
-        public IsomorphicColumn(TableColumnDefinition<U> columnDefinition, IsomorphismDefinition<T, U> structure) {
+        public IsomorphicColumn(ColumnStorableTypeBuilderDefinition<U> columnDefinition, IsomorphismDefinition<T, U> structure) {
             this.columnDefinition = columnDefinition;
             this.structure = structure;
         }
@@ -294,10 +294,10 @@ public class TableColumn<T> implements TableColumnDefinition<T> {
         }
     }
 
-    private static class RetrievedByIndexColumn<T> implements TableColumnDefinition<T> {
-        private final TableColumnDefinition<T> columnDefinition;
+    private static class RetrievedByIndexColumn<T> implements ColumnStorableTypeBuilderDefinition<T> {
+        private final ColumnStorableTypeBuilderDefinition<T> columnDefinition;
         private final int index;
-        public RetrievedByIndexColumn(TableColumnDefinition<T> columnDefinition, int index) {
+        public RetrievedByIndexColumn(ColumnStorableTypeBuilderDefinition<T> columnDefinition, int index) {
             this.columnDefinition = columnDefinition;
             this.index = index;
         }
@@ -328,7 +328,7 @@ public class TableColumn<T> implements TableColumnDefinition<T> {
         }
     }
 
-    private static class BooleanColumn implements TableColumnDefinition<Boolean> {
+    private static class BooleanColumn implements ColumnStorableTypeBuilderDefinition<Boolean> {
         private final String columnName;
 
         public BooleanColumn(String columnName) {

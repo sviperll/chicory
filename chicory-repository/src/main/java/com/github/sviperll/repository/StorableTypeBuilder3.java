@@ -41,7 +41,7 @@ public class StorableTypeBuilder3<T, U, V, W> {
         return new AtomicStorableComponent<T, V>() {
 
             @Override
-            public TableColumnDefinition<V> getColumn() {
+            public ColumnStorableTypeBuilderDefinition<V> getColumn() {
                 return element.getColumn();
             }
 
@@ -56,7 +56,7 @@ public class StorableTypeBuilder3<T, U, V, W> {
         return new AtomicStorableComponent<T, V>() {
 
             @Override
-            public TableColumnDefinition<V> getColumn() {
+            public ColumnStorableTypeBuilderDefinition<V> getColumn() {
                 return element.getColumn();
             }
 
@@ -71,7 +71,7 @@ public class StorableTypeBuilder3<T, U, V, W> {
         return new AtomicStorableComponent<T, V>() {
 
             @Override
-            public TableColumnDefinition<V> getColumn() {
+            public ColumnStorableTypeBuilderDefinition<V> getColumn() {
                 return element.getColumn();
             }
 

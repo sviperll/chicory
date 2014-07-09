@@ -33,7 +33,7 @@ import java.sql.SQLException;
 /**
  * @param <U> column value data-type
  */
-public interface TableColumnDefinition<U> {
+public interface ColumnStorableTypeBuilderDefinition<U> {
     String getColumnName();
 
     PreparedStatementParameterSetter<U> createStatementSetter(PreparedStatement statement);

@@ -36,8 +36,8 @@ import java.util.List;
  */
 public class RepositoryFactory {
     private final RepositorySupport support;
-    public RepositoryFactory(RepositorySupport support) {
-        this.support = support;
+    public RepositoryFactory(RepositorySupportDefinition support) {
+        this.support = RepositorySupport.of(support);
     }
 
     public RepositorySupport support() {

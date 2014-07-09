@@ -31,7 +31,7 @@ package com.github.sviperll.repository;
  * @param <U> column value data-type
  */
 public interface AtomicStorableComponent<T, U> {
-    TableColumnDefinition<U> getColumn();
+    ColumnStorableTypeBuilderDefinition<U> getColumn();
 
     U getComponent(T compound);
 }

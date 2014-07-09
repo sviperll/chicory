@@ -43,13 +43,13 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
             return new StorableType<>(definition);
     }
 
-    public static <T> StorableType<T> of(final TableColumnDefinition<T> column) {
+    public static <T> StorableType<T> of(final ColumnStorableTypeBuilderDefinition<T> column) {
         return new StorableType<>(new StorableTypeDefinition<T>() {
             @Override
             public List<? extends AtomicStorableComponent<T, ?>> getAtomicComponents() {
                 return Collections.singletonList(new AtomicStorableComponent<T, T>() {
                     @Override
-                    public TableColumnDefinition<T> getColumn() {
+                    public ColumnStorableTypeBuilderDefinition<T> getColumn() {
                         return column;
                     }
 
@@ -65,6 +65,10 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
                 return column.retrieveValue(resultSet);
             }
         });
+    }
+
+    public static ColumnBuilder forColumn(String name) {
+        return new ColumnBuilder(name);
     }
 
     public static <T, U> StorableType<T> of(final StorableTypeDefinition<U> base, final IsomorphismDefinition<T, U> isomorphism) {
