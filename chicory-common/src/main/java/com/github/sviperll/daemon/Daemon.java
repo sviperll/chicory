@@ -51,25 +51,26 @@ public class Daemon {
         signalWaiter.waitForSignal();
     }
 
-    public static void run(DaemonLog log, Runnable runnable) throws IOException {
-        Daemon daemom = new Daemon(log, runnable);
+    public static void run(Runnable runnable, DaemonLog log) throws IOException {
+        Daemon daemom = new Daemon(runnable, log);
         daemom.run();
     }
 
-    public static void run(DaemonLog log, Runnable runnable, File pidFile) throws IOException {
-        Daemon daemom = new Daemon(log, runnable, pidFile);
+    public static void run(Runnable runnable, DaemonLog log, File pidFile) throws IOException {
+        Daemon daemom = new Daemon(runnable, log, pidFile);
         daemom.run();
     }
 
-    private File pidFile = null;
+    private final File pidFile;
     private final DaemonLog log;
     private final Runnable runnable;
-    private Daemon(DaemonLog log, Runnable runnable) {
+    private Daemon(Runnable runnable, DaemonLog log) {
         this.log = log;
         this.runnable = runnable;
+        this.pidFile = null;
     }
 
-    private Daemon(DaemonLog log, Runnable runnable, File pidFile) {
+    private Daemon(Runnable runnable, DaemonLog log, File pidFile) {
         this.log = log;
         this.runnable = runnable;
         this.pidFile = pidFile;

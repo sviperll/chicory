@@ -24,34 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.io;
+package com.github.sviperll.graphics;
 
-import java.io.Closeable;
-import java.io.IOException;
+import java.awt.Graphics2D;
+import java.awt.Point;
 
-public class JoinedCloseable implements Closeable {
-    private final Iterable<? extends Closeable> closeables;
-    public JoinedCloseable(Iterable<? extends Closeable> closeables) {
-        this.closeables = closeables;
-    }
-
-    @Override
-    public void close() throws IOException {
-        Exception exception = null;
-        for (Closeable closeable: closeables) {
-            try {
-                closeable.close();
-            } catch (    IOException | RuntimeException ex) {
-                exception = ex;
-            }
-        }
-        if (exception != null) {
-            if (exception instanceof IOException)
-                throw (IOException)exception;
-            else if (exception instanceof RuntimeException)
-                throw (RuntimeException)exception;
-            else
-                throw new IllegalStateException("Unexpected exception type: " + exception);
-        }
-    }
+public interface Drawable {
+    void draw(Graphics2D graphics, Point location);
 }

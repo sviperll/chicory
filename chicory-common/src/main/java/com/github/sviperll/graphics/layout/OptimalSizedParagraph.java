@@ -24,8 +24,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.draw;
+package com.github.sviperll.graphics.layout;
 
+import com.github.sviperll.graphics.Drawable;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -37,32 +38,46 @@ public class OptimalSizedParagraph implements Drawable {
     private final TextLine lines;
     private final ParagraphPlacement placement;
     private final Dimension dimension;
+    private final double accuracy;
 
-    public OptimalSizedParagraph(TextLine lines, ParagraphPlacement placement, Dimension dimension) {
+    public OptimalSizedParagraph(TextLine lines, ParagraphPlacement placement, Dimension dimension, double accuracy) {
         this.placement = placement;
         this.dimension = dimension;
         this.lines = lines;
+        this.accuracy = accuracy;
     }
 
     @Override
     public void draw(Graphics2D graphics, Point point) {
-        setOptimalFontSize(graphics);
+        setOptimalFontSize(graphics, accuracy);
         SimpleParagraph p = new SimpleParagraph(lines, placement, dimension.width);
         p.draw(graphics, point);
     }
 
-    private void setOptimalFontSize(Graphics2D graphics) {
+    private void setOptimalFontSize(Graphics2D graphics, double delta) {
         FontRenderContext frc = graphics.getFontRenderContext();
         Font font = graphics.getFont();
-        float size = font.getSize2D();
-        for(;;) {
-            LineBreakTester lbt = new LineBreakTester(frc, font);
-            if (lbt.testLine())
-                break;
-            size -= 0.5;
-            font = font.deriveFont(size);
+        double maxSize = font.getSize2D();
+        while (fits(frc, font, maxSize)) {
+            maxSize *= 2;
         }
-        graphics.setFont(font);
+        double minSize = maxSize;
+        while (!fits(frc, font, minSize)) {
+            minSize /= 2;
+        }
+        while (maxSize - minSize > delta) {
+            double size = (minSize + maxSize) / 2;
+            if (fits(frc, font, size))
+                minSize = size;
+            else
+                maxSize = size;
+        }
+        graphics.setFont(font.deriveFont((float)minSize));
+    }
+
+    private boolean fits(FontRenderContext frc, Font font, double size) {
+        LineBreakTester lineBreakTester = new LineBreakTester(frc, font.deriveFont((float)size));
+        return lineBreakTester.testLine();
     }
 
     private class LineBreakTester {

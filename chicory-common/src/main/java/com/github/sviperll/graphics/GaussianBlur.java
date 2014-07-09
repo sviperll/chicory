@@ -24,15 +24,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.draw;
+package com.github.sviperll.graphics;
 
 import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.awt.image.ColorModel;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
+import java.awt.image.WritableRaster;
+import java.util.Hashtable;
 
-public class GaussianBlur {
+public class GaussianBlur implements BufferedImageOp {
     public static GaussianBlur prepare(double sigmaHor, double sigmaVer, int width, int height, RenderingHints renderingHints) {
         BufferedImageOp opHor = null;
         if (sigmaVer != 0) {
@@ -47,7 +52,7 @@ public class GaussianBlur {
             Kernel kernelVer = new Kernel(1, kernelValuesVer.length, kernelValuesVer);
             opVer = new ConvolveOp(kernelVer, ConvolveOp.EDGE_NO_OP, renderingHints);
         }
-        return new GaussianBlur(opHor, opVer);
+        return new GaussianBlur(opHor, opVer, renderingHints);
     }
 
     private static float[] gausianKernelValues(double sigma, int n) {
@@ -68,10 +73,12 @@ public class GaussianBlur {
     }
     private final BufferedImageOp opHor;
     private final BufferedImageOp opVer;
+    private final RenderingHints renderingHints;
 
-    private GaussianBlur(BufferedImageOp opHor, BufferedImageOp opVer) {
+    private GaussianBlur(BufferedImageOp opHor, BufferedImageOp opVer, RenderingHints renderingHints) {
         this.opHor = opHor;
         this.opVer = opVer;
+        this.renderingHints = renderingHints;
     }
 
     public BufferedImage filter(BufferedImage image) {
@@ -82,5 +89,60 @@ public class GaussianBlur {
             image = opVer.filter(image, null);
         }
         return image;
+    }
+
+    @Override
+    public BufferedImage filter(BufferedImage src, BufferedImage dest) {
+        if (opHor != null && opVer != null) {
+            BufferedImage image = opHor.filter(src, null);
+            return opVer.filter(image, dest);
+        } else if (opVer != null) {
+            return opVer.filter(src, dest);
+        } else if (opHor != null) {
+            return opHor.filter(src, dest);
+        } else {
+            if (dest == null) {
+                dest = createCompatibleDestImage(src, null);
+            }
+            src.copyData(dest.getRaster());
+            return dest;
+        }
+    }
+
+    @Override
+    public Rectangle2D getBounds2D(BufferedImage src) {
+        if (opHor != null && opVer != null) {
+            return opHor.getBounds2D(src).createIntersection(opVer.getBounds2D(src));
+        } else if (opVer != null) {
+            return opVer.getBounds2D(src);
+        } else if (opHor != null) {
+            return opHor.getBounds2D(src);
+        } else
+            return new Rectangle2D.Float(src.getMinX(), src.getMinY(), src.getWidth(), src.getHeight());
+    }
+
+    @Override
+    public BufferedImage createCompatibleDestImage(BufferedImage src, ColorModel destCM) {
+        if (destCM == null)
+            destCM = src.getColorModel();
+        WritableRaster raster = src.getRaster().createCompatibleWritableRaster();
+        Hashtable<String, Object> properties = new Hashtable<>();
+        for (String name: src.getPropertyNames()) {
+            properties.put(name, src.getProperty(name));
+        }
+        return new BufferedImage(destCM, raster, src.isAlphaPremultiplied(), properties);
+    }
+
+    @Override
+    public Point2D getPoint2D(Point2D srcPt, Point2D dstPt) {
+        if (dstPt == null)
+            dstPt = new Point2D.Double();
+        dstPt.setLocation(srcPt);
+        return dstPt;
+    }
+
+    @Override
+    public RenderingHints getRenderingHints() {
+        return renderingHints;
     }
 }
