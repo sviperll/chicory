@@ -29,8 +29,8 @@ package com.github.sviperll.concurrent;
 
 import java.util.concurrent.TimeoutException;
 
+@SuppressWarnings("serial")
 public class RuntimeTimeoutException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
     private final TimeoutException cause;
     public RuntimeTimeoutException(String message, TimeoutException cause) {
         super(message, cause);
