@@ -49,14 +49,16 @@ public class OptimalSizedParagraph implements Drawable {
 
     @Override
     public void draw(Graphics2D graphics, Point point) {
-        setOptimalFontSize(graphics, accuracy);
+        FontRenderContext frc = graphics.getFontRenderContext();
+        Font currentFont = graphics.getFont();
+        Font optimalFont = deriveOptimalFont(frc, currentFont);
+        graphics.setFont(optimalFont);
         SimpleParagraph p = new SimpleParagraph(lines, placement, dimension.width);
         p.draw(graphics, point);
+        graphics.setFont(currentFont);
     }
 
-    private void setOptimalFontSize(Graphics2D graphics, double delta) {
-        FontRenderContext frc = graphics.getFontRenderContext();
-        Font font = graphics.getFont();
+    private Font deriveOptimalFont(FontRenderContext frc, Font font) {
         double maxSize = font.getSize2D();
         while (fits(frc, font, maxSize)) {
             maxSize *= 2;
@@ -65,14 +67,14 @@ public class OptimalSizedParagraph implements Drawable {
         while (!fits(frc, font, minSize)) {
             minSize /= 2;
         }
-        while (maxSize - minSize > delta) {
+        while (maxSize - minSize > accuracy) {
             double size = (minSize + maxSize) / 2;
             if (fits(frc, font, size))
                 minSize = size;
             else
                 maxSize = size;
         }
-        graphics.setFont(font.deriveFont((float)minSize));
+        return font.deriveFont((float)minSize);
     }
 
     private boolean fits(FontRenderContext frc, Font font, double size) {
