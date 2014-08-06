@@ -67,6 +67,12 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
         });
     }
 
+    /**
+     * Build storable type for single table column
+     *
+     * @param name column name in relational database
+     * @return builder object to build storable type
+     */
     public static ColumnBuilder forColumn(String name) {
         return new ColumnBuilder(name);
     }

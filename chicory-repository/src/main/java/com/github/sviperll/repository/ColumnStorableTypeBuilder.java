@@ -39,18 +39,38 @@ import java.sql.SQLException;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDefinition<T> {
+    /**
+     * You should probably use {@link StorableType#forColumn}
+     *
+     * @see StorableType#forColumn
+     */
     public static ColumnStorableTypeBuilder<Integer> integer(String columnName) {
         return new ColumnStorableTypeBuilder<>(new IntegerColumn(columnName));
     }
 
+    /**
+     * You should probably use {@link StorableType#forColumn}
+     *
+     * @see StorableType#forColumn
+     */
     public static ColumnStorableTypeBuilder<String> string(String columnName) {
         return new ColumnStorableTypeBuilder<>(new StringColumn(columnName));
     }
 
+    /**
+     * You should probably use {@link StorableType#forColumn}
+     *
+     * @see StorableType#forColumn
+     */
     public static ColumnStorableTypeBuilder<UnixTime> unixTime(String columnName) {
         return new ColumnStorableTypeBuilder<>(new UnixTimeColumn(columnName));
     }
 
+    /**
+     * You should probably use {@link StorableType#forColumn}
+     *
+     * @see StorableType#forColumn
+     */
     public static ColumnStorableTypeBuilder<Boolean> booleanColumn(final String columnName) {
         return new ColumnStorableTypeBuilder<>(new BooleanColumn(columnName));
     }
@@ -100,6 +120,9 @@ public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDe
         return new ColumnStorableTypeBuilder<>(new RetrievedByIndexColumn<>(column, index));
     }
 
+    /**
+     * @return storable type for single column
+     */
     public StorableType<T> build() {
         return StorableType.of(column);
     }
