@@ -34,5 +34,14 @@ package com.github.sviperll.repository;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 public enum SlicingQueryOperator {
-    LESS, LESS_OR_EQUAL, GREATER, GREATER_OR_EQUAL
+    LESS("<"), LESS_OR_EQUAL("<="), GREATER(">"), GREATER_OR_EQUAL(">=");
+    private final String sqlOperator;
+
+    private SlicingQueryOperator(String sqlOperator) {
+        this.sqlOperator = sqlOperator;
+    }
+
+    public String sqlOperator() {
+        return sqlOperator;
+    }
 }
