@@ -42,9 +42,11 @@ public class RepositorySupport implements RepositorySupportDefinition, SQLTransa
     }
 
     private final RepositorySupportDefinition definition;
+    private final SQLConnection connection;
 
     private RepositorySupport(RepositorySupportDefinition definition) {
         this.definition = definition;
+        this.connection = definition.connection();
     }
 
     @Override
@@ -94,32 +96,36 @@ public class RepositorySupport implements RepositorySupportDefinition, SQLTransa
 
     @Override
     public void beginTransaction() throws SQLException {
-        definition.connection().beginTransaction();
+        connection.beginTransaction();
     }
 
     @Override
     public void beginTransaction(SQLTransactionIsolationLevel level) throws SQLException {
-        definition.connection().beginTransaction(level);
+        connection.beginTransaction(level);
     }
 
     @Override
     public void commitTransaction() throws SQLException {
-        definition.connection().commitTransaction();
+        connection.commitTransaction();
     }
 
     @Override
     public void rollbackTransaction() throws SQLException {
-        definition.connection().rollbackTransaction();
+        connection.rollbackTransaction();
     }
 
     @Override
     public void rollbackTransactionIfNotCommited() throws SQLException {
-        definition.connection().rollbackTransactionIfNotCommited();
+        connection.rollbackTransactionIfNotCommited();
     }
 
     @Override
     public SQLConnection connection() {
-        return definition.connection();
+        return connection;
+    }
+
+    public void close() throws SQLException {
+        connection.close();
     }
 
     private static class VoidReadableRepositoryDirectoryConfiguration<V, O> implements ReadableRepositoryDirectoryConfiguration<Void, V, O> {
