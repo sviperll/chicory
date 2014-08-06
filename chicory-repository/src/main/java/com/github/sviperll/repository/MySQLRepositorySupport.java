@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MySQLRepositorySupportDefinition implements RepositorySupportDefinition {
+public class MySQLRepositorySupport implements RepositorySupportDefinition {
     private static <T, U> boolean isElementsEquals(AtomicStorableComponent<T, U> definition, T value1, T value2) {
         U elementValue1 = definition.getComponent(value1);
         U elementValue2 = definition.getComponent(value2);
@@ -48,7 +48,7 @@ public class MySQLRepositorySupportDefinition implements RepositorySupportDefini
 
     private final SQLConnection connection;
 
-    public MySQLRepositorySupportDefinition(SQLConnection connection) {
+    public MySQLRepositorySupport(SQLConnection connection) {
         this.connection = connection;
     }
 
