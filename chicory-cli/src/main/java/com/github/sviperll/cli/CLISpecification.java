@@ -202,7 +202,7 @@ public class CLISpecification {
     /**
      * Interface to specify how to write default value of some command line key in usage-message
      * 
-     * @see formatParameterDescription
+     * @see ParameterDescriptionFormatter#formatParameterDescription
      */
     public interface ParameterDescriptionFormatter {
         /**
