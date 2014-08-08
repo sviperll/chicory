@@ -44,34 +44,54 @@ public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDe
      *
      * @see StorableType#forColumn
      */
+    @Deprecated
     public static ColumnStorableTypeBuilder<Integer> integer(String columnName) {
+        return integerColumnBuilder(columnName);
+    }
+
+    /**
+     * You should probably use {@link StorableType#forColumn}
+     *
+     * @see StorableType#forColumn
+     */
+    @Deprecated
+    public static ColumnStorableTypeBuilder<String> string(String columnName) {
+        return stringColumnBuilder(columnName);
+    }
+
+    /**
+     * You should probably use {@link StorableType#forColumn}
+     *
+     * @see StorableType#forColumn
+     */
+    @Deprecated
+    public static ColumnStorableTypeBuilder<UnixTime> unixTime(String columnName) {
+        return unixTimeColumnBuilder(columnName);
+    }
+
+    /**
+     * You should probably use {@link StorableType#forColumn}
+     *
+     * @see StorableType#forColumn
+     */
+    @Deprecated
+    public static ColumnStorableTypeBuilder<Boolean> booleanColumn(final String columnName) {
+        return booleanColumnBuilder(columnName);
+    }
+
+    static ColumnStorableTypeBuilder<Integer> integerColumnBuilder(String columnName) {
         return new ColumnStorableTypeBuilder<>(new IntegerColumn(columnName));
     }
 
-    /**
-     * You should probably use {@link StorableType#forColumn}
-     *
-     * @see StorableType#forColumn
-     */
-    public static ColumnStorableTypeBuilder<String> string(String columnName) {
+    static ColumnStorableTypeBuilder<String> stringColumnBuilder(String columnName) {
         return new ColumnStorableTypeBuilder<>(new StringColumn(columnName));
     }
 
-    /**
-     * You should probably use {@link StorableType#forColumn}
-     *
-     * @see StorableType#forColumn
-     */
-    public static ColumnStorableTypeBuilder<UnixTime> unixTime(String columnName) {
+    static ColumnStorableTypeBuilder<UnixTime> unixTimeColumnBuilder(String columnName) {
         return new ColumnStorableTypeBuilder<>(new UnixTimeColumn(columnName));
     }
 
-    /**
-     * You should probably use {@link StorableType#forColumn}
-     *
-     * @see StorableType#forColumn
-     */
-    public static ColumnStorableTypeBuilder<Boolean> booleanColumn(final String columnName) {
+    static ColumnStorableTypeBuilder<Boolean> booleanColumnBuilder(final String columnName) {
         return new ColumnStorableTypeBuilder<>(new BooleanColumn(columnName));
     }
 

@@ -46,28 +46,28 @@ public class ColumnBuilder {
      * @return builder object to build storable type for single integer column
      */
     public ColumnStorableTypeBuilder<Integer> integer() {
-        return ColumnStorableTypeBuilder.integer(name);
+        return ColumnStorableTypeBuilder.integerColumnBuilder(name);
     }
 
     /**
      * @return builder object to build storable type for single string column
      */
     public ColumnStorableTypeBuilder<String> string() {
-        return ColumnStorableTypeBuilder.string(name);
+        return ColumnStorableTypeBuilder.stringColumnBuilder(name);
     }
 
     /**
      * @return builder object to build storable type for single UnitTime column
      */
     public ColumnStorableTypeBuilder<UnixTime> unixTime() {
-        return ColumnStorableTypeBuilder.unixTime(name);
+        return ColumnStorableTypeBuilder.unixTimeColumnBuilder(name);
     }
 
     /**
      * @return builder object to build storable type for single boolean column
      */
     public ColumnStorableTypeBuilder<Boolean> booleanColumn() {
-        return ColumnStorableTypeBuilder.booleanColumn(name);
+        return ColumnStorableTypeBuilder.booleanColumnBuilder(name);
     }
 
 }
