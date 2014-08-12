@@ -37,7 +37,7 @@ public class TimesTest {
         Day day = new Day(2013, new YearDay(Month.FEBRUARY, 5), WeekDay.TUESDAY);
         ClockTime clockTime = new ClockTime(18, 9, 47, 593);
         HumanTime humanExpected = new HumanTime(day, clockTime, moscow);
-        HumanTime humanActual = Times.getHumanTime(unix, moscow);
+        HumanTime humanActual = Time.getHumanTime(unix, moscow);
         assertEquals(humanExpected.clockTime(), humanActual.clockTime());
         assertEquals(humanExpected.offset(), humanActual.offset());
         assertEquals(humanExpected.day().weekDay(), humanActual.day().weekDay());
@@ -52,7 +52,7 @@ public class TimesTest {
         ClockTime clockTime = new ClockTime(18, 9, 47, 593);
         HumanTime human = new HumanTime(day, clockTime, moscow);
         UnixTime unixExpected = new UnixTime(1360073387593L);
-        UnixTime unixActual = Times.getUnixTime(human);
+        UnixTime unixActual = Time.getUnixTime(human);
         assertEquals(unixExpected, unixActual);
     }
 
@@ -61,8 +61,8 @@ public class TimesTest {
         TimeZoneOffset moscow = new TimeZoneOffset(4 * 60);
         for (int i = 0; i < 300; i++) {
             UnixTime unix1 = new UnixTime((int)(Math.random() * 1000000000) - 500000000);
-            HumanTime human = Times.getHumanTime(unix1, moscow);
-            UnixTime unix2 = Times.getUnixTime(human);
+            HumanTime human = Time.getHumanTime(unix1, moscow);
+            UnixTime unix2 = Time.getUnixTime(human);
             assertEquals(unix1, unix2);
         }
     }

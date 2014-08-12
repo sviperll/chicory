@@ -28,7 +28,7 @@ package com.github.sviperll.repository;
 
 import com.github.sviperll.IsomorphismDefinition;
 import com.github.sviperll.repository.ColumnStorableTypeBuilderDefinition.PreparedStatementParameterSetter;
-import com.github.sviperll.time.Times;
+import com.github.sviperll.time.Time;
 import com.github.sviperll.time.UnixTime;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -275,12 +275,12 @@ public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDe
 
         @Override
         public UnixTime retrieveValue(ResultSet resultSet, String label) throws SQLException {
-            return Times.resultSet(resultSet).getUnixTime(label, Times.GMT_OFFSET);
+            return Time.resultSet(resultSet).getUnixTime(label, Time.GMT_OFFSET);
         }
 
         @Override
         public UnixTime retrieveValue(ResultSet resultSet, int index) throws SQLException {
-            return Times.resultSet(resultSet).getUnixTime(index, Times.GMT_OFFSET);
+            return Time.resultSet(resultSet).getUnixTime(index, Time.GMT_OFFSET);
         }
 
         private static class UnixTimeColumnStatementSetter implements PreparedStatementParameterSetter<UnixTime> {
@@ -292,7 +292,7 @@ public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDe
 
             @Override
             public void setValue(int index, UnixTime value) throws SQLException {
-                Times.preparedStatement(statement).setUnixTime(index, value, Times.GMT_OFFSET);
+                Time.preparedStatement(statement).setUnixTime(index, value, Time.GMT_OFFSET);
             }
         }
     }

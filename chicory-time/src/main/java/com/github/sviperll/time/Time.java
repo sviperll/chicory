@@ -32,11 +32,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
-public class Times {
+public class Time {
     public static final TimeZoneOffset GMT_OFFSET = new TimeZoneOffset(0);
 
     public static HumanTime getHumanTime(UnixTime instant, TimeZoneOffset offset) {
@@ -62,6 +64,7 @@ public class Times {
         formatter.format("GMT%+03d%02d", hours, minutes);
         TimeZone timeZone = TimeZone.getTimeZone(formatter.toString());
         GregorianCalendar calendar = new GregorianCalendar(timeZone);
+        calendar.setGregorianChange(new Date(Long.MIN_VALUE));
         calendar.clear();
         return calendar;
     }
@@ -274,7 +277,7 @@ public class Times {
         return new TimePreparedStatement(statement);
     }
 
-    private Times() {
+    private Time() {
     }
 
     public static class TimeResultSet {
