@@ -50,7 +50,7 @@ public class Function<T, R> implements Applicable<T, R> {
             // so this cast is safe
             return (Function<T, R>)function;
         } else
-            return new Function<>(function);
+            return new Function<T, R>(function);
     }
 
     private final Applicable<? super T, R> function;
@@ -64,19 +64,19 @@ public class Function<T, R> implements Applicable<T, R> {
     }
 
     public <U> Function<U, R> composeWith(Applicable<U, ? extends T> thatFunction) {
-        return new Function<>(new ComposedApplicable<>(this.function, thatFunction));
+        return new Function<U, R>(new ComposedApplicable<U, T, R>(this.function, thatFunction));
     }
 
     public <U> Function<T, U> andThen(Applicable<? super R, U> thatFunction) {
-        return new Function<>(new ComposedApplicable<>(thatFunction, this.function));
+        return new Function<T, U>(new ComposedApplicable<T, R, U>(thatFunction, this.function));
     }
 
     public Function<T, R> passNullThrough() {
-        return new Function<>(new PassingNullThroughApplicable<>(function));
+        return new Function<T, R>(new PassingNullThroughApplicable<T, R>(function));
     }
 
     public Function<T, R> throwOnNull() {
-        return new Function<>(new ThrowingOnNullApplicable<>(function));
+        return new Function<T, R>(new ThrowingOnNullApplicable<T, R>(function));
     }
 
     private static class IdApplicable<R, T extends R> implements Applicable<T, R> {
@@ -87,9 +87,9 @@ public class Function<T, R> implements Applicable<T, R> {
     }
 
     private static class ComposedApplicable<T, Q, R> implements Applicable<T, R> {
-        private final Applicable<? super Q, R> f;
-        private final Applicable<? super T, Q> g;
-        public ComposedApplicable(Applicable<? super Q, R> f, Applicable<? super T, Q> g) {
+        private final Applicable<? super Q, ? extends R> f;
+        private final Applicable<? super T, ? extends Q> g;
+        public ComposedApplicable(Applicable<? super Q, ? extends R> f, Applicable<? super T, ? extends Q> g) {
             this.f = f;
             this.g = g;
         }

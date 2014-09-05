@@ -52,7 +52,7 @@ public class SimpleParagraph implements Drawable {
 
     @Override
     public void draw(Graphics2D graphics, Point location) {
-        Map<TextAttribute, Object> attrs = new TreeMap<>();
+        Map<TextAttribute, Object> attrs = new TreeMap<TextAttribute, Object>();
         attrs.put(TextAttribute.FONT, graphics.getFont());
 
         AttributedString as = new AttributedString(lines.text(), attrs);

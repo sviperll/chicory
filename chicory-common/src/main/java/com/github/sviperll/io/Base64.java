@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Base64 {
     /**
@@ -47,8 +49,15 @@ public class Base64 {
     public static byte[] encode(byte[] bytes) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try (OutputStream os = createOneLineEncoderOutputStream(baos)) {
+            OutputStream os = createOneLineEncoderOutputStream(baos);
+            try {
                 os.write(bytes);
+            } finally {
+                try {
+                    os.close();
+                } catch (Exception ex) {
+                    Logger.getLogger(Base64.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             return baos.toByteArray();
         } catch (IOException ex) {
@@ -72,8 +81,15 @@ public class Base64 {
     public static byte[] encodeIntoMultipleLines(byte[] bytes) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try (OutputStream os = createEncoderOutputStream(baos)) {
+            OutputStream os = createEncoderOutputStream(baos);
+            try {
                 os.write(bytes);
+            } finally {
+                try {
+                    os.close();
+                } catch (Exception ex) {
+                    Logger.getLogger(Base64.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             return baos.toByteArray();
         } catch (IOException ex) {
@@ -95,8 +111,15 @@ public class Base64 {
     public static byte[] encodeIntoMultipleLines(byte[] bytes, int splitLinesAt) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try (OutputStream os = createEncoderOutputStream(baos, splitLinesAt)) {
+            OutputStream os = createEncoderOutputStream(baos, splitLinesAt);
+            try {
                 os.write(bytes);
+            } finally {
+                try {
+                    os.close();
+                } catch (Exception ex) {
+                    Logger.getLogger(Base64.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             return baos.toByteArray();
         } catch (IOException ex) {

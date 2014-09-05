@@ -38,13 +38,13 @@ class StreamIterator<T> implements CloseableIterator<T> {
     private static CloseableIterator EMPTY_INTERATOR = new EmptyIterator();
 
     public static <T> CloseableIterator<T> createInstance(Streamable<T> streamable) {
-        final Drainer<T> drainer = new Drainer<>(streamable);
+        final Drainer<T> drainer = new Drainer<T>(streamable);
         Thread thread = new Thread(drainer);
         thread.start();
         return drainer.fetch().accept(new DrainerResponseVisitor<T, CloseableIterator<T>>() {
             @Override
             public CloseableIterator<T> fetched(T value) {
-                StreamIterator<T> iterator = new StreamIterator<>(drainer);
+                StreamIterator<T> iterator = new StreamIterator<T>(drainer);
                 iterator.setHasNextValueState(value);
                 return iterator;
             }

@@ -47,7 +47,9 @@ public class CLIHandlers {
             public void handleCLIParameter(String param) throws CLIParameterFormatException {
                 try {
                     property.set(Charset.forName(param));
-                } catch (        IllegalCharsetNameException | UnsupportedCharsetException ex) {
+                } catch (IllegalCharsetNameException ex) {
+                    throw new CLIParameterFormatException("Argument is not one of supported charecter sets: " + param, ex);
+                } catch (UnsupportedCharsetException ex) {
                     throw new CLIParameterFormatException("Argument is not one of supported charecter sets: " + param, ex);
                 }
             }

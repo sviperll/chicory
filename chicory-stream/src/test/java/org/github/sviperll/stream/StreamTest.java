@@ -55,12 +55,15 @@ public class StreamTest {
             }
         });
         assert(!isOpened);
-        try (CloseableIterator<Integer> iterator = test.openIterator()) {
+        CloseableIterator<Integer> iterator = test.openIterator();
+        try {
             assert(isOpened);
             assertEquals(1, iterator.next().intValue());
             assertEquals(2, iterator.next().intValue());
             assertEquals(3, iterator.next().intValue());
             assert(!isOpened);
+        } finally {
+            iterator.close();
         }
     }
 
@@ -79,11 +82,14 @@ public class StreamTest {
             }
         });
         assert(!isOpened);
-        try (CloseableIterator<Integer> iterator = test.openIterator()) {
+        CloseableIterator<Integer> iterator = test.openIterator();
+        try {
             assert(isOpened);
             assertEquals(1, iterator.next().intValue());
             assertEquals(2, iterator.next().intValue());
             assert(isOpened);
+        } finally {
+            iterator.close();
         }
         assert(!isOpened); // Should close stream as soon as requested
     }
@@ -105,7 +111,8 @@ public class StreamTest {
             }
         });
         assert(!isOpened);
-        try (CloseableIterator<Integer> iterator = test.openIterator()) {
+        CloseableIterator<Integer> iterator = test.openIterator();
+        try {
             assert(isOpened);
             assertEquals(1, iterator.next().intValue());
             assertEquals(2, iterator.next().intValue());
@@ -117,6 +124,8 @@ public class StreamTest {
                 assert(true); // Exception should be thrown
                 assert(!isOpened); // Should close stream as soon as exception is thrown
             }
+        } finally {
+            iterator.close();
         }
     }
 

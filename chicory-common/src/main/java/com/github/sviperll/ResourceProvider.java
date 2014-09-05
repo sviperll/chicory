@@ -58,7 +58,7 @@ public class ResourceProvider<T> implements ResourceProviderDefinition<T> {
         if (source instanceof ResourceProvider)
             return (ResourceProvider<T>)source;
         else
-            return new ResourceProvider<>(source);
+            return new ResourceProvider<T>(source);
     }
 
     private final ResourceProviderDefinition<? extends T> source;

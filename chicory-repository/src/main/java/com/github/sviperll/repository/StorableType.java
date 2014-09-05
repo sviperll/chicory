@@ -40,11 +40,11 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
         if (definition instanceof StorableType)
             return (StorableType<T>)definition;
         else
-            return new StorableType<>(definition);
+            return new StorableType<T>(definition);
     }
 
     public static <T> StorableType<T> of(final ColumnStorableTypeBuilderDefinition<T> column) {
-        return new StorableType<>(new StorableTypeDefinition<T>() {
+        return new StorableType<T>(new StorableTypeDefinition<T>() {
             @Override
             public List<? extends AtomicStorableComponent<T, ?>> getAtomicComponents() {
                 return Collections.singletonList(new AtomicStorableComponent<T, T>() {
@@ -82,7 +82,7 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
     }
 
     public static <T, U> StorableTypeBuilder1<T, U> of(IsomorphismDefinition<T, U> isomorphism) {
-        return new StorableTypeBuilder1<>(isomorphism);
+        return new StorableTypeBuilder1<T, U>(isomorphism);
     }
 
     public static <T, U, V> StorableType<T> of(final StorableTypeDefinition<U> baseTuple1, final StorableTypeDefinition<V> baseTuple2, final TypeStructure2<T, U, V> structure) {
@@ -90,7 +90,7 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
     }
 
     public static <T, U, V> StorableTypeBuilder2<T, U, V> of(TypeStructure2<T, U, V> structure) {
-        return new StorableTypeBuilder2<>(structure);
+        return new StorableTypeBuilder2<T, U, V>(structure);
     }
 
     public static <T, U, V, W> StorableType<T> of(final StorableTypeDefinition<U> baseTuple1, final StorableTypeDefinition<V> baseTuple2, final StorableTypeDefinition<W> baseTuple3, final TypeStructure3<T, U, V, W> structure) {
@@ -98,7 +98,7 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
     }
 
     public static <T, U, V, W> StorableTypeBuilder3<T, U, V, W> of(TypeStructure3<T, U, V, W> structure) {
-        return new StorableTypeBuilder3<>(structure);
+        return new StorableTypeBuilder3<T, U, V, W>(structure);
     }
 
     public static <T, U, V, W, X> StorableType<T> of(final StorableTypeDefinition<U> baseTuple1, final StorableTypeDefinition<V> baseTuple2, final StorableTypeDefinition<W> baseTuple3, final StorableTypeDefinition<X> baseTuple4, final TypeStructure4<T, U, V, W, X> structure) {
@@ -106,7 +106,7 @@ public class StorableType<T> implements StorableTypeDefinition<T> {
     }
 
     public static <T, U, V, W, X> StorableTypeBuilder4<T, U, V, W, X> of(TypeStructure4<T, U, V, W, X> structure) {
-        return new StorableTypeBuilder4<>(structure);
+        return new StorableTypeBuilder4<T, U, V, W, X>(structure);
     }
 
 

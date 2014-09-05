@@ -80,26 +80,26 @@ public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDe
     }
 
     static ColumnStorableTypeBuilder<Integer> integerColumnBuilder(String columnName) {
-        return new ColumnStorableTypeBuilder<>(new IntegerColumn(columnName));
+        return new ColumnStorableTypeBuilder<Integer>(new IntegerColumn(columnName));
     }
 
     static ColumnStorableTypeBuilder<String> stringColumnBuilder(String columnName) {
-        return new ColumnStorableTypeBuilder<>(new StringColumn(columnName));
+        return new ColumnStorableTypeBuilder<String>(new StringColumn(columnName));
     }
 
     static ColumnStorableTypeBuilder<UnixTime> unixTimeColumnBuilder(String columnName) {
-        return new ColumnStorableTypeBuilder<>(new UnixTimeColumn(columnName));
+        return new ColumnStorableTypeBuilder<UnixTime>(new UnixTimeColumn(columnName));
     }
 
     static ColumnStorableTypeBuilder<Boolean> booleanColumnBuilder(final String columnName) {
-        return new ColumnStorableTypeBuilder<>(new BooleanColumn(columnName));
+        return new ColumnStorableTypeBuilder<Boolean>(new BooleanColumn(columnName));
     }
 
     public static <T> ColumnStorableTypeBuilder<T> of(ColumnStorableTypeBuilderDefinition<T> column) {
         if (column instanceof ColumnStorableTypeBuilder)
             return (ColumnStorableTypeBuilder<T>)column;
         else
-            return new ColumnStorableTypeBuilder<>(column);
+            return new ColumnStorableTypeBuilder<T>(column);
     }
 
     private final ColumnStorableTypeBuilderDefinition<T> column;
@@ -133,11 +133,11 @@ public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDe
     }
 
     public <U> ColumnStorableTypeBuilder<U> isomorphic(IsomorphismDefinition<U, T> structure) {
-        return new ColumnStorableTypeBuilder<>(new IsomorphicColumn<>(column, structure));
+        return new ColumnStorableTypeBuilder<U>(new IsomorphicColumn<U, T>(column, structure));
     }
 
     public ColumnStorableTypeBuilder<T> retrievedByIndex(int index) {
-        return new ColumnStorableTypeBuilder<>(new RetrievedByIndexColumn<>(column, index));
+        return new ColumnStorableTypeBuilder<T>(new RetrievedByIndexColumn<T>(column, index));
     }
 
     /**

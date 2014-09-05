@@ -89,7 +89,7 @@ public class StorableTypeBuilder3<T, U, V, W> {
     }
 
     public StorableType<T> build(final StorableTypeDefinition<U> field1, final StorableTypeDefinition<V> field2, final StorableTypeDefinition<W> field3) {
-        final List<AtomicStorableComponent<T, ?>> elements = new ArrayList<>();
+        final List<AtomicStorableComponent<T, ?>> elements = new ArrayList<AtomicStorableComponent<T, ?>>();
         for (AtomicStorableComponent<U, ?> element: field1.getAtomicComponents()) {
             elements.add(convertElement1(element, structure));
         }

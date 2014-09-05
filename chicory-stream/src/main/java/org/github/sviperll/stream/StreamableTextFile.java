@@ -33,6 +33,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -60,12 +62,19 @@ public class StreamableTextFile {
             @Override
             public void forEach(SaturableConsuming<? super String> consumer) {
                 try {
-                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), charset))) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), charset));
+                    try {
                         String s;
                         while ((s = reader.readLine()) != null) {
                             if (!consumer.needsMore())
                                 break;
                             consumer.accept(s);
+                        }
+                    } finally {
+                        try {
+                            reader.close();
+                        } catch (Exception ex) {
+                            Logger.getLogger(StreamableTextFile.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 } catch (IOException ex) {
@@ -80,12 +89,19 @@ public class StreamableTextFile {
             @Override
             public void forEach(SaturableConsuming<? super Character> consumer) {
                 try {
-                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), charset))) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), charset));
+                    try {
                         int c;
                         while ((c = reader.read()) >= 0) {
                             if (!consumer.needsMore())
                                 break;
                             consumer.accept((char)c);
+                        }
+                    } finally {
+                        try {
+                            reader.close();
+                        } catch (Exception ex) {
+                            Logger.getLogger(StreamableTextFile.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 } catch (IOException ex) {

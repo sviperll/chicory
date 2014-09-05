@@ -39,10 +39,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Files {
     public static String read(File passwordFile, Charset charset) throws FileNotFoundException, IOException {
-        try (InputStream stream = new BufferedInputStream(new FileInputStream(passwordFile))) {
+        InputStream stream = new BufferedInputStream(new FileInputStream(passwordFile));
+        try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, charset));
             StringBuilder builder = new StringBuilder();
             char[] buffer = new char[2048];
@@ -50,16 +53,29 @@ public class Files {
             while ((bytesRead = reader.read(buffer)) >= 0)
                 builder.append(buffer, 0, bytesRead);
             return builder.toString();
+        } finally {
+            try {
+                stream.close();
+            } catch (Exception ex) {
+                Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
     public static void write(File file, String contents, Charset charset) throws IOException {
-        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+        BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
+        try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, charset));
             try {
                 writer.write(contents);
             } finally {
                 writer.flush();
+            }
+        } finally {
+            try {
+                outputStream.close();
+            } catch (Exception ex) {
+                Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

@@ -59,7 +59,7 @@ public class StorableTypeBuilder1<T, U> {
     }
 
     public StorableType<T> build(final StorableTypeDefinition<U> base) {
-        final List<AtomicStorableComponent<T, ?>> elements = new ArrayList<>();
+        final List<AtomicStorableComponent<T, ?>> elements = new ArrayList<AtomicStorableComponent<T, ?>>();
         for (AtomicStorableComponent<U, ?> element : base.getAtomicComponents()) {
             elements.add(convertElement(element, isomorphism));
         }

@@ -48,22 +48,22 @@ import java.util.TreeSet;
  */
 class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
     public static <T, U, R, E extends Exception> CollectorState<T, R, E> optional(final Applicable<? super T, Collecting<? super T, U, E>> notOptionalCollector, final OptionalVisitor<? super U, R, E> visitor) {
-        StatefulCollecting<T, R, E> state = new StatefulCollecting<>(null);
-        NoResultCollecting<T, U, R, E> noResultCollectorState = new NoResultCollecting<>(visitor, state, notOptionalCollector);
+        StatefulCollecting<T, R, E> state = new StatefulCollecting<T, R, E>(null);
+        NoResultCollecting<T, U, R, E> noResultCollectorState = new NoResultCollecting<T, U, R, E>(visitor, state, notOptionalCollector);
         state.setBehaviour(noResultCollectorState);
-        return new CollectorState<>(state, state);
+        return new CollectorState<T, R, E>(state, state);
     }
 
     public static <T, U> CollectorState<T, U, RuntimeException> reducing(final U seed, final BiApplicable<U, ? super T, U> function) {
-        ReducingCollecting<T, U, RuntimeException> state = new ReducingCollecting<>(seed, function);
-        return new CollectorState<>(state, state);
+        ReducingCollecting<T, U, RuntimeException> state = new ReducingCollecting<T, U, RuntimeException>(seed, function);
+        return new CollectorState<T, U, RuntimeException>(state, state);
     }
 
     public static <T, R, E extends Exception> CollectorState<T, R, E> reducing(final BinaryOperatorDefinition<T> operator, final OptionalVisitor<? super T, R, E> visitor) {
         Applicable<T, Collecting<? super T, T, E>> stateFactory = new Applicable<T, Collecting<? super T, T, E>>() {
             @Override
             public Collecting<T, T, E> apply(T seed) {
-                return new ReducingCollecting<>(seed, operator);
+                return new ReducingCollecting<T, T, E>(seed, operator);
             }
         };
         return optional(stateFactory, visitor);
@@ -75,7 +75,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
 
     public static <T extends Comparable<? super T>> CollectorState<T, List<T>, RuntimeException> toSortedList() {
         Collecting<T, List<T>, RuntimeException> state = new Collecting<T, List<T>, RuntimeException>() {
-            private ArrayList<T> list = new ArrayList<>();
+            private ArrayList<T> list = new ArrayList<T>();
             @Override
             public List<T> get() throws RuntimeException {
                 java.util.Collections.sort(list);
@@ -92,15 +92,15 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return true;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<T, List<T>, RuntimeException>(state, state);
     }
 
     public static <T extends Comparable<? super T>> CollectorState<T, List<T>, RuntimeException> toSortedList(final int limit) {
         Collecting<T, List<T>, RuntimeException> state = new Collecting<T, List<T>, RuntimeException>() {
-            private TreeSet<T> set = new TreeSet<>();
+            private TreeSet<T> set = new TreeSet<T>();
             @Override
             public List<T> get() throws RuntimeException {
-                ArrayList<T> list = new ArrayList<>();
+                ArrayList<T> list = new ArrayList<T>();
                 list.addAll(set);
                 return list;
             }
@@ -117,7 +117,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return true;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<T, List<T>, RuntimeException>(state, state);
     }
 
     public static <T> CollectorState<T, HashSet<T>, RuntimeException> toHashSet() {
@@ -169,12 +169,12 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return true;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<T, R, RuntimeException>(state, state);
     }
 
     public static <I, K, V, R extends Map<K, V>> CollectorState<I, R, RuntimeException> toMap(final Applicable<? super I, ? extends K> function, final Supplier<? extends Collecting<I, V, ? extends RuntimeException>> collector, final Supplier<R> factory) {
         Collecting<I, R, RuntimeException> state = new Collecting<I, R, RuntimeException>() {
-            HashMap<K, Collecting<I, V, ? extends RuntimeException>> state = new HashMap<>();
+            HashMap<K, Collecting<I, V, ? extends RuntimeException>> state = new HashMap<K, Collecting<I, V, ? extends RuntimeException>>();
             @Override
             public R get() throws RuntimeException {
                 R result = factory.get();
@@ -200,14 +200,14 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return true;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<I, R, RuntimeException>(state, state);
     }
 
     public static <I, K, V> CollectorState<I, HashMap<K, V>, RuntimeException> toHashMap(final Applicable<? super I, ? extends K> function, final Supplier<? extends Collecting<I, V, ? extends RuntimeException>> collector) {
         return toMap(function, collector, new Supplier<HashMap<K, V>>() {
             @Override
             public HashMap<K, V> get() {
-                return new HashMap<>();
+                return new HashMap<K, V>();
             }
         });
     }
@@ -216,7 +216,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
         return toMap(function, collector, new Supplier<TreeMap<K, V>>() {
             @Override
             public TreeMap<K, V> get() {
-                return new TreeMap<>();
+                return new TreeMap<K, V>();
             }
         });
     }
@@ -240,7 +240,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return count;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<T, Integer, RuntimeException>(state, state);
     }
 
     public static CollectorState<Integer, Integer, RuntimeException> summingInt() {
@@ -262,7 +262,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return sum;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<Integer, Integer, RuntimeException>(state, state);
     }
 
     public static CollectorState<Long, Long, RuntimeException> summingLong() {
@@ -284,7 +284,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return sum;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<Long, Long, RuntimeException>(state, state);
     }
 
     public static CollectorState<Double, Double, RuntimeException> summingDouble() {
@@ -306,7 +306,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return sum;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<Double, Double, RuntimeException>(state, state);
     }
 
     public static CollectorState<Integer, Integer, RuntimeException> productingInt() {
@@ -328,7 +328,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return product;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<Integer, Integer, RuntimeException>(state, state);
     }
 
     public static CollectorState<Long, Long, RuntimeException> productingLong() {
@@ -350,7 +350,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return product;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<Long, Long, RuntimeException>(state, state);
     }
 
     public static CollectorState<Double, Double, RuntimeException> productingDouble() {
@@ -372,7 +372,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return product;
             }
         };
-        return new CollectorState<>(state, state);
+        return new CollectorState<Double, Double, RuntimeException>(state, state);
     }
 
     public static <T extends Comparable<? super T>, R, E extends Exception> CollectorState<T, R, E> maximum(OptionalVisitor<? super T, R, E> visitor) {
@@ -487,7 +487,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
         if (collecting instanceof CollectorState)
             return (CollectorState<T, R, E>)collecting;
         else
-            return new CollectorState<>(collecting, collecting);
+            return new CollectorState<T, R, E>(collecting, collecting);
     }
 
     private final SaturableConsuming<T> consumer;
@@ -513,19 +513,19 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
     }
 
     public CollectorState<T, R, E> limiting(final int limit) {
-        return new CollectorState<>(SaturableConsumer.of(consumer).limiting(limit), supplier);
+        return new CollectorState<T, R, E>(SaturableConsumer.of(consumer).limiting(limit), supplier);
     }
 
     public CollectorState<T, R, E> skipping(final int offset) {
-        return new CollectorState<>(SaturableConsumer.of(consumer).skipping(offset), supplier);
+        return new CollectorState<T, R, E>(SaturableConsumer.of(consumer).skipping(offset), supplier);
     }
 
     public CollectorState<T, R, E> filtering(final Evaluatable<? super T> predicate) {
-        return new CollectorState<>(SaturableConsumer.of(consumer).filtering(predicate), supplier);
+        return new CollectorState<T, R, E>(SaturableConsumer.of(consumer).filtering(predicate), supplier);
     }
 
     public <U> CollectorState<U, R, E> mapping(final Applicable<U, ? extends T> function) {
-        return new CollectorState<>(SaturableConsumer.of(consumer).mapping(function), supplier);
+        return new CollectorState<U, R, E>(SaturableConsumer.of(consumer).mapping(function), supplier);
     }
 
     public <U> CollectorState<T, U, E> finallyTransforming(final Applicable<? super R, U> function) {
@@ -535,7 +535,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
                 return function.apply(supplier.get());
             }
         };
-        return new CollectorState<>(consumer, newSupplier);
+        return new CollectorState<T, U, E>(consumer, newSupplier);
     }
 
     private static class StatefulCollecting<T, R, E extends Exception> implements Collecting<T, R, E> {
@@ -584,7 +584,7 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
         @Override
         public void accept(T value) {
             Collecting<? super T, U, E> reducingConsumer = collector.apply(value);
-            state.setBehaviour(new NotOptionalCollectorState<>(reducingConsumer, visitor));
+            state.setBehaviour(new NotOptionalCollectorState<T, U, R, E>(reducingConsumer, visitor));
         }
 
         @Override

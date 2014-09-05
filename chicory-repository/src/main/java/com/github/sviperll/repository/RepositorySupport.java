@@ -61,7 +61,7 @@ public class RepositorySupport implements RepositorySupportDefinition, SQLTransa
     }
 
     public <V, O> List<V> entryList(ReadableRepositoryConfiguration<V, O> configuration, SlicingQuery<O> slicing) throws SQLException {
-        return entryList(new VoidReadableRepositoryDirectoryConfiguration<>(configuration), null, slicing);
+        return entryList(new VoidReadableRepositoryDirectoryConfiguration<V, O>(configuration), null, slicing);
     }
 
     @Override

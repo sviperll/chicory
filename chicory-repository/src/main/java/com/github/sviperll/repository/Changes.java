@@ -32,7 +32,7 @@ package com.github.sviperll.repository;
  */
 public class Changes<T> {
     public static <T> Changes<T> fromTo(T oldValue, T newValue) {
-        return new Changes<>(oldValue, newValue);
+        return new Changes<T>(oldValue, newValue);
     }
 
     private final T oldValue;

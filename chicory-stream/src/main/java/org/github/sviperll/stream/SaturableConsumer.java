@@ -40,7 +40,7 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
         if (consuming instanceof SaturableConsumer)
             return (SaturableConsumer<T>)consuming;
         else
-            return new SimpleSaturableConsumer<>(consuming);
+            return new SimpleSaturableConsumer<T>(consuming);
     }
 
     abstract SaturableConsumer<T> filtering(Evaluatable<? super T> predicate);
@@ -59,22 +59,22 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
 
         @Override
         SaturableConsumer<T> filtering(Evaluatable<? super T> predicate) {
-            return new FilteringSaturableConsumer<>(this, predicate);
+            return new FilteringSaturableConsumer<T>(this, predicate);
         }
 
         @Override
         SaturableConsumer<T> limiting(int limit) {
-            return new LimitingSaturableConsumer<>(this, limit);
+            return new LimitingSaturableConsumer<T>(this, limit);
         }
 
         @Override
         <U> SaturableConsumer<U> mapping(Applicable<U, ? extends T> function) {
-            return new MappedSaturableConsumer<>(this, function);
+            return new MappedSaturableConsumer<T, U>(this, function);
         }
 
         @Override
         SaturableConsumer<T> skipping(int offset) {
-            return new SkippingSaturableConsumer<>(this, offset);
+            return new SkippingSaturableConsumer<T>(this, offset);
         }
 
         @Override
@@ -98,22 +98,22 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
 
         @Override
         SaturableConsumer<T> filtering(Evaluatable<? super T> predicate2) {
-            return new FilteringSaturableConsumer<>(original, Predicate.and(predicate1, predicate2));
+            return new FilteringSaturableConsumer<T>(original, Predicate.and(predicate1, predicate2));
         }
 
         @Override
         SaturableConsumer<T> limiting(int limit) {
-            return new LimitingSaturableConsumer<>(this, limit);
+            return new LimitingSaturableConsumer<T>(this, limit);
         }
 
         @Override
         <U> SaturableConsumer<U> mapping(Applicable<U, ? extends T> function) {
-            return new MappedSaturableConsumer<>(this, function);
+            return new MappedSaturableConsumer<T, U>(this, function);
         }
 
         @Override
         SaturableConsumer<T> skipping(int offset) {
-            return new SkippingSaturableConsumer<>(this, offset);
+            return new SkippingSaturableConsumer<T>(this, offset);
         }
 
         @Override
@@ -140,7 +140,7 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
 
         @Override
         SaturableConsumer<T> filtering(Evaluatable<? super T> predicate) {
-            return new FilteringSaturableConsumer<>(this, predicate);
+            return new FilteringSaturableConsumer<T>(this, predicate);
         }
 
         @Override
@@ -148,17 +148,17 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
             if (limit2 >= limit1)
                 return this;
             else
-                return new LimitingSaturableConsumer<>(original, limit2);
+                return new LimitingSaturableConsumer<T>(original, limit2);
         }
 
         @Override
         <U> SaturableConsumer<U> mapping(Applicable<U, ? extends T> function) {
-            return new MappedSaturableConsumer<>(this, function);
+            return new MappedSaturableConsumer<T, U>(this, function);
         }
 
         @Override
         SaturableConsumer<T> skipping(int offset) {
-            return new SkippingSaturableConsumer<>(this, offset);
+            return new SkippingSaturableConsumer<T>(this, offset);
         }
 
         @Override
@@ -184,22 +184,22 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
 
         @Override
         SaturableConsumer<T> filtering(Evaluatable<? super T> predicate) {
-            return new FilteringSaturableConsumer<>(this, predicate);
+            return new FilteringSaturableConsumer<T>(this, predicate);
         }
 
         @Override
         SaturableConsumer<T> limiting(int limit) {
-            return new LimitingSaturableConsumer<>(this, limit);
+            return new LimitingSaturableConsumer<T>(this, limit);
         }
 
         @Override
         <U> SaturableConsumer<U> mapping(Applicable<U, ? extends T> function2) {
-            return new MappedSaturableConsumer<>(original, Function.of(function1).composeWith(function2));
+            return new MappedSaturableConsumer<V, U>(original, Function.of(function1).composeWith(function2));
         }
 
         @Override
         SaturableConsumer<T> skipping(int offset) {
-            return new SkippingSaturableConsumer<>(this, offset);
+            return new SkippingSaturableConsumer<T>(this, offset);
         }
 
         @Override
@@ -224,22 +224,22 @@ abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
 
         @Override
         SaturableConsumer<T> filtering(Evaluatable<? super T> predicate) {
-            return new FilteringSaturableConsumer<>(this, predicate);
+            return new FilteringSaturableConsumer<T>(this, predicate);
         }
 
         @Override
         SaturableConsumer<T> limiting(int limit) {
-            return new LimitingSaturableConsumer<>(this, limit);
+            return new LimitingSaturableConsumer<T>(this, limit);
         }
 
         @Override
         <U> SaturableConsumer<U> mapping(Applicable<U, ? extends T> function) {
-            return new MappedSaturableConsumer<>(this, function);
+            return new MappedSaturableConsumer<T, U>(this, function);
         }
 
         @Override
         SaturableConsumer<T> skipping(int offset2) {
-            return new SkippingSaturableConsumer<>(original, offset1 + offset2);
+            return new SkippingSaturableConsumer<T>(original, offset1 + offset2);
         }
 
         @Override

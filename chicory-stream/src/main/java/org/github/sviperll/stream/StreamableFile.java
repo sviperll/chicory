@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -55,12 +57,19 @@ public class StreamableFile {
             @Override
             public void forEach(SaturableConsuming<? super Byte> consumer) {
                 try {
-                    try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+                    BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+                    try {
                         int b;
                         while ((b = inputStream.read()) >= 0) {
                             if (!consumer.needsMore())
                                 break;
                             consumer.accept((byte)b);
+                        }
+                    } finally {
+                        try {
+                            inputStream.close();
+                        } catch (Exception ex) {
+                            Logger.getLogger(StreamableFile.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 } catch (IOException ex) {

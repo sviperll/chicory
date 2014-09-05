@@ -49,11 +49,11 @@ import java.util.TreeMap;
 public class CLISpecification {
     private static final ParameterDescriptionFormatter DEFAULT_FORMATTER = new DefaultParameterDescriptionFormatter();
 
-    private final Map<String, String> usage = new TreeMap<>();
-    private final Map<Character, CLIFlagHandler> shortFlagHandlers = new TreeMap<>();
-    private final Map<String, CLIFlagHandler> longFlagHandlers = new TreeMap<>();
-    private final Map<Character, CLIParameterHandler> shortParameterHandlers = new TreeMap<>();
-    private final Map<String, CLIParameterHandler> longParameterHandlers = new TreeMap<>();
+    private final Map<String, String> usage = new TreeMap<String, String>();
+    private final Map<Character, CLIFlagHandler> shortFlagHandlers = new TreeMap<Character, CLIFlagHandler>();
+    private final Map<String, CLIFlagHandler> longFlagHandlers = new TreeMap<String, CLIFlagHandler>();
+    private final Map<Character, CLIParameterHandler> shortParameterHandlers = new TreeMap<Character, CLIParameterHandler>();
+    private final Map<String, CLIParameterHandler> longParameterHandlers = new TreeMap<String, CLIParameterHandler>();
     private final Appendable usageWriter;
     private final ParameterDescriptionFormatter formatter;
 
@@ -170,7 +170,7 @@ public class CLISpecification {
     }
 
     public String[] run(String[] args) throws CLIException {
-        List<String> unprocessed = new ArrayList<>();
+        List<String> unprocessed = new ArrayList<String>();
         Processor p = new Processor(new Parser(args));
         for (;;) {
             if (p.isEndOfArgs()) {

@@ -77,7 +77,7 @@ public class Handlers {
     }
 
     public static java.util.logging.Handler createAsynchronousHandler(java.util.logging.Handler handler, int queueSize) {
-        BlockingQueue<LogRecord> queue = new ArrayBlockingQueue<>(queueSize);
+        BlockingQueue<LogRecord> queue = new ArrayBlockingQueue<LogRecord>(queueSize);
         AsynchronousHandler aynchrohous = new AsynchronousHandler(handler, queue);
         Thread thread = new Thread(aynchrohous);
         thread.setDaemon(true);
@@ -169,7 +169,7 @@ public class Handlers {
         private volatile boolean isRunning = false;
         private final Handler handler;
         private final BlockingQueue<LogRecord> queue;
-        private final BlockingQueue<Boolean> exitQueue = new SynchronousQueue<>();
+        private final BlockingQueue<Boolean> exitQueue = new SynchronousQueue<Boolean>();
 
         public AsynchronousHandler(Handler handler, BlockingQueue<LogRecord> queue) {
             this.handler = handler;

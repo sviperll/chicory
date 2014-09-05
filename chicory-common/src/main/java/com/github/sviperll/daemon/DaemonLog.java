@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -87,9 +89,24 @@ public class DaemonLog {
         @Override
         public void provideResourceTo(Consumer<? super OutputStream> consumer) {
             try {
-                try (OutputStream stream = new HUPReopeningFileOutputStream(file);
-                     BufferedOutputStream bufferedStream = new BufferedOutputStream(stream)) {
-                    consumer.accept(bufferedStream);
+                OutputStream stream = new HUPReopeningFileOutputStream(file);
+                try {
+                    BufferedOutputStream bufferedStream = new BufferedOutputStream(stream);
+                    try {
+                        consumer.accept(bufferedStream);
+                    } finally {
+                        try {
+                            bufferedStream.close();
+                        } catch (Exception ex) {
+                            Logger.getLogger(LogFileStreamProvider.class.getName()).log(Level.OFF, null, ex);
+                        }
+                    }
+                } finally {
+                    try {
+                        stream.close();
+                    } catch (Exception ex) {
+                        Logger.getLogger(LogFileStreamProvider.class.getName()).log(Level.OFF, null, ex);
+                    }
                 }
             } catch (IOException ex) {
                 throw new RuntimeException(ex);

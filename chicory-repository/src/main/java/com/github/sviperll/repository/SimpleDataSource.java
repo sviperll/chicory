@@ -34,6 +34,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 
@@ -65,8 +66,15 @@ public class SimpleDataSource implements DataSource, ResourceProviderDefinition<
     @Override
     public void provideResourceTo(final Consumer<? super Connection> consumer) {
         try {
-            try (Connection connection = getConnection()) {
+            Connection connection = getConnection();
+            try {
                 consumer.accept(connection);
+            } finally {
+                try {
+                    connection.close();
+                } catch (Exception ex) {
+                    Logger.getLogger(SimpleDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);

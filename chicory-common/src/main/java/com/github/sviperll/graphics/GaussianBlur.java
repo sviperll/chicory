@@ -145,7 +145,7 @@ public class GaussianBlur implements BufferedImageOp {
         if (destCM == null)
             destCM = src.getColorModel();
         WritableRaster raster = src.getRaster().createCompatibleWritableRaster();
-        Hashtable<String, Object> properties = new Hashtable<>();
+        Hashtable<String, Object> properties = new Hashtable<String, Object>();
         for (String name: src.getPropertyNames()) {
             properties.put(name, src.getProperty(name));
         }

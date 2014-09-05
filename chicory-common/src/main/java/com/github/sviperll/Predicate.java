@@ -91,7 +91,7 @@ public abstract class Predicate<T> implements Evaluatable<T> {
             // so this cast is safe!
             return (Predicate<T>)evaluatable;
         else {
-            return new SimplePredicate<>(evaluatable);
+            return new SimplePredicate<T>(evaluatable);
         }
     }
 
@@ -118,17 +118,17 @@ public abstract class Predicate<T> implements Evaluatable<T> {
 
         @Override
         public Predicate<T> not() {
-            return new NotPredicate<>(this);
+            return new NotPredicate<T>(this);
         }
 
         @Override
         public Predicate<T> and(Evaluatable<? super T> that) {
-            return new AndPredicate<>(this, that);
+            return new AndPredicate<T>(this, that);
         }
 
         @Override
         public Predicate<T> or(Evaluatable<? super T> that) {
-            return new OrPredicate<>(this, that);
+            return new OrPredicate<T>(this, that);
         }
 
         @Override
@@ -140,17 +140,17 @@ public abstract class Predicate<T> implements Evaluatable<T> {
     private static class TruePredicate<T> extends Predicate<T> {
         @Override
         public Predicate<T> not() {
-            return new NotPredicate<>(this);
+            return new NotPredicate<T>(this);
         }
 
         @Override
         public Predicate<T> and(Evaluatable<? super T> that) {
-            return new AndPredicate<>(this, that);
+            return new AndPredicate<T>(this, that);
         }
 
         @Override
         public Predicate<T> or(Evaluatable<? super T> that) {
-            return new OrPredicate<>(this, that);
+            return new OrPredicate<T>(this, that);
         }
 
         @Override
@@ -162,17 +162,17 @@ public abstract class Predicate<T> implements Evaluatable<T> {
     private static class FalsePredicate<T> extends Predicate<T> {
         @Override
         public Predicate<T> not() {
-            return new NotPredicate<>(this);
+            return new NotPredicate<T>(this);
         }
 
         @Override
         public Predicate<T> and(Evaluatable<? super T> that) {
-            return new AndPredicate<>(this, that);
+            return new AndPredicate<T>(this, that);
         }
 
         @Override
         public Predicate<T> or(Evaluatable<? super T> that) {
-            return new OrPredicate<>(this, that);
+            return new OrPredicate<T>(this, that);
         }
 
         @Override
@@ -194,12 +194,12 @@ public abstract class Predicate<T> implements Evaluatable<T> {
 
         @Override
         public Predicate<T> and(Evaluatable<? super T> that) {
-            return new AndPredicate<>(this, that);
+            return new AndPredicate<T>(this, that);
         }
 
         @Override
         public Predicate<T> or(Evaluatable<? super T> that) {
-            return new OrPredicate<>(this, that);
+            return new OrPredicate<T>(this, that);
         }
 
         @Override
@@ -218,17 +218,17 @@ public abstract class Predicate<T> implements Evaluatable<T> {
 
         @Override
         public Predicate<T> not() {
-            return new NotPredicate<>(this);
+            return new NotPredicate<T>(this);
         }
 
         @Override
         public Predicate<T> and(Evaluatable<? super T> predicate3) {
-            return new AndPredicate<>(predicate1, of(predicate2).and(predicate3));
+            return new AndPredicate<T>(predicate1, of(predicate2).and(predicate3));
         }
 
         @Override
         public Predicate<T> or(Evaluatable<? super T> that) {
-            return new OrPredicate<>(this, that);
+            return new OrPredicate<T>(this, that);
         }
 
         @Override
@@ -247,17 +247,17 @@ public abstract class Predicate<T> implements Evaluatable<T> {
 
         @Override
         public Predicate<T> not() {
-            return new NotPredicate<>(this);
+            return new NotPredicate<T>(this);
         }
 
         @Override
         public Predicate<T> and(Evaluatable<? super T> that) {
-            return new AndPredicate<>(this, that);
+            return new AndPredicate<T>(this, that);
         }
 
         @Override
         public Predicate<T> or(Evaluatable<? super T> predicate3) {
-            return new OrPredicate<>(predicate1, of(predicate2).or(predicate3));
+            return new OrPredicate<T>(predicate1, of(predicate2).or(predicate3));
         }
 
         @Override

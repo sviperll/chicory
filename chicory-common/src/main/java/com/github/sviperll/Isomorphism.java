@@ -57,7 +57,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
         if (isomorphism instanceof Isomorphism)
             return (Isomorphism<T, U>)isomorphism;
         else
-            return new Isomorphism<>(isomorphism);
+            return new Isomorphism<T, U>(isomorphism);
     }
 
     private final IsomorphismDefinition<T, U> isomorphism;
@@ -76,7 +76,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public <V> Isomorphism<V, U> composeWith(final IsomorphismDefinition<V, T> thatIsomorphism) {
-        return new Isomorphism<>(new IsomorphismDefinition<V, U>() {
+        return new Isomorphism<V, U>(new IsomorphismDefinition<V, U>() {
             @Override
             public U forward(V object) {
                 return isomorphism.forward(thatIsomorphism.forward(object));
@@ -90,7 +90,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public <V> Isomorphism<T, V> andThen(final IsomorphismDefinition<U, V> thatIsomorphism) {
-        return new Isomorphism<>(new IsomorphismDefinition<T, V>() {
+        return new Isomorphism<T, V>(new IsomorphismDefinition<T, V>() {
             @Override
             public V forward(T object) {
                 return thatIsomorphism.forward(isomorphism.forward(object));
@@ -104,7 +104,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public Isomorphism<U, T> reverse() {
-        return new Isomorphism<>(new IsomorphismDefinition<U, T>() {
+        return new Isomorphism<U, T>(new IsomorphismDefinition<U, T>() {
             @Override
             public T forward(U object) {
                 return isomorphism.backward(object);
@@ -118,7 +118,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public Isomorphism<T, U> passNullThrough() {
-        return new Isomorphism<>(new IsomorphismDefinition<T, U>() {
+        return new Isomorphism<T, U>(new IsomorphismDefinition<T, U>() {
             @Override
             public U forward(T object) {
                 if (object == null)
@@ -138,7 +138,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     }
 
     public Isomorphism<T, U> throwOnNull() {
-        return new Isomorphism<>(new IsomorphismDefinition<T, U>() {
+        return new Isomorphism<T, U>(new IsomorphismDefinition<T, U>() {
             @Override
             public U forward(T object) {
                 if (object == null)
