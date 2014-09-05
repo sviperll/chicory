@@ -22,7 +22,7 @@ Usage
         <dependency>
             <groupId>com.github.sviperll</groupId>
             <artifactId>chicory-cli</artifactId>
-            <version>0.15</version>
+            <version>0.16</version>
         </dependency>
 
         <!-- ... -->
