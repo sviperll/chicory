@@ -116,7 +116,6 @@ public class SimpleDataSource implements DataSource, ResourceProviderDefinition<
         return false;
     }
 
-    @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         throw new SQLFeatureNotSupportedException();
     }

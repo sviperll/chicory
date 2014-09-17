@@ -86,7 +86,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<T, List<T>, RuntimeException>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
             @Override
             public Collecting<T, List<T>, RuntimeException> get() {
-                return CollectorState.toSortedList();
+                return CollectorState.<T>toSortedList();
             }
         });
     }
@@ -101,7 +101,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<T, List<T>, RuntimeException>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
             @Override
             public Collecting<T, List<T>, RuntimeException> get() {
-                return CollectorState.toSortedList(limit);
+                return CollectorState.<T>toSortedList(limit);
             }
         });
     }
@@ -182,7 +182,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
             @Override
             public Collecting<T, R, E> get() {
-                return CollectorState.maximum(optionalVisitor);
+                return CollectorState.<T, R, E>maximum(optionalVisitor);
             }
         });
     }
@@ -191,7 +191,7 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
             @Override
             public Collecting<T, R, E> get() {
-                return CollectorState.minimum(optionalVisitor);
+                return CollectorState.<T, R, E>minimum(optionalVisitor);
             }
         });
     }
