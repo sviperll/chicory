@@ -1,8 +1,0 @@
-include "chicory-common",
-        "chicory-cli",
-        "chicory-repository",
-        "chicory-stream",
-        "chicory-task",
-        "chicory-time",
-        "chicory-environment"
-

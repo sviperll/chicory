@@ -169,6 +169,7 @@ public class StreamTest {
         assertEquals(180, sum4);
     }
 
+    @SuppressWarnings("serial")
     private static class ExpectedException extends RuntimeException {
     }
 }
