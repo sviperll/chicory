@@ -3,3 +3,4 @@
 /.nb-gradle
 /.gradle
 *~
+/target/
