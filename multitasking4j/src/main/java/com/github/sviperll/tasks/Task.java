@@ -51,7 +51,7 @@ public class Task implements TaskDefinition {
      * <p>
      * TaskDefinition#cleanup and TaskDefinition#signalKill methods of created task does nothong
      *
-     * @param of of to base task on
+     * @param runnable to base task on
      * @return new task
      */
     public static Task of(Runnable runnable) {
