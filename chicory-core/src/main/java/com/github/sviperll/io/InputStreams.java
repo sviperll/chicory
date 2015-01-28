@@ -39,7 +39,7 @@ public class InputStreams {
      *
      * @param stream original stream to access length bytes from
      * @param length number of bytes in resulting stream
-     * @return proxy stream to rean length bytes from original stream
+     * @return proxy stream to read length bytes from original stream
      */
     public static InputStream truncated(InputStream stream, int length) {
         return new TruncatedInputStream(stream, length);

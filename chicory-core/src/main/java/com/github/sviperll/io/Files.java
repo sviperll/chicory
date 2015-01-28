@@ -46,13 +46,30 @@ public class Files {
     public static String read(File passwordFile, Charset charset) throws FileNotFoundException, IOException {
         InputStream stream = new BufferedInputStream(new FileInputStream(passwordFile));
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, charset));
-            StringBuilder builder = new StringBuilder();
-            char[] buffer = new char[2048];
-            int bytesRead;
-            while ((bytesRead = reader.read(buffer)) >= 0)
-                builder.append(buffer, 0, bytesRead);
-            return builder.toString();
+            InputStreamReader streamReader = new InputStreamReader(stream, charset);
+            try {
+                BufferedReader reader = new BufferedReader(streamReader);
+                try {
+                    StringBuilder builder = new StringBuilder();
+                    char[] buffer = new char[2048];
+                    int bytesRead;
+                    while ((bytesRead = reader.read(buffer)) >= 0)
+                        builder.append(buffer, 0, bytesRead);
+                    return builder.toString();
+                } finally {
+                    try {
+                        reader.close();
+                    } catch (Exception ex) {
+                        Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } finally {
+                try {
+                    streamReader.close();
+                } catch (Exception ex) {
+                    Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         } finally {
             try {
                 stream.close();
@@ -65,11 +82,28 @@ public class Files {
     public static void write(File file, String contents, Charset charset) throws IOException {
         BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
         try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, charset));
+            OutputStreamWriter streamWriter = new OutputStreamWriter(outputStream, charset);
             try {
-                writer.write(contents);
+                BufferedWriter writer = new BufferedWriter(streamWriter);
+                try {
+                    try {
+                        writer.write(contents);
+                    } finally {
+                        writer.flush();
+                    }
+                } finally {
+                    try {
+                        writer.close();
+                    } catch (Exception ex) {
+                        Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             } finally {
-                writer.flush();
+                try {
+                    outputStream.close();
+                } catch (Exception ex) {
+                    Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         } finally {
             try {

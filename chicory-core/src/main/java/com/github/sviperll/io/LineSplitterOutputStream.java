@@ -28,6 +28,7 @@ package com.github.sviperll.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class LineSplitterOutputStream extends OutputStream {
     private static final byte[] DEFAULT_LINE_SPLITTING_BYTE_SEQUENCE = "\r\n".getBytes(Charsets.ASCII);
@@ -49,8 +50,10 @@ public class LineSplitterOutputStream extends OutputStream {
     public LineSplitterOutputStream(OutputStream os, int splitLinesAt, byte[] lineSplitingByteSequence) {
         this.os = os;
         this.splitLinesAt = splitLinesAt;
-        this.lineSplitingByteSequence = lineSplitingByteSequence;
-
+        this.lineSplitingByteSequence =
+                lineSplitingByteSequence == DEFAULT_LINE_SPLITTING_BYTE_SEQUENCE
+                    ? DEFAULT_LINE_SPLITTING_BYTE_SEQUENCE
+                    : Arrays.copyOf(lineSplitingByteSequence, lineSplitingByteSequence.length);
     }
 
     @Override

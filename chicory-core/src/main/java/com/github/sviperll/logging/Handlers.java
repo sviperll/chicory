@@ -36,7 +36,6 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -169,11 +168,10 @@ public class Handlers {
 
     private static class AsynchronousHandler extends Handler implements Runnable {
         private static final LogRecord EXIT = new LogRecord(Level.OFF, null);
-        private volatile boolean doExit = false;
-        private volatile boolean isRunning = false;
         private final Handler handler;
         private final BlockingQueue<LogRecord> queue;
-        private final BlockingQueue<Boolean> exitQueue = new SynchronousQueue<Boolean>();
+        private final Object stateLock = new Object();
+        private State state = State.NOT_RUNNING;
 
         public AsynchronousHandler(Handler handler, BlockingQueue<LogRecord> queue) {
             this.handler = handler;
@@ -187,14 +185,17 @@ public class Handlers {
                     queue.put(record);
                     break;
                 } catch (InterruptedException ex) {
-                    continue;
                 }
             }
         }
 
         @Override
         public void run() {
-            isRunning = true;
+            synchronized (stateLock) {
+                if (state != State.NOT_RUNNING)
+                    return;
+                state = State.RUNNING;
+            }
             try {
                 for (;;) {
                     LogRecord record;
@@ -208,14 +209,9 @@ public class Handlers {
                     handler.publish(record);
                 }
             } finally {
-                isRunning = false;
-                for (;;) {
-                    try {
-                        exitQueue.put(true);
-                        break;
-                    } catch (InterruptedException ex) {
-                        continue;
-                    }
+                synchronized (stateLock) {
+                    state = State.NOT_RUNNING;
+                    stateLock.notifyAll();
                 }
             }
         }
@@ -227,24 +223,28 @@ public class Handlers {
 
         @Override
         public void close() throws SecurityException {
-            if (!doExit && isRunning) {
-                doExit = true;
-                publish(EXIT);
-                for (;;) {
-                    try {
-                        exitQueue.take();
-                        break;
-                    } catch (InterruptedException ex) {
-                        continue;
+            synchronized (stateLock) {
+                if (state == State.RUNNING) {
+                    state = State.WAITING_FOR_EXIT;
+                    publish(EXIT);
+                    while (state != State.NOT_RUNNING) {
+                        try {
+                            stateLock.wait();
+                            break;
+                        } catch (InterruptedException ex) {
+                        }
                     }
                 }
-                doExit = false;
+                if (state == State.NOT_RUNNING) {
+                    LogRecord record;
+                    while ((record = queue.poll()) != null) {
+                        handler.publish(record);
+                    }
+                    handler.close();
+                    state = State.CLOSED;
+                }
             }
-            LogRecord record;
-            while ((record = queue.poll()) != null) {
-                handler.publish(record);
-            }
-            handler.close();
         }
+        private enum State { NOT_RUNNING, RUNNING, WAITING_FOR_EXIT, CLOSED };
     }
 }
