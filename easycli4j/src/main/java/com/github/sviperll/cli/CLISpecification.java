@@ -336,7 +336,7 @@ public class CLISpecification {
         }
     }
 
-    private class Parser {
+    private static class Parser {
 
         private final String[] args;
         private int i;

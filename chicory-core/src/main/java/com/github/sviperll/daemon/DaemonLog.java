@@ -91,17 +91,26 @@ public class DaemonLog {
         public static final Applicable<OutputStream, ResourceProvider<Handler>> INSTANCE = new FlushingLoggingFactory();
         @Override
         public ResourceProvider<Handler> apply(final OutputStream stream) {
-            return ResourceProvider.of(new ResourceProviderDefinition<Handler>() {
-                @Override
-                public void provideResourceTo(Consumer<? super Handler> consumer) {
-                    Handler handler = Handlers.createFlushingHandler(stream);
-                    try {
-                        consumer.accept(handler);
-                    } finally {
-                        handler.close();
-                    }
+            return ResourceProvider.of(new FlushingHandlerResourcePeovider(stream));
+        }
+
+        private static class FlushingHandlerResourcePeovider implements ResourceProviderDefinition<Handler> {
+
+            private final OutputStream stream;
+
+            public FlushingHandlerResourcePeovider(OutputStream stream) {
+                this.stream = stream;
+            }
+
+            @Override
+            public void provideResourceTo(Consumer<? super Handler> consumer) {
+                Handler handler = Handlers.createFlushingHandler(stream);
+                try {
+                    consumer.accept(handler);
+                } finally {
+                    handler.close();
                 }
-            });
+            }
         }
     }
 
@@ -122,14 +131,14 @@ public class DaemonLog {
                         try {
                             bufferedStream.close();
                         } catch (Exception ex) {
-                            Logger.getLogger(LogFileStreamProvider.class.getName()).log(Level.OFF, null, ex);
+                            Logger.getLogger(LogFileStreamProvider.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 } finally {
                     try {
                         stream.close();
                     } catch (Exception ex) {
-                        Logger.getLogger(LogFileStreamProvider.class.getName()).log(Level.OFF, null, ex);
+                        Logger.getLogger(LogFileStreamProvider.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             } catch (IOException ex) {

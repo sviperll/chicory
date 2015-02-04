@@ -27,6 +27,7 @@
 
 package com.github.sviperll;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 public class Comparators {
@@ -41,7 +42,7 @@ public class Comparators {
     private Comparators() {
     }
 
-    private static class NaturalOrder<T extends Comparable<? super T>> implements Comparator<T> {
+    private static class NaturalOrder<T extends Comparable<? super T>> implements Comparator<T>, Serializable {
         @Override
         public int compare(T o1, T o2) {
             return o1.compareTo(o2);

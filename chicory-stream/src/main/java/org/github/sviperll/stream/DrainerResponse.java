@@ -57,34 +57,62 @@ abstract class DrainerResponse<T> {
     public abstract <R> R accept(DrainerResponseVisitor<T, R> visitor);
 
     private static class DrainerResponseFactory<T> implements DrainerResponseVisitor<T, DrainerResponse<T>> {
+        @SuppressWarnings("rawtypes")
+        private static final DrainerResponse CLOSED = new ClosedDrainerResponse();
+
         @Override
         public DrainerResponse<T> fetched(final T value) {
-            return new DrainerResponse<T>() {
-                @Override
-                public <R> R accept(DrainerResponseVisitor<T, R> visitor) {
-                    return visitor.fetched(value);
-                }
-            };
+            return new FetchedDrainerResponse<T>(value);
         }
 
         @Override
+        @SuppressWarnings({"rawtypes", "unchecked"})
         public DrainerResponse<T> closed() {
-            return new DrainerResponse<T>() {
-                @Override
-                public <R> R accept(DrainerResponseVisitor<T, R> visitor) {
-                    return visitor.closed();
-                }
-            };
+            return (DrainerResponse<T>)CLOSED;
         }
 
         @Override
         public DrainerResponse<T> error(final RuntimeException exception) {
-            return new DrainerResponse<T>() {
-                @Override
-                public <R> R accept(DrainerResponseVisitor<T, R> visitor) {
-                    return visitor.error(exception);
-                }
-            };
+            return new ErrorDrainerResponse<T>(exception);
+        }
+
+        private static class FetchedDrainerResponse<T> extends DrainerResponse<T> {
+
+            private final T value;
+
+            public FetchedDrainerResponse(T value) {
+                this.value = value;
+            }
+
+            @Override
+            public <R> R accept(DrainerResponseVisitor<T, R> visitor) {
+                return visitor.fetched(value);
+            }
+        }
+
+        private static class ClosedDrainerResponse<T> extends DrainerResponse<T> {
+
+            public ClosedDrainerResponse() {
+            }
+
+            @Override
+            public <R> R accept(DrainerResponseVisitor<T, R> visitor) {
+                return visitor.closed();
+            }
+        }
+
+        private static class ErrorDrainerResponse<T> extends DrainerResponse<T> {
+
+            private final RuntimeException exception;
+
+            public ErrorDrainerResponse(RuntimeException exception) {
+                this.exception = exception;
+            }
+
+            @Override
+            public <R> R accept(DrainerResponseVisitor<T, R> visitor) {
+                return visitor.error(exception);
+            }
         }
     }
 }

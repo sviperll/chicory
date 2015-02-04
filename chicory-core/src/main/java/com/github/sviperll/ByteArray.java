@@ -30,12 +30,12 @@ import java.util.Arrays;
 
 public class ByteArray implements Comparable<ByteArray> {
     private final byte[] a;
-    public ByteArray(byte[] a) {
-        this.a = a;
+    public ByteArray(byte... a) {
+        this.a = Arrays.copyOf(a, a.length);
     }
 
     public byte[] byteArrayValue() {
-        return a;
+        return Arrays.copyOf(a, a.length);
     }
 
     @Override

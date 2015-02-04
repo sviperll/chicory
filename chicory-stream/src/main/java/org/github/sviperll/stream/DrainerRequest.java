@@ -31,10 +31,8 @@ package org.github.sviperll.stream;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 abstract class DrainerRequest {
-    @SuppressWarnings("rawtypes")
     private static DrainerRequestFactory FACTORY = new DrainerRequestFactory();
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public static DrainerRequestVisitor<DrainerRequest> factory() {
         return FACTORY;
     }
@@ -51,24 +49,39 @@ abstract class DrainerRequest {
     public abstract <R> R accept(DrainerRequestVisitor<R> visitor);
 
     private static class DrainerRequestFactory implements DrainerRequestVisitor<DrainerRequest> {
+	private static final DrainerRequest FETCH = new FetchDrainerRequest();
+	private static final DrainerRequest CLOSE = new CloseDrainerRequest();
+
         @Override
         public DrainerRequest fetch() {
-            return new DrainerRequest() {
-                @Override
-                public <R> R accept(DrainerRequestVisitor<R> visitor) {
-                    return visitor.fetch();
-                }
-            };
+            return FETCH;
         }
 
         @Override
         public DrainerRequest close() {
-            return new DrainerRequest() {
-                @Override
-                public <R> R accept(DrainerRequestVisitor<R> visitor) {
-                    return visitor.close();
-                }
-            };
+            return CLOSE;
+        }
+
+        private static class FetchDrainerRequest extends DrainerRequest {
+
+            public FetchDrainerRequest() {
+            }
+
+            @Override
+            public <R> R accept(DrainerRequestVisitor<R> visitor) {
+                return visitor.fetch();
+            }
+        }
+
+        private static class CloseDrainerRequest extends DrainerRequest {
+
+            public CloseDrainerRequest() {
+            }
+
+            @Override
+            public <R> R accept(DrainerRequestVisitor<R> visitor) {
+                return visitor.close();
+            }
         }
     }
 }

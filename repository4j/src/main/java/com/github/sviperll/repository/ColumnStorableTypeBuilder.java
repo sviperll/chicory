@@ -385,12 +385,7 @@ public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDe
 
         @Override
         public PreparedStatementParameterSetter<Boolean> createStatementSetter(final PreparedStatement statement) {
-            return new PreparedStatementParameterSetter<Boolean>() {
-                @Override
-                public void setValue(int index, Boolean value) throws SQLException {
-                    statement.setBoolean(index, value);
-                }
-            };
+            return new BooleanColumnPreparedStatementParameterSetter(statement);
         }
 
         @Override
@@ -406,6 +401,20 @@ public class ColumnStorableTypeBuilder<T> implements ColumnStorableTypeBuilderDe
         @Override
         public Boolean retrieveValue(ResultSet resultSet, int index) throws SQLException {
             return resultSet.getBoolean(index);
+        }
+
+        private static class BooleanColumnPreparedStatementParameterSetter implements PreparedStatementParameterSetter<Boolean> {
+
+            private final PreparedStatement statement;
+
+            public BooleanColumnPreparedStatementParameterSetter(PreparedStatement statement) {
+                this.statement = statement;
+            }
+
+            @Override
+            public void setValue(int index, Boolean value) throws SQLException {
+                statement.setBoolean(index, value);
+            }
         }
     }
 }
