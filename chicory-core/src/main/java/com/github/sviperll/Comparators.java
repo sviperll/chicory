@@ -43,6 +43,7 @@ public class Comparators {
     }
 
     private static class NaturalOrder<T extends Comparable<? super T>> implements Comparator<T>, Serializable {
+        private static final long serialVersionUID = 1L;
         @Override
         public int compare(T o1, T o2) {
             return o1.compareTo(o2);
