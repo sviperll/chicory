@@ -19,6 +19,8 @@
         <module>chicory-core</module>
         <module>chicory-time</module>
         <module>chicory-stream</module>
+        <module>metachicory</module>
+        <module>text-formats</module>
     </modules>
     <scm>
         <connection>scm:git:git://github.com/sviperll/chicory.git</connection>
