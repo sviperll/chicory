@@ -19,9 +19,6 @@
         <module>chicory-core</module>
         <module>chicory-time</module>
         <module>chicory-stream</module>
-        <module>easycli4j</module>
-        <module>repository4j</module>
-        <module>multitasking4j</module>
     </modules>
     <scm>
         <connection>scm:git:git://github.com/sviperll/chicory.git</connection>
