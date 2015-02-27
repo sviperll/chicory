@@ -10,7 +10,7 @@
     <name>chicory-maven-parent</name>
     <packaging>pom</packaging>
     <version>0.17-SNAPSHOT</version>
-    <url>http://maven.apache.org</url>
+    <url>https://github.com/sviperll/chicory</url>
     <properties>
         <netbeans.hint.license>BSD3</netbeans.hint.license>
     </properties>
@@ -24,8 +24,8 @@
         <connection>scm:git:git://github.com/sviperll/chicory.git</connection>
         <developerConnection>scm:git:git@github.com:sviperll/chicory.git</developerConnection>
         <url>https://github.com/sviperll/chicory</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <licenses>
         <license>
             <name>The BSD 3-Clause License</name>
