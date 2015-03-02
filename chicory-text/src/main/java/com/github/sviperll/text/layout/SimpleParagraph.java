@@ -24,10 +24,10 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.graphics.layout;
+package com.github.sviperll.text.layout;
 
 import com.github.sviperll.graphics.Drawable;
-import com.github.sviperll.graphics.layout.TextLine.TextAlignment;
+import com.github.sviperll.text.layout.TextLine.TextAlignment;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.font.FontRenderContext;

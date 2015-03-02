@@ -27,14 +27,19 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.metachicory;
+package com.github.sviperll.meta;
 
-/**
- *
- * @author Victor Nazarov <asviraspossible@gmail.com>
- */
+import com.helger.jcodemodel.JClassAlreadyExistsException;
+
 @SuppressWarnings("serial")
-public class ErrorTypeFound extends ProcessingException {
-    public ErrorTypeFound() {
+public class CodeGenerationException extends ProcessingException {
+
+    public CodeGenerationException(JClassAlreadyExistsException ex) {
+        super(ex);
     }
+
+    CodeGenerationException(ClassNotFoundException ex) {
+        super(ex);
+    }
+
 }

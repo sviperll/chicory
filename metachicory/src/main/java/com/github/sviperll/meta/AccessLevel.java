@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Victor Nazarov <asviraspossible@gmail.com>
+ * Copyright (c) 2015, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -27,22 +27,12 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.metachicory;
+package com.github.sviperll.meta;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-@SuppressWarnings("serial")
-public class RuntimeProcessingException extends RuntimeException {
-    private final ProcessingException cause;
-
-    public RuntimeProcessingException(ProcessingException cause) {
-        super(cause);
-        this.cause = cause;
-    }
-    @Override
-    public ProcessingException getCause() {
-        return cause;
-    }
+public enum AccessLevel {
+    PRIVATE, PACKAGE, PROTECTED, PUBLIC;
 }

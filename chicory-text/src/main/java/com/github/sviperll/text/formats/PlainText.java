@@ -27,19 +27,20 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.metachicory;
+package com.github.sviperll.text.formats;
 
-import com.helger.jcodemodel.JClassAlreadyExistsException;
+import com.github.sviperll.meta.TextFormat;
 
-@SuppressWarnings("serial")
-public class CodeGenerationException extends ProcessingException {
-
-    public CodeGenerationException(JClassAlreadyExistsException ex) {
-        super(ex);
+/**
+ *
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ */
+@TextFormat
+public class PlainText {
+    public static Appendable createEscapingAppendable(Appendable appendable) {
+        return appendable;
     }
 
-    CodeGenerationException(ClassNotFoundException ex) {
-        super(ex);
+    private PlainText() {
     }
-
 }

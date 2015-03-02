@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.graphics.layout;
+package com.github.sviperll.text.layout;
 
 import com.github.sviperll.graphics.Drawable;
 import java.awt.Dimension;

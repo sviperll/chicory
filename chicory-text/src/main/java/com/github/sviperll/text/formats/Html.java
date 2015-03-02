@@ -27,20 +27,69 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.textformats;
+package com.github.sviperll.text.formats;
 
-import com.github.sviperll.metachicory.TextFormat;
+import com.github.sviperll.meta.TextFormat;
+import java.io.IOException;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 @TextFormat
-public class PlainText {
+public class Html {
     public static Appendable createEscapingAppendable(Appendable appendable) {
-        return appendable;
+        return new HtmlAppendale(appendable);
     }
 
-    private PlainText() {
+    private static class HtmlAppendale implements Appendable {
+        private final Appendable appendable;
+
+        public HtmlAppendale(Appendable appendable) {
+            this.appendable = appendable;
+        }
+
+        @Override
+        public Appendable append(CharSequence csq) throws IOException {
+            return append(csq, 0, csq.length());
+        }
+
+        @Override
+        public Appendable append(CharSequence csq, int start, int end) throws IOException {
+            for (int i = start; i < end; i++) {
+                char c = csq.charAt(i);
+                if (c == '&') {
+                    appendable.append(csq, start, i);
+                    start = i + 1;
+                    appendable.append("&amp;");
+                } else if (c == '<') {
+                    appendable.append(csq, start, i);
+                    start = i + 1;
+                    appendable.append("&lt;");
+                } else if (c == '>') {
+                    appendable.append(csq, start, i);
+                    start = i + 1;
+                    appendable.append("&gt;");
+                }
+            }
+            appendable.append(csq, start, end);
+            return this;
+        }
+
+        @Override
+        public Appendable append(char c) throws IOException {
+            if (c == '&')
+                appendable.append("&amp;");
+            else if (c == '<')
+                appendable.append("&lt;");
+            else if (c == '>')
+                appendable.append("&gt;");
+            else
+                appendable.append(c);
+            return this;
+        }
+    }
+
+    private Html() {
     }
 }

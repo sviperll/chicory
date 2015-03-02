@@ -6,8 +6,8 @@
         <artifactId>chicory-maven-parent</artifactId>
         <version>0.18-SNAPSHOT</version>
     </parent>
-    <artifactId>text-formats</artifactId>
-    <name>text-formats</name>
+    <artifactId>chicory-text</artifactId>
+    <name>chicory-text</name>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
