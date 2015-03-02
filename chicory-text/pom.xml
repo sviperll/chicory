@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-maven-parent</artifactId>
-        <version>0.18</version>
+        <version>0.19-SNAPSHOT</version>
     </parent>
     <artifactId>chicory-text</artifactId>
     <name>chicory-text</name>
