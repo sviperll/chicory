@@ -1,0 +1,14 @@
+com.github.sviperll
+com.github.sviperll.collection
+com.github.sviperll.concurrent
+com.github.sviperll.daemon
+com.github.sviperll.environment
+com.github.sviperll.graphics
+com.github.sviperll.io
+com.github.sviperll.logging
+com.github.sviperll.meta
+com.github.sviperll.mime
+com.github.sviperll.text.formats
+com.github.sviperll.text.layout
+com.github.sviperll.time
+org.github.sviperll.stream
