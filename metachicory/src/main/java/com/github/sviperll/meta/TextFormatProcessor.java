@@ -51,7 +51,7 @@ import javax.tools.Diagnostic;
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-@SupportedAnnotationTypes("com.github.sviperll.texttemplates.TemplateFormat")
+@SupportedAnnotationTypes("com.github.sviperll.meta.TextFormat")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class TextFormatProcessor extends AbstractProcessor {
     private final List<String> errors = new ArrayList<String>();
@@ -84,6 +84,7 @@ public class TextFormatProcessor extends AbstractProcessor {
             String message = MessageFormat.format("{0} class annotated with {1} annotation should contain {2} method:\n    public static Appendable {2}(Appendable appendable)", arguments);
             errors.add(message);
         }
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found " + templateFormatElement.getQualifiedName() + " text format");
     }
     private ExecutableElement getCreateEscapingAppendableMethod(TypeElement templateFormatElement, TextFormat directive) {
         List<? extends Element> elements = templateFormatElement.getEnclosedElements();

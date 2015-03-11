@@ -30,9 +30,10 @@
 package com.github.sviperll.meta;
 
 /**
- *
+ * Denotes access level to class' members: methods, fields and inner-classes
+ * 
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public enum AccessLevel {
+public enum MemberAccess {
     PRIVATE, PACKAGE, PROTECTED, PUBLIC;
 }
