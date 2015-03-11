@@ -70,3 +70,4 @@ class App {
 }
 ```
 
+[Javadoc](http://sviperll.github.io/chicory/chicory-stream/apidocs/index.html)

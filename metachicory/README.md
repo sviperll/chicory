@@ -24,4 +24,4 @@ Changelog
 Usage
 -----
 
-See [javadoc](#)
+See [javadoc](http://sviperll.github.io/chicory/metachicory/apidocs/index.html)

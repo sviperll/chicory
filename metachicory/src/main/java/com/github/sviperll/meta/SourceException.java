@@ -29,8 +29,6 @@
  */
 package com.github.sviperll.meta;
 
-import com.github.sviperll.meta.ProcessingException;
-
 @SuppressWarnings("serial")
 public class SourceException extends ProcessingException {
 

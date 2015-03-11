@@ -46,11 +46,10 @@ import java.lang.annotation.Target;
  * <ul>
  *   <li>it should have no type variables
  *   <li>it should provide method with the following signature:
- * {@code
- * <code>
+ * <br>
+ * <pre>{@code
  *     public static Appendable createEscapingAppendable(Appendable appendable)
- * </code>
- * }
+ * }</pre>
  * </ul>
  * <p>
  * An implementation of createEscapingAppendable method should decorate given appendable argument
@@ -61,18 +60,16 @@ import java.lang.annotation.Target;
  * <p>
  * For example, HTML implementation should escape '&amp;', '&lt;' and '&gt;' characters.
  * <p>
- * {@code
- * <pre>
+ * <pre>{@code
  *     Appendable htmlAppendable = Html.createEscapingAppendable(System.out);
- *     htmlAppendable.append(" if a &lt; b &amp; b &lt; c then a &lt; c ");
- * </pre>
- * }
+ *     htmlAppendable.append(" if a < b & b < c then a < c ");
+ * }</pre>
  * <p>
  * The result when running code above should be
  * <p>
- * <pre>
- *  if a &amp;lt; b &amp;amp; b &amp;lt; c then a &amp;lt; c
- * </pre>
+ * <pre>{@code
+ *  if a &lt; b &amp; b &lt; c then a &lt; c
+ * }</pre>
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
 */

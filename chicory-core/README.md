@@ -29,4 +29,4 @@ Since 0.18
 Usage
 -----
 
-See [javadoc](#)
+See [javadoc](http://sviperll.github.io/chicory/chicory-core/apidocs/index.html)

@@ -36,67 +36,66 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to mark interfaces used as /visitors/.
- *
- * Visitor definition is used in context of /Visitor-pattern/.
- * @see "[Wikipedia article](http://en.wikipedia.org/wiki/Visitor_pattern)"
- *
+ * Used to mark interfaces used as <em>visitors</em>.
+ * <p>
+ * Visitor definition is used in context of <em>Visitor-pattern</em>.
+ * <p>
  * Visitor interfaces are to be generic and declare at least one type-variable.
  * Mandatory type-variable is the result of "visit".
- *
- * Suppose that you have declared interface `MyVisitorInterface`
- *
- * ```
+ * <p>
+ * Suppose that you have declared interface <tt>MyVisitorInterface</tt>
+ * <p>
+ * <pre>{@code
  *     interface MyVisitorInterface<R> {
  *         R variant1(...);
  *         R variant2(...);
  *     }
- * ```
- *
+ * }</pre>
+ * <p>
  * When you actually use an instance of visitor-interface to visit some data-type
  * the result of "visit" is always the type bounded by result-type-variable.
- *
- * ```
+ * <p>
+ * <pre>{@code
  *     MyDataType type = ...;
  *     MyVisitorInterface<Integer> integerVisitor = ...;
  *     Integer visitResult = type.accept(integerVisitor);
- * ```
- *
+ * }</pre>
+ * <p>
  * Result of visit is Integer in an example above, but can be any other type.
  * String is used in an example below:
- *
- * ```
+ * <p>
+ * <pre>{@code
  *     MyVisitorInterface<String> stringVisitor = ...;
  *     String visitResult = type.accept(stringVisitor);
- * ```
- *
+ * }</pre>
+ * <p>
  * Annotation arguments are used to declare roles of type-variables.
- *
- * `MyVisitorInterface` from an example above should be annotated like this:
- *
- * ```
+ * <p>
+ * <tt>MyVisitorInterface</tt> from an example above should be annotated like this:
+ * <p>
+ * <pre>{@code
  *     @Visitor(resultVariableName = "R")
  *     interface MyVisitorInterface<R> {
  *         R variant1(...);
  *         R variant2(...);
  *     }
- * ```
- *
+ * }</pre>
+ * <p>
  * All interface methods are to have result-type-variable as a return-type.
- *
+ * <p>
  * Visitor interface can have an exception-type variable
- *
- * ```
+ * <p>
+ * <pre>{@code
  *     @Visitor(resultVariableName = "R", exceptionVariableName = "E")
  *     interface MyVisitorInterface2<R, E> {
  *         R variant1(...) throws E;
  *         R variant2(...) throws E;
  *     }
- * ```
- *
+ * }</pre>
+ * <p>
  * In this case every-visit can potentially throw an exception of type bounded by exception-type-variable
- *
- * ```
+ * <p>
+ * <pre>{@code
  *     MyDataType2 type = ...;
  *     MyVisitorInterface2<Integer, IOException> integerIOVisitor = ...;
  *     Integer visitResult1;
@@ -113,10 +112,11 @@ import java.lang.annotation.Target;
  *     } catch (SQLException ex) {
  *         ...
  *     }
- * ```
- *
+ * }</pre>
+ * <p>
  * When exception type-variable is used all methods should declare this type variable in the list of thrown exceptions.
  *
+ * @see <a href="http://en.wikipedia.org/wiki/Visitor_pattern">Wikipedia article</a>
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -127,29 +127,26 @@ public @interface Visitor {
      * Name of type-variable that denotes "visit" result type.
      *
      * @see com.github.sviperll.meta.Visitor
-     *
      * @return name of type-variable that denotes "visit" result type.
      */
     String resultVariableName();
 
     /**
      * Name of type-variable that denotes an "visit" exception type.
-     *
-     * @see com.github.sviperll.meta.Visitor
-     *
+     * <p>
      * No exception type is used if this annotation argument is omitted.
      *
+     * @see com.github.sviperll.meta.Visitor
      * @return name of type-variable that denotes an "visit" exception type.
      */
     String exceptionVariableName() default ":none";
 
     /**
      * Name of type-variable that denotes a data-type self-reference.
-     *
-     * @see com.github.sviperll.meta.Visitor
-     *
+     * <p>
      * No self-reference type is used if this annotation argument is omitted.
      *
+     * @see com.github.sviperll.meta.Visitor
      * @return name of type-variable that denotes a data-type self-reference.
      */
     String selfReferenceVariableName() default ":none";
