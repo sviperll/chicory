@@ -13,6 +13,7 @@
     <url>https://github.com/sviperll/chicory</url>
     <properties>
         <netbeans.hint.license>BSD3</netbeans.hint.license>
+        <github.global.server>github</github.global.server>
     </properties>
     <modules>
         <module>chicory-environment</module>
@@ -57,6 +58,19 @@
                     </docletArtifact>
                     <useStandardDocletOptions>true</useStandardDocletOptions>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.9</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>site</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
