@@ -28,7 +28,7 @@ package com.github.sviperll;
 
 public class Strings {
     /**
-     * Same as escape, but encloses string in double-quotes
+     * Same as escape, but encloses string in double-quotes.
      * Ex. "abc\ndef" is converted into "\"abc\\ndef\""
      */
     public static String quote(String s) {
@@ -39,7 +39,7 @@ public class Strings {
         return sb.toString();
     }
     /**
-     * Escapes special characters in string
+     * Escapes special characters in string.
      * Ex. "abc\ndef" is converted into "abc\\ndef"
      */
     public static String escape(String s) {

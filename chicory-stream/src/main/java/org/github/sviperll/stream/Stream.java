@@ -37,6 +37,9 @@ import com.github.sviperll.Supplier;
 import com.github.sviperll.UnaryOperatorDefinition;
 
 /**
+ * Objects that provides stream processing.
+ *
+ * @see Streamable
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
@@ -99,7 +102,7 @@ public class Stream<T> implements Streamable<T> {
         });
     }
 
-    public static <T> Stream<T> of(final T element1) {
+    public static <T> Stream<T> ofElements(final T element1) {
         return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
@@ -108,7 +111,7 @@ public class Stream<T> implements Streamable<T> {
         });
     }
 
-    public static <T> Stream<T> of(final T element1, final T element2) {
+    public static <T> Stream<T> ofElements(final T element1, final T element2) {
         return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
@@ -118,7 +121,7 @@ public class Stream<T> implements Streamable<T> {
         });
     }
 
-    public static <T> Stream<T> of(final T element1, final T element2, final T element3) {
+    public static <T> Stream<T> ofElements(final T element1, final T element2, final T element3) {
         return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
@@ -129,7 +132,7 @@ public class Stream<T> implements Streamable<T> {
         });
     }
 
-    public static <T> Stream<T> of(final T element1, final T element2, final T element3, final T element4) {
+    public static <T> Stream<T> ofElements(final T element1, final T element2, final T element3, final T element4) {
         return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {
@@ -141,7 +144,7 @@ public class Stream<T> implements Streamable<T> {
         });
     }
 
-    public static <T> Stream<T> of(final T element1, final T element2, final T element3, final T element4, final T element5) {
+    public static <T> Stream<T> ofElements(final T element1, final T element2, final T element3, final T element4, final T element5) {
         return Stream.of(new Streamable<T>() {
             @Override
             public void forEach(SaturableConsuming<? super T> consumer) {

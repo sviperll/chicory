@@ -38,20 +38,19 @@ import java.lang.annotation.Target;
 /**
  * Marks classes defining text format.
  * <p>
- Each text format should be represented as a stand-alone class.
- Each class should define pecularities specific for each text format.
- Such classes should all be marked with TextFormat annotation.
- <p>
+ * Each text format should be represented as a stand-alone class.
+ * Each class should define pecularities specific for each text format.
+ * Such classes should all be marked with TextFormat annotation.
+ * <p>
  * There two requirements for marked class
  * <ul>
  *   <li>it should have no type variables
  *   <li>it should provide method with the following signature:
- * <br>
- * <pre>{@code
+ * <blockquote><pre>{@code
  *     public static Appendable createEscapingAppendable(Appendable appendable)
- * }</pre>
+ * }</pre></blockquote>
  * </ul>
- * <p>
+ *
  * An implementation of createEscapingAppendable method should decorate given appendable argument
  * to create new appendable that will escape any special characters, specific to given format.
  * <p>

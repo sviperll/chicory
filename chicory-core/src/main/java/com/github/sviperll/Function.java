@@ -27,12 +27,17 @@
 package com.github.sviperll;
 
 /**
+ * Objects used as pure functions.
+ *
+ * @see Applicable
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @param <T> argument type
+ * @param <R> result type
  */
 public class Function<T, R> implements Applicable<T, R> {
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static Function ID = new Function(new IdApplicable());
+    private static final Function ID = new Function(new IdApplicable());
 
     public static <T> Function<T, T> identity() {
         return typedIdentity();

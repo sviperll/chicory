@@ -26,6 +26,15 @@
  */
 package com.github.sviperll;
 
+/**
+ * Minimal implementation usable as function-object.
+ *
+ * Use {@link Function#of(Applicable) Function#of} method to create actual function objects.
+ *
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @param <T> argument type
+ * @param <R> result type
+ */
 public interface Applicable<T, R> {
     R apply(T t);
 }

@@ -29,6 +29,9 @@ package com.github.sviperll;
 import java.util.List;
 
 /**
+ * Objects used as logic predicates.
+ *
+ * @see Evaluatable
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
@@ -75,7 +78,7 @@ public abstract class Predicate<T> implements Evaluatable<T> {
         return result;
     }
 
-    public static <T> Predicate<T> of(final Function<? super T, Boolean> function) {
+    public static <T> Predicate<T> from(final Function<? super T, Boolean> function) {
         return of(new Evaluatable<T>() {
             @Override
             public boolean evaluate(T t) {

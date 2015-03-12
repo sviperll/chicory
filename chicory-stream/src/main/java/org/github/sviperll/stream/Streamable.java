@@ -27,7 +27,10 @@
 package org.github.sviperll.stream;
 
 /**
+ * Minimal implementation of stream like object.
  *
+ * Use {@link Stream#of(Streamable) Stream#of} to create actual streams
+ * 
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 public interface Streamable<T> {

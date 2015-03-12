@@ -44,13 +44,13 @@ import java.lang.annotation.Target;
  * Mandatory type-variable is the result of "visit".
  * <p>
  * Suppose that you have declared interface <tt>MyVisitorInterface</tt>
- * <p>
- * <pre>{@code
- *     interface MyVisitorInterface<R> {
+ * 
+ * <blockquote><pre>{@code
+ *     interface MyVisitorInterface<R> &#123;
  *         R variant1(...);
  *         R variant2(...);
- *     }
- * }</pre>
+ *     &#125;
+ * }</pre></blockquote>
  * <p>
  * When you actually use an instance of visitor-interface to visit some data-type
  * the result of "visit" is always the type bounded by result-type-variable.
@@ -75,10 +75,10 @@ import java.lang.annotation.Target;
  * <p>
  * <pre>{@code
  *     @Visitor(resultVariableName = "R")
- *     interface MyVisitorInterface<R> {
+ *     interface MyVisitorInterface<R> &#123;
  *         R variant1(...);
  *         R variant2(...);
- *     }
+ *     &#125;
  * }</pre>
  * <p>
  * All interface methods are to have result-type-variable as a return-type.
@@ -87,10 +87,10 @@ import java.lang.annotation.Target;
  * <p>
  * <pre>{@code
  *     @Visitor(resultVariableName = "R", exceptionVariableName = "E")
- *     interface MyVisitorInterface2<R, E> {
+ *     interface MyVisitorInterface2<R, E> &#123;
  *         R variant1(...) throws E;
  *         R variant2(...) throws E;
- *     }
+ *     &#125;
  * }</pre>
  * <p>
  * In this case every-visit can potentially throw an exception of type bounded by exception-type-variable
@@ -99,19 +99,19 @@ import java.lang.annotation.Target;
  *     MyDataType2 type = ...;
  *     MyVisitorInterface2<Integer, IOException> integerIOVisitor = ...;
  *     Integer visitResult1;
- *     try {
+ *     try &#123;
  *         visitResult1 = type.accept(integerIOVisitor);
- *     } catch (IOException ex) {
+ *     &#125; catch (IOException ex) &#123;
  *         ...
- *     }
+ *     &#125;
  *
  *     MyVisitorInterface2<String, SQLException> stringSQLVisitor = ...;
  *     String visitResult2;
- *     try {
+ *     try &#123;
  *         visitResult2 = type.accept(stringSQLVisitor);
- *     } catch (SQLException ex) {
+ *     &#125; catch (SQLException ex) &#123;
  *         ...
- *     }
+ *     &#125;
  * }</pre>
  * <p>
  * When exception type-variable is used all methods should declare this type variable in the list of thrown exceptions.
@@ -127,7 +127,6 @@ public @interface Visitor {
      * Name of type-variable that denotes "visit" result type.
      *
      * @see com.github.sviperll.meta.Visitor
-     * @return name of type-variable that denotes "visit" result type.
      */
     String resultVariableName();
 
@@ -137,7 +136,6 @@ public @interface Visitor {
      * No exception type is used if this annotation argument is omitted.
      *
      * @see com.github.sviperll.meta.Visitor
-     * @return name of type-variable that denotes an "visit" exception type.
      */
     String exceptionVariableName() default ":none";
 
@@ -147,7 +145,6 @@ public @interface Visitor {
      * No self-reference type is used if this annotation argument is omitted.
      *
      * @see com.github.sviperll.meta.Visitor
-     * @return name of type-variable that denotes a data-type self-reference.
      */
     String selfReferenceVariableName() default ":none";
 }
