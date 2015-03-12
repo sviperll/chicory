@@ -45,74 +45,74 @@ import java.lang.annotation.Target;
  * <p>
  * Suppose that you have declared interface <tt>MyVisitorInterface</tt>
  * 
- * <blockquote><pre>{@code
- *     interface MyVisitorInterface<R> &#123;
+ * <blockquote><pre><code>
+ *     interface MyVisitorInterface&lt;R&gt; {
  *         R variant1(...);
  *         R variant2(...);
- *     &#125;
- * }</pre></blockquote>
+ *     }
+ * </code></pre></blockquote>
  * <p>
  * When you actually use an instance of visitor-interface to visit some data-type
  * the result of "visit" is always the type bounded by result-type-variable.
  * <p>
- * <pre>{@code
+ * <blockquote><pre><code>
  *     MyDataType type = ...;
- *     MyVisitorInterface<Integer> integerVisitor = ...;
+ *     MyVisitorInterface&lt;Integer&gt; integerVisitor = ...;
  *     Integer visitResult = type.accept(integerVisitor);
- * }</pre>
+ * </code></pre></blockquote>
  * <p>
  * Result of visit is Integer in an example above, but can be any other type.
  * String is used in an example below:
  * <p>
- * <pre>{@code
- *     MyVisitorInterface<String> stringVisitor = ...;
+ * <blockquote><pre><code>
+ *     MyVisitorInterface&lt;String&gt; stringVisitor = ...;
  *     String visitResult = type.accept(stringVisitor);
- * }</pre>
+ * </code></pre></blockquote>
  * <p>
  * Annotation arguments are used to declare roles of type-variables.
  * <p>
  * <tt>MyVisitorInterface</tt> from an example above should be annotated like this:
  * <p>
- * <pre>{@code
- *     @Visitor(resultVariableName = "R")
- *     interface MyVisitorInterface<R> &#123;
+ * <blockquote><pre><code>
+ *     &#64;Visitor(resultVariableName = "R")
+ *     interface MyVisitorInterface&lt;R&gt; {
  *         R variant1(...);
  *         R variant2(...);
- *     &#125;
- * }</pre>
+ *     }
+ * </code></pre></blockquote>
  * <p>
  * All interface methods are to have result-type-variable as a return-type.
  * <p>
  * Visitor interface can have an exception-type variable
  * <p>
- * <pre>{@code
- *     @Visitor(resultVariableName = "R", exceptionVariableName = "E")
- *     interface MyVisitorInterface2<R, E> &#123;
+ * <blockquote><pre><code>
+ *     &#64;Visitor(resultVariableName = "R", exceptionVariableName = "E")
+ *     interface MyVisitorInterface2&lt;R, E&gt; {
  *         R variant1(...) throws E;
  *         R variant2(...) throws E;
- *     &#125;
- * }</pre>
+ *     }
+ * </code></pre></blockquote>
  * <p>
  * In this case every-visit can potentially throw an exception of type bounded by exception-type-variable
  * <p>
- * <pre>{@code
+ * <blockquote><pre><code>
  *     MyDataType2 type = ...;
- *     MyVisitorInterface2<Integer, IOException> integerIOVisitor = ...;
+ *     MyVisitorInterface2&lt;Integer, IOException&gt; integerIOVisitor = ...;
  *     Integer visitResult1;
- *     try &#123;
+ *     try {
  *         visitResult1 = type.accept(integerIOVisitor);
- *     &#125; catch (IOException ex) &#123;
+ *     } catch (IOException ex) {
  *         ...
- *     &#125;
+ *     }
  *
- *     MyVisitorInterface2<String, SQLException> stringSQLVisitor = ...;
+ *     MyVisitorInterface2&lt;String, SQLException&gt; stringSQLVisitor = ...;
  *     String visitResult2;
- *     try &#123;
+ *     try {
  *         visitResult2 = type.accept(stringSQLVisitor);
- *     &#125; catch (SQLException ex) &#123;
+ *     } catch (SQLException ex) {
  *         ...
- *     &#125;
- * }</pre>
+ *     }
+ * </code></pre></blockquote>
  * <p>
  * When exception type-variable is used all methods should declare this type variable in the list of thrown exceptions.
  *

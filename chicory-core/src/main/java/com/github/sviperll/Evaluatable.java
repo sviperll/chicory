@@ -29,7 +29,7 @@ package com.github.sviperll;
 /**
  * Minimal implementation of object usable as logic predicate.
  *
- * Use {@link Predicate#of(Evaluatable) Predicate#of) to construct actual predicate objects.
+ * Use {@link Predicate#of(Evaluatable) Predicate#of} to construct actual predicate objects.
  * 
  * @author Victor Nazarov <asviraspossible@gmail.com>
  * @param <T>
