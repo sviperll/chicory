@@ -164,26 +164,42 @@ public class JCodeModelJavaxLangModelAdapter {
         } catch (JClassAlreadyExistsException ex) {
             throw new CodeGenerationException(ex);
         }
+        declareInnerClasses(newClass, element, environment);
         ClassFiller filler = new ClassFiller(newClass);
         filler.fillClass(element, environment);
         return newClass;
     }
 
+    private void declareInnerClasses(JDefinedClass klass, TypeElement element, TypeEnvironment environment) throws ProcessingException {
+        for (Element enclosedElement: element.getEnclosedElements()) {
+            if (enclosedElement.getKind().equals(ElementKind.INTERFACE) || enclosedElement.getKind().equals(ElementKind.CLASS)) {
+                EClassType classType = toClassType(enclosedElement.getKind());
+                int modifiers = toJMod(enclosedElement.getModifiers());
+                if (classType.equals(EClassType.INTERFACE)) {
+                    modifiers &= ~JMod.ABSTRACT;
+                    modifiers &= ~JMod.STATIC;
+                }
+                JDefinedClass enclosedClass;
+                try {
+                    enclosedClass = klass._class(modifiers, enclosedElement.getSimpleName().toString(), classType);
+                } catch (JClassAlreadyExistsException ex) {
+                    throw new CodeGenerationException(ex);
+                }
+                declareInnerClasses(enclosedClass, (TypeElement)enclosedElement, environment);
+            }
+        }
+    }
+
     private void defineInnerClass(JDefinedClass enclosingClass, TypeElement element, TypeEnvironment environment) throws ProcessingException {
-        EClassType classType = toClassType(element.getKind());
-        int modifiers = toJMod(element.getModifiers());
-        if (classType.equals(EClassType.INTERFACE)) {
-            modifiers &= ~JMod.ABSTRACT;
-            modifiers &= ~JMod.STATIC;
+        for (JDefinedClass innerClass: enclosingClass.classes()) {
+            if (innerClass.fullName().equals(element.getQualifiedName().toString())) {
+                ClassFiller filler = new ClassFiller(innerClass);
+                filler.fillClass(element, environment);
+                return;
+            }
         }
-        JDefinedClass newClass;
-        try {
-            newClass = enclosingClass._class(modifiers, element.getSimpleName().toString(), classType);
-        } catch (JClassAlreadyExistsException ex) {
-            throw new CodeGenerationException(ex);
-        }
-        ClassFiller filler = new ClassFiller(newClass);
-        filler.fillClass(element, environment);
+        throw new IllegalStateException(MessageFormat.format("Inner class should always be defined if outer class is defined: inner class {0}, enclosing class {1}",
+                                                            element, enclosingClass));
     }
 
     private AbstractJClass ref(TypeElement element) throws ProcessingException {
@@ -217,7 +233,8 @@ public class JCodeModelJavaxLangModelAdapter {
                     return innerClass;
                 }
             }
-            throw new IllegalStateException("Inner class should always be defined if outer class is defined");
+            throw new IllegalStateException(MessageFormat.format("Inner class should always be defined if outer class is defined: inner class {0}, enclosing class {1}",
+                                                                 element, enclosingClass));
         } else
             throw new IllegalStateException("Enclosing element should be package or class");
     }
