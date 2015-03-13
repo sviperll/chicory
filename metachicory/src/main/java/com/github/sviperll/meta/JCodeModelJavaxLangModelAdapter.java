@@ -452,7 +452,9 @@ public class JCodeModelJavaxLangModelAdapter {
                         annotationUse.param(name, (Boolean)value);
                     else if (value instanceof Class)
                         annotationUse.param(name, (Class)value);
-                    else if (value instanceof VariableElement) {
+                    else if (value instanceof DeclaredType) {
+                        annotationUse.param(name, toJType((DeclaredType)value, typeEnvironment));
+                    } else if (value instanceof VariableElement) {
                         try {
                             annotationUse.param(name, actualEnumConstantValue((VariableElement)value));
                         } catch (ClassNotFoundException ex) {
@@ -542,6 +544,14 @@ public class JCodeModelJavaxLangModelAdapter {
                                 int i = 0;
                                 for (AnnotationValue elementValue: list) {
                                     elements[i] = (Class<?>)elementValue.getValue();
+                                    i++;
+                                }
+                                annotationUse.paramArray(name, elements);
+                            } else if (element instanceof DeclaredType) {
+                                AbstractJType[] elements = new AbstractJType[list.size()];
+                                int i = 0;
+                                for (AnnotationValue elementValue: list) {
+                                    elements[i] = toJType((DeclaredType)elementValue.getValue(), typeEnvironment);
                                     i++;
                                 }
                                 annotationUse.paramArray(name, elements);
