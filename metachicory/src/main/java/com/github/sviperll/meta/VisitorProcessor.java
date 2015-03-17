@@ -59,7 +59,7 @@ public class VisitorProcessor extends AbstractProcessor {
             for (Element element: roundEnv.getElementsAnnotatedWith(Visitor.class)) {
                 try {
                     validateVisitor((TypeElement)element);
-                } catch (ProcessingException ex) {
+                } catch (SourceValidationException ex) {
                     errors.add(ex.getMessage());
                 }
             }
@@ -67,7 +67,7 @@ public class VisitorProcessor extends AbstractProcessor {
         return true;
     }
 
-    private void validateVisitor(TypeElement element) throws SourceException {
+    private void validateVisitor(TypeElement element) throws SourceValidationException {
         Visitor visitorAnnotation = element.getAnnotation(Visitor.class);
         TypeParameterElement resultTypeParameterElement = null;
         for (TypeParameterElement typeParameter: element.getTypeParameters()) {
@@ -75,7 +75,7 @@ public class VisitorProcessor extends AbstractProcessor {
                 resultTypeParameterElement = typeParameter;
         }
         if (resultTypeParameterElement == null)
-            throw new SourceException(MessageFormat.format("No result type variable named {0} found for {1} declared as {2}",
+            throw new SourceValidationException(MessageFormat.format("No result type variable named {0} found for {1} declared as {2}",
                                                            visitorAnnotation.resultVariableName(),
                                                            element.getQualifiedName(),
                                                            Visitor.class.getName()));
@@ -87,7 +87,7 @@ public class VisitorProcessor extends AbstractProcessor {
                     exceptionTypeParameterElement = typeParameter;
             }
             if (exceptionTypeParameterElement == null)
-                throw new SourceException(MessageFormat.format("No exception type variable named {0} found for {1} declared as {2}",
+                throw new SourceValidationException(MessageFormat.format("No exception type variable named {0} found for {1} declared as {2}",
                                                                visitorAnnotation.exceptionVariableName(),
                                                                element.getQualifiedName(),
                                                                Visitor.class.getName()));
@@ -100,7 +100,7 @@ public class VisitorProcessor extends AbstractProcessor {
                     selfReferenceTypeParameterElement = typeParameter;
             }
             if (selfReferenceTypeParameterElement == null)
-                throw new SourceException(MessageFormat.format("No self-reference type variable named {0} found for {1} declared as {2}",
+                throw new SourceValidationException(MessageFormat.format("No self-reference type variable named {0} found for {1} declared as {2}",
                                                                visitorAnnotation.selfReferenceVariableName(),
                                                                element.getQualifiedName(),
                                                                Visitor.class.getName()));

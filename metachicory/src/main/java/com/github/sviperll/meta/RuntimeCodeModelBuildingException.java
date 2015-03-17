@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Victor Nazarov <asviraspossible@gmail.com>
+ * Copyright (c) 2015, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -34,15 +34,15 @@ package com.github.sviperll.meta;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 @SuppressWarnings("serial")
-public class RuntimeProcessingException extends RuntimeException {
-    private final ProcessingException cause;
+class RuntimeCodeModelBuildingException extends RuntimeException {
+    private final CodeModelBuildingException cause;
 
-    public RuntimeProcessingException(ProcessingException cause) {
+    public RuntimeCodeModelBuildingException(CodeModelBuildingException cause) {
         super(cause);
         this.cause = cause;
     }
     @Override
-    public ProcessingException getCause() {
+    public CodeModelBuildingException getCause() {
         return cause;
     }
 }

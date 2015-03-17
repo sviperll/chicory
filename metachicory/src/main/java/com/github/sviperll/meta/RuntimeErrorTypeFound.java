@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Victor Nazarov <asviraspossible@gmail.com>
+ * Copyright (c) 2015, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,14 +29,20 @@
  */
 package com.github.sviperll.meta;
 
+/**
+ *
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ */
 @SuppressWarnings("serial")
-public class SourceException extends ProcessingException {
+class RuntimeErrorTypeFound extends RuntimeException {
+    private final ErrorTypeFound cause;
 
-    public SourceException(String message) {
-        super(message);
+    public RuntimeErrorTypeFound(ErrorTypeFound cause) {
+        super(cause);
+        this.cause = cause;
     }
-
-    public SourceException(String message, Exception ex) {
-        super(message, ex);
+    @Override
+    public ErrorTypeFound getCause() {
+        return cause;
     }
 }

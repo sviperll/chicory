@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Victor Nazarov <asviraspossible@gmail.com>
+ * Copyright (c) 2015, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,21 +29,46 @@
  */
 package com.github.sviperll.meta;
 
+import com.github.sviperll.io.NullOutputStream;
+import com.helger.jcodemodel.AbstractCodeWriter;
+import com.helger.jcodemodel.JPackage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+
 /**
+ * Discards generated code.
+ * <p>
+ * AbstractCodeWriter to be used with {@code JCodeModel}
+ * <p>
+ * This writer writes nothing and fully discards all generated code.
+ * It can be used to check that nothing goes wrong during code generation.
+ *
+ * @see com.helger.jcodemodel.JCodeModel
+ * @see com.helger.jcodemodel.AbstractCodeWriter
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-@SuppressWarnings("serial")
-public class ProcessingException extends Exception {
-    protected ProcessingException() {
+public class NullCodeWriter extends AbstractCodeWriter {
+    private static final NullCodeWriter INSTANCE = new NullCodeWriter();
+
+    /**
+     * Returns default instance
+     */
+    public static final NullCodeWriter getInstance() {
+        return INSTANCE;
     }
-    protected ProcessingException(Throwable ex) {
-        super(ex);
+
+    private NullCodeWriter() {
+        super(Charset.defaultCharset());
     }
-    protected ProcessingException(String message) {
-        super(message);
+
+    @Override
+    public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
+        return NullOutputStream.getInstance();
     }
-    protected ProcessingException(String message, Throwable ex) {
-        super(message, ex);
+
+    @Override
+    public void close() throws IOException {
     }
 }

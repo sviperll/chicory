@@ -15,5 +15,10 @@
             <artifactId>jcodemodel</artifactId>
             <version>2.7.8</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.sviperll</groupId>
+            <artifactId>chicory-core</artifactId>
+            <version>${project.version}</version>
+       </dependency>
     </dependencies>
 </project>

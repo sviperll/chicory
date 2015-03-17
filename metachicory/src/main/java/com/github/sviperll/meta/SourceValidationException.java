@@ -29,17 +29,14 @@
  */
 package com.github.sviperll.meta;
 
-import com.helger.jcodemodel.JClassAlreadyExistsException;
-
 @SuppressWarnings("serial")
-public class CodeGenerationException extends ProcessingException {
+class SourceValidationException extends Exception {
 
-    public CodeGenerationException(JClassAlreadyExistsException ex) {
-        super(ex);
+    public SourceValidationException(String message) {
+        super(message);
     }
 
-    CodeGenerationException(ClassNotFoundException ex) {
-        super(ex);
+    public SourceValidationException(String message, Exception ex) {
+        super(message, ex);
     }
-
 }

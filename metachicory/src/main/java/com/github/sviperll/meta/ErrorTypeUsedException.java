@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Victor Nazarov <asviraspossible@gmail.com>
+ * Copyright (c) 2015, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -30,11 +30,17 @@
 package com.github.sviperll.meta;
 
 /**
+ * Usage of any error-type.
+ * <p>
+ * You can introduce error types into your code model.
+ * Usage of any error type cause an exception to be thrown.
+ * Exception message is specified on error-type instantiation.
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 @SuppressWarnings("serial")
-public class ErrorTypeFound extends Exception {
-    public ErrorTypeFound() {
+public class ErrorTypeUsedException extends UnsupportedOperationException {
+    public ErrorTypeUsedException(String message) {
+        super(message);
     }
 }
