@@ -30,13 +30,13 @@
 package com.github.sviperll.meta;
 
 @SuppressWarnings("serial")
-class SourceValidationException extends Exception {
+public class SourceCodeValidationException extends Exception {
 
-    public SourceValidationException(String message) {
+    public SourceCodeValidationException(String message) {
         super(message);
     }
 
-    public SourceValidationException(String message, Exception ex) {
+    public SourceCodeValidationException(String message, Exception ex) {
         super(message, ex);
     }
 }
