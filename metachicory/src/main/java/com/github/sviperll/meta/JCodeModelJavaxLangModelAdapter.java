@@ -34,22 +34,18 @@ import com.helger.jcodemodel.AbstractJType;
 import com.helger.jcodemodel.EClassType;
 import com.helger.jcodemodel.IJAnnotatable;
 import com.helger.jcodemodel.JAnnotationUse;
-import com.helger.jcodemodel.JArrayClass;
 import com.helger.jcodemodel.JClassAlreadyExistsException;
 import com.helger.jcodemodel.JCodeModel;
 import com.helger.jcodemodel.JDefinedClass;
-import com.helger.jcodemodel.JFormatter;
 import com.helger.jcodemodel.JMethod;
 import com.helger.jcodemodel.JMod;
 import com.helger.jcodemodel.JPackage;
 import com.helger.jcodemodel.JTypeVar;
 import com.helger.jcodemodel.JTypeWildcard;
 import com.helger.jcodemodel.JVar;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -133,24 +129,12 @@ public class JCodeModelJavaxLangModelAdapter {
     private final JCodeModel codeModel;
     private final Elements elementUtils;
 
-    private boolean containsErrorTypes;
-
     /**
      * Creates new instance of JCodeModelJavaxLangModelAdapter.
      */
     public JCodeModelJavaxLangModelAdapter(JCodeModel codeModel, Elements elementUtils) {
         this.codeModel = codeModel;
         this.elementUtils = elementUtils;
-    }
-
-    public boolean errorTypesAreGenerated() {
-        containsErrorTypes = false;
-        try {
-            codeModel.build(NullCodeWriter.getInstance());
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        return containsErrorTypes;
     }
 
     /**
@@ -366,7 +350,7 @@ public class JCodeModelJavaxLangModelAdapter {
             @Override
             public AbstractJType visitError(ErrorType t, Void p) {
                 if (includesErrorTypes)
-                    return new JErrorType("<error>");
+                    return codeModel.errorClass(t.asElement().getSimpleName().toString() + " in annotated source code");
                 else {
                     try {
                         throw new ErrorTypeFound();
@@ -675,76 +659,5 @@ public class JCodeModelJavaxLangModelAdapter {
             }
         }
 
-    }
-
-    private class JErrorType extends AbstractJClass {
-        private final String message;
-        JErrorType(String message) {
-            super(codeModel);
-            this.message = message;
-        }
-
-        @Override
-        public String fullName() {
-            return "<error>";
-        }
-
-        @Override
-        public String name() {
-            return "<error>";
-        }
-
-        @Override
-        public JArrayClass array() {
-            throw new ErrorTypeUsedException(message);
-        }
-
-        @Override
-        @Deprecated
-        public AbstractJClass boxify() {
-            return this;
-        }
-
-        @Override
-        public AbstractJType unboxify() {
-            return this;
-        }
-
-        @Override
-        public void generate(JFormatter jf) {
-            containsErrorTypes = true;
-            jf.print(" <error> ");
-        }
-
-        @Override
-        public JPackage _package() {
-            throw new ErrorTypeUsedException(message);
-        }
-
-        @Override
-        public AbstractJClass _extends() {
-            throw new ErrorTypeUsedException(message);
-        }
-
-        @Override
-        public Iterator<AbstractJClass> _implements() {
-            return Collections.emptyIterator();
-        }
-
-        @Override
-        public boolean isInterface() {
-            return false;
-        }
-
-        @Override
-        public boolean isAbstract() {
-            return false;
-        }
-
-        @Override
-        protected AbstractJClass substituteParams(JTypeVar[] arg0,
-                                                  List<? extends AbstractJClass> arg1) {
-            return this;
-        }
     }
 }
