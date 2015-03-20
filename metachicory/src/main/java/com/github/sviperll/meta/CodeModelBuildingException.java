@@ -29,21 +29,17 @@
  */
 package com.github.sviperll.meta;
 
-/**
- *
- * @author Victor Nazarov <asviraspossible@gmail.com>
- */
+import com.helger.jcodemodel.JClassAlreadyExistsException;
+
 @SuppressWarnings("serial")
-public class ProcessingException extends Exception {
-    protected ProcessingException() {
-    }
-    protected ProcessingException(Throwable ex) {
+public class CodeModelBuildingException extends Exception {
+
+    public CodeModelBuildingException(JClassAlreadyExistsException ex) {
         super(ex);
     }
-    protected ProcessingException(String message) {
-        super(message);
+
+    CodeModelBuildingException(ClassNotFoundException ex) {
+        super(ex);
     }
-    protected ProcessingException(String message, Throwable ex) {
-        super(message, ex);
-    }
+
 }

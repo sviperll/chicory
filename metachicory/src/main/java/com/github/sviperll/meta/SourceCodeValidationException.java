@@ -29,35 +29,14 @@
  */
 package com.github.sviperll.meta;
 
-import com.helger.jcodemodel.AbstractJType;
-import java.util.Map;
-import java.util.TreeMap;
+@SuppressWarnings("serial")
+public class SourceCodeValidationException extends Exception {
 
-/**
- *
- * @author Victor Nazarov <asviraspossible@gmail.com>
- */
-class TypeEnvironment {
-    private final Map<String, AbstractJType> map = new TreeMap<String, AbstractJType>();
-    private final TypeEnvironment parent;
-    TypeEnvironment() {
-        parent = null;
+    public SourceCodeValidationException(String message) {
+        super(message);
     }
-    private TypeEnvironment(TypeEnvironment parent) {
-        this.parent = parent;
-    }
-    public TypeEnvironment enclosed() {
-        return new TypeEnvironment(this);
-    }
-    public AbstractJType get(String name) {
-        AbstractJType result = map.get(name);
-        if (result != null || parent == null) {
-            return result;
-        } else {
-            return parent.get(name);
-        }
-    }
-    public void put(String name, AbstractJType type) {
-        map.put(name, type);
+
+    public SourceCodeValidationException(String message, Exception ex) {
+        super(message, ex);
     }
 }

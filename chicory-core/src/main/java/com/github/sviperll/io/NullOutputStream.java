@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Victor Nazarov <asviraspossible@gmail.com>
+ * Copyright (c) 2015, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -27,19 +27,25 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.meta;
+package com.github.sviperll.io;
 
-import com.helger.jcodemodel.JClassAlreadyExistsException;
+import java.io.IOException;
+import java.io.OutputStream;
 
-@SuppressWarnings("serial")
-public class CodeGenerationException extends ProcessingException {
-
-    public CodeGenerationException(JClassAlreadyExistsException ex) {
-        super(ex);
+/**
+ *
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ */
+public class NullOutputStream extends OutputStream {
+    private static final NullOutputStream INSTANCE = new NullOutputStream();
+    public static final NullOutputStream getInstance() {
+        return INSTANCE;
+    }
+    
+    private NullOutputStream() {
     }
 
-    CodeGenerationException(ClassNotFoundException ex) {
-        super(ex);
+    @Override
+    public void write(int b) throws IOException {
     }
-
 }

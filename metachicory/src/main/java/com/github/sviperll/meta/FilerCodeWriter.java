@@ -41,12 +41,33 @@ import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
+/**
+ * Writes java classes through {@code Filer}.
+ * <p>
+ * {@code AbstractCodeWriter} to be used with {@code JCodeModel}.
+ * <p>
+ * This writer uses {@code Filer} to write actual java source files.
+ * {@code Filer} object is provided by Java-compiler and is available to annotation processors.
+ *
+ * @see com.helger.jcodemodel.JCodeModel
+ * @see javax.annotation.processing.AbstractProcessor
+ * @see com.helger.jcodemodel.AbstractCodeWriter
+ * @see javax.annotation.processing.Filer
+ *
+ * @author Victor Nazarov <asviraspossible@gmail.com>
+ */
 public class FilerCodeWriter extends AbstractCodeWriter {
     private static final String JAVA_SOURCE_SUFFIX = ".java";
     private final Filer filer;
     private final List<OutputStream> closeables = new ArrayList<OutputStream>();
     private final Messager messager;
 
+    /**
+     * Creates new instance.
+     *
+     * @param filer {@code Filer} used to create java sources
+     * @param messager is only used for error reporting
+     */
     public FilerCodeWriter(Filer filer, Messager messager) {
         super(Charset.defaultCharset());
         this.filer = filer;
