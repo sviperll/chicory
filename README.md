@@ -37,7 +37,7 @@ Child projects
 
    Metaprogramming tools. Useful for annotation processors implementation.
 
- * [chicory-environment](https://github.com/sviperll/chicory/tree/master/metachicory)
+ * [chicory-environment](https://github.com/sviperll/chicory/tree/master/chicory-environment)
 
    Not portable part of chicory. This package should be as small as possible.
    Classes used for talking to operating system.
