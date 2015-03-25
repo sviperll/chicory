@@ -7,6 +7,7 @@ com.github.sviperll.graphics
 com.github.sviperll.io
 com.github.sviperll.logging
 com.github.sviperll.meta
+com.github.sviperll.meta.java.model
 com.github.sviperll.mime
 com.github.sviperll.text.formats
 com.github.sviperll.text.layout
