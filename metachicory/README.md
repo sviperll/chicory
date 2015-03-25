@@ -14,7 +14,7 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>metachicory</artifactId>
-        <version>0.20</version>
+        <version>0.21</version>
     </dependency>
 ```
 
