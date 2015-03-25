@@ -49,6 +49,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
+                    <preparationGoals>org.codehaus.mojo:exec-maven-plugin:1.4.0:exec -Dexecutable=update-versions.sh</preparationGoals>
                 </configuration>
             </plugin>
         </plugins>
