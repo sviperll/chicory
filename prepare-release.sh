@@ -49,4 +49,11 @@ NEXT_DEVELOPMENT_VERSION="${RELEASE_VERSION}-successor-SNAPSHOT"
 
 echo "Next development version: $NEXT_DEVELOPMENT_VERSION"
 
-mvn release:prepare -DdryRun=true "-DreleaseVersion=$RELEASE_VERSION" "-DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION" && ( echo "STABLE_VERSION=$STABLE_VERSION" ; echo "UNSTABLE_VERSION=$UNSTABLE_VERSION" ) > versions.sh
+echo "STABLE_VERSION=$STABLE_VERSION" > versions.sh
+if ! test -z "$UNSTABLE_VERSION"; then
+  echo "UNSTABLE_VERSION=$UNSTABLE_VERSION" >> versions.sh
+fi
+
+./generate-readmes.sh
+
+mvn release:prepare -DdryRun=true "-DreleaseVersion=$RELEASE_VERSION" "-DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION"
