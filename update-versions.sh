@@ -9,3 +9,5 @@ if test -e versions.sh.next; then
 
   git commit -m "Update version information"
 fi
+
+exit 0

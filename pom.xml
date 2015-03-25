@@ -54,7 +54,6 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
-                    <preparationGoals>exec:exec -Dexec.executable=update-versions.sh</preparationGoals>
                 </configuration>
             </plugin>
         </plugins>
