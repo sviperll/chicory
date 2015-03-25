@@ -45,11 +45,16 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
-                    <preparationGoals>org.codehaus.mojo:exec-maven-plugin:1.4.0:exec -Dexecutable=update-versions.sh</preparationGoals>
+                    <preparationGoals>exec:exec -Dexec.executable=update-versions.sh</preparationGoals>
                 </configuration>
             </plugin>
         </plugins>
