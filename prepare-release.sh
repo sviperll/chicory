@@ -54,4 +54,4 @@ if ! test -z "$UNSTABLE_VERSION"; then
   echo "UNSTABLE_VERSION=$UNSTABLE_VERSION" >> versions.sh.next
 fi
 
-mvn release:clean release:verify "-DreleaseVersion=$RELEASE_VERSION" "-DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION" && ./update-versions.sh && mvn release:prepare
+mvn release:prepare "-DdryRun=true" "-DreleaseVersion=$RELEASE_VERSION" "-DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION" && ./update-versions.sh && mvn release:prepare
