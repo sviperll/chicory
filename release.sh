@@ -6,6 +6,7 @@ fi
 
 . ./versions.sh
 
+JDK6_HOME=/usr/lib/jvm/java-6-openjdk-i386
 VERSION="$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | grep -v '^\[INFO\]')"
 
 echo "Current version: $VERSION"
@@ -60,14 +61,23 @@ if ! test -z "$UNSTABLE_VERSION"; then
   echo "UNSTABLE_VERSION=$UNSTABLE_VERSION" >> versions.sh.next
 fi
 
-if mvn release:prepare "-DdryRun=true" "-DreleaseVersion=$RELEASE_VERSION" "-DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION"; then
+if mvn clean test; then
   echo "Is everything ok? Proceed with the release? [yes/no]:"
   read ANSWER
   if test "$ANSWER" '=' "yes"; then
-    mvn release:clean \
-	&& mvn release:prepare "-DreleaseVersion=$RELEASE_VERSION" "-DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION" \
-        && mvn release:perform \
-        && ./update-versions.sh \
-        && git push
+
+    # Set java's bootclasspath
+    export JDK6_HOME
+    if mvn release:prepare "-DdryRun=true" "-DreleaseVersion=$RELEASE_VERSION" "-DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION"; then
+      echo "Is everything ok? Proceed with the release? [yes/no]:"
+      read ANSWER
+      if test "$ANSWER" '=' "yes"; then
+        mvn release:clean \
+            && mvn release:prepare "-DreleaseVersion=$RELEASE_VERSION" "-DdevelopmentVersion=$NEXT_DEVELOPMENT_VERSION" \
+            && mvn release:perform \
+            && ./update-versions.sh \
+            && git push
+      fi
+    fi
   fi
 fi
