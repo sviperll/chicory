@@ -14,13 +14,22 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>metachicory</artifactId>
-        <version>0.21</version>
+        <version>0.22</version>
     </dependency>
 ```
 
 
 Changelog
 ---------
+
+ * Since 0.22
+
+    - Change `@Visitor` retention to compile-time
+
+ * Since 0.21
+
+    - Move JCodeModelJavaxLangModelAdapter-related classes to com.github.sviperll.meta.java.model package
+    - Add support to jcodemodel's error-types to JCodeModelJavaxLangModelAdapter
 
 Usage
 -----
