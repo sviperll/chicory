@@ -119,7 +119,7 @@ import java.lang.annotation.Target;
  * @see <a href="http://en.wikipedia.org/wiki/Visitor_pattern">Wikipedia article</a>
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 @Documented
 public @interface Visitor {
