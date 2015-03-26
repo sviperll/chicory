@@ -25,6 +25,7 @@ read N
 echo
 KIND=$(echo alpha beta rc final| awk -v "N=$N" '{print $N}')
 
+echo "Choose actual version number:"
 N_MAX=$(echo "$VERSION $KIND" | awk -f version.awk | wc -l)
 echo "$VERSION $KIND" | awk -f version.awk | awk '{print ++n ". " $0} END{print ++n ". Custom" }'
 
