@@ -1,11 +1,5 @@
 #!/bin/sh
 
-if ! test -e versions.sh; then
-  touch versions.sh
-fi
-
-. ./versions.sh
-
 JDK6_HOME=/usr/lib/jvm/java-6-openjdk-i386
 VERSION="$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version | grep -v '^\[INFO\]')"
 

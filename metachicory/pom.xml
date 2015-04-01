@@ -9,6 +9,9 @@
     <artifactId>metachicory</artifactId>
     <name>metachicory</name>
     <packaging>jar</packaging>
+    <properties>
+        <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.helger</groupId>

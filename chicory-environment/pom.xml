@@ -8,5 +8,8 @@
     <artifactId>chicory-environment</artifactId>
     <name>chicory-environment</name>
     <packaging>jar</packaging>
+    <properties>
+        <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
+    </properties>
 </project>
 

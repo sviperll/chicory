@@ -7,7 +7,6 @@ Part of [chicory](https://github.com/sviperll/chicory).
 
 Installation
 ------------
-
 Use maven dependency:
 
 ```xml

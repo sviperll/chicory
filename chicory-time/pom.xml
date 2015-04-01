@@ -8,6 +8,9 @@
     <artifactId>chicory-time</artifactId>
     <name>chicory-time</name>
     <packaging>jar</packaging>
+    <properties>
+        <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.github.sviperll</groupId>

@@ -13,6 +13,7 @@
     <url>https://github.com/sviperll/chicory</url>
     <properties>
         <netbeans.hint.license>BSD3</netbeans.hint.license>
+        <project.properties.file>project.properties</project.properties.file>
     </properties>
     <modules>
         <module>chicory-environment</module>
@@ -48,6 +49,59 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>com.github.sviperll</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>0.1-SNAPSHOT</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <readEntries>
+                        <readEntry>
+                            <file>${project.properties.file}</file>
+                            <internalPrefix>project.</internalPrefix>
+                            <externalPrefix></externalPrefix>
+                        </readEntry>
+                    </readEntries>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>read-versions</id>
+                        <goals>
+                            <goal>read</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.sviperll</groupId>
+                <artifactId>mustache-maven-plugin</artifactId>
+                <version>0.1-SNAPSHOT</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <contexts>
+                        <context>
+                            <file>${project.properties.file}</file>
+                            <type>properties</type>
+                            <templates>
+                                <template>
+                                    <inputFile>README.md.mustache</inputFile>
+                                    <outputFile>README.md</outputFile>
+                                </template>
+                            </templates>
+                        </context>
+                    </contexts>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>render-readme</id>
+                        <goals>
+                            <goal>render</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
