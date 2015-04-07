@@ -120,10 +120,10 @@
                 <configuration>
                     <releaseVersion>${release.version}</releaseVersion>
                     <developmentVersion>${release.version}-successor-SNAPSHOT</developmentVersion>
-                    <pushChanges>false</pushChanges>
+                    <!-- <pushChanges>false</pushChanges> -->
+                    <!-- <localCheckout>true</localCheckout> -->
                     <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
-                    <arguments>-X</arguments>
                     <preparationGoals>-Drelease.version=${release.version} clean version-kind:update-file verify scm:checkin</preparationGoals>
                 </configuration>
             </plugin>
@@ -163,7 +163,7 @@
                             <execution>
                                 <id>default-cli</id>
                                 <configuration>
-                                    <pushChanges>false</pushChanges>
+                                    <!-- <pushChanges>false</pushChanges> -->
                                     <includes>${project.properties.file},README.md,*/README.md</includes>
                                     <message>[maven-release-plugin] update release version information</message>
                                 </configuration>
