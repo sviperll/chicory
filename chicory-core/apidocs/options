@@ -1,0 +1,26 @@
+-classpath
+'/home/vir/code/chicory/target/checkout/chicory-environment/target/chicory-environment-0.23-rc1.jar:/home/vir/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar:/home/vir/.m2/repository/javax/mail/mail/1.4/mail-1.4.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/home/vir/code/chicory/target/checkout/chicory-core/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2015. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/vir/code/chicory/target/checkout/chicory-core/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'chicory-core 0.23-rc1 API'
+-linkoffline
+'http://docs.oracle.com/javase/6/docs/api' '/home/vir/code/chicory/target/checkout/chicory-core/target/javadoc-bundle-options'
+-linkoffline
+'https://github.com/sviperll/chicory/chicory-environment/apidocs' '/home/vir/code/chicory/target/checkout/chicory-environment/target/site/apidocs'
+-use
+-version
+-windowtitle
+'chicory-core 0.23-rc1 API'
