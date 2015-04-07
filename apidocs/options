@@ -1,0 +1,24 @@
+-classpath
+'/home/vir/code/chicory/target/checkout/chicory-environment/target/classes:/home/vir/code/chicory/target/checkout/chicory-core/target/classes:/home/vir/code/chicory/target/checkout/chicory-time/target/classes:/home/vir/code/chicory/target/checkout/chicory-stream/target/classes:/home/vir/code/chicory/target/checkout/metachicory/target/classes:/home/vir/code/chicory/target/checkout/chicory-text/target/classes:/home/vir/.m2/repository/com/google/code/findbugs/annotations/2.0.3/annotations-2.0.3.jar:/home/vir/code/chicory/target/checkout/metachicory/target/classes:/home/vir/code/chicory/target/checkout/chicory-environment/target/classes:/home/vir/code/chicory/target/checkout/chicory-core/target/classes:/home/vir/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar:/home/vir/.m2/repository/javax/mail/mail/1.4/mail-1.4.jar:/home/vir/.m2/repository/com/helger/jcodemodel/2.7.9/jcodemodel-2.7.9.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/home/vir/code/chicory/target/checkout/chicory-environment/src/main/java:/home/vir/code/chicory/target/checkout/chicory-core/src/main/java:/home/vir/code/chicory/target/checkout/chicory-time/src/main/java:/home/vir/code/chicory/target/checkout/chicory-stream/src/main/java:/home/vir/code/chicory/target/checkout/metachicory/src/main/java:/home/vir/code/chicory/target/checkout/chicory-text/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2015. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/vir/code/chicory/target/checkout/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'chicory-maven-parent 0.23-rc1 API'
+-linkoffline
+'http://docs.oracle.com/javase/6/docs/api' '/home/vir/code/chicory/target/checkout/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'chicory-maven-parent 0.23-rc1 API'
