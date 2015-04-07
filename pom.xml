@@ -150,7 +150,6 @@
                     <developmentVersion>${release.version}-successor-SNAPSHOT</developmentVersion>
                     <!-- <pushChanges>false</pushChanges> -->
                     <!-- <localCheckout>true</localCheckout> -->
-                    <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
                     <preparationGoals>-Drelease.version=${release.version} clean version-kind:update-file verify scm:checkin</preparationGoals>
                     <!-- <goals>deploy site-deploy</goals> -->
