@@ -1,0 +1,26 @@
+-classpath
+'/home/vir/.m2/repository/com/google/code/findbugs/annotations/2.0.3/annotations-2.0.3.jar:/home/vir/code/chicory/target/checkout/chicory-environment/target/chicory-environment-0.23-rc1.jar:/home/vir/code/chicory/target/checkout/chicory-core/target/chicory-core-0.23-rc1.jar:/home/vir/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar:/home/vir/.m2/repository/javax/mail/mail/1.4/mail-1.4.jar:/home/vir/.m2/repository/com/helger/jcodemodel/2.7.9/jcodemodel-2.7.9.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/home/vir/code/chicory/target/checkout/metachicory/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2015. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/vir/code/chicory/target/checkout/metachicory/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'metachicory 0.23-rc1 API'
+-linkoffline
+'http://docs.oracle.com/javase/6/docs/api' '/home/vir/code/chicory/target/checkout/metachicory/target/javadoc-bundle-options'
+-linkoffline
+'https://github.com/sviperll/chicory/chicory-core/apidocs' '/home/vir/code/chicory/target/checkout/chicory-core/target/site/apidocs'
+-use
+-version
+-windowtitle
+'metachicory 0.23-rc1 API'
