@@ -23,7 +23,7 @@ You can use latest unstable version instead:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-time</artifactId>
-        <version>0.23-rc4</version>
+        <version>0.23-rc5</version>
     </dependency>
 ```
 
