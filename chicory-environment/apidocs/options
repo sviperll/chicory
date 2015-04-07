@@ -1,0 +1,22 @@
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/home/vir/code/chicory/target/checkout/chicory-environment/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2015. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/vir/code/chicory/target/checkout/chicory-environment/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'chicory-environment 0.23-rc1 API'
+-linkoffline
+'http://docs.oracle.com/javase/6/docs/api' '/home/vir/code/chicory/target/checkout/chicory-environment/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'chicory-environment 0.23-rc1 API'
