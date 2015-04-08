@@ -19,19 +19,10 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-stream</artifactId>
-        <version>0.22</version>
+        <version>0.23</version>
     </dependency>
 ```
 
-You can use latest unstable version instead:
-
-```xml
-    <dependency>
-        <groupId>com.github.sviperll</groupId>
-        <artifactId>chicory-stream</artifactId>
-        <version>0.23-rc8</version>
-    </dependency>
-```
 
 Changelog
 ---------
