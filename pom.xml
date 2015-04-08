@@ -68,7 +68,7 @@
             <plugin>
                 <groupId>com.github.sviperll</groupId>
                 <artifactId>mustache-maven-plugin</artifactId>
-                <version>0.1-SNAPSHOT</version>
+                <version>0.2</version>
                 <inherited>true</inherited>
                 <configuration>
                     <encoding>UTF-8</encoding>
@@ -97,7 +97,7 @@
             <plugin>
                 <groupId>com.github.sviperll</groupId>
                 <artifactId>versioning-maven-plugin</artifactId>
-                <version>0.1-SNAPSHOT</version>
+                <version>0.3</version>
                 <configuration>
                     <version>${project.version}</version>
                     <decidedVersionPropertyName>release.version</decidedVersionPropertyName>
@@ -152,7 +152,6 @@
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
                     <preparationGoals>-DdoReleasePreparation=true clean versioning:update-file verify scm:checkin</preparationGoals>
                     <!-- <goals>deploy site-deploy</goals> -->
-                    <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                 </configuration>
             </plugin>
             <plugin>
