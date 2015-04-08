@@ -96,12 +96,11 @@
             </plugin>
             <plugin>
                 <groupId>com.github.sviperll</groupId>
-                <artifactId>version-kind-maven-plugin</artifactId>
+                <artifactId>versioning-maven-plugin</artifactId>
                 <version>0.1-SNAPSHOT</version>
-                <inherited>false</inherited>
                 <configuration>
-                    <baseVersion>${project.version}</baseVersion>
-                    <chosenVersionPropertyName>release.version</chosenVersionPropertyName>
+                    <version>${project.version}</version>
+                    <decidedVersionPropertyName>release.version</decidedVersionPropertyName>
                     <versionFile>
                         <file>${project.properties.file}</file>
                         <stability>
@@ -151,8 +150,9 @@
                     <!-- <pushChanges>false</pushChanges> -->
                     <!-- <localCheckout>true</localCheckout> -->
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
-                    <preparationGoals>-Drelease.version=${release.version} clean version-kind:update-file verify scm:checkin</preparationGoals>
+                    <preparationGoals>-DdoReleasePreparation=true clean versioning:update-file verify scm:checkin</preparationGoals>
                     <!-- <goals>deploy site-deploy</goals> -->
+                    <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                 </configuration>
             </plugin>
             <plugin>
@@ -167,23 +167,11 @@
             <id>release-preparation</id>
             <activation>
                 <property>
-                    <name>release.version</name>
+                    <name>doReleasePreparation</name>
                 </property>
             </activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>com.github.sviperll</groupId>
-                        <artifactId>version-kind-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>default-cli</id>
-                                <configuration>
-                                    <baseVersion>${release.version}</baseVersion>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-scm-plugin</artifactId>
