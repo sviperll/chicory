@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-maven-parent</artifactId>
-        <version>0.24</version>
+        <version>0.24-successor-SNAPSHOT</version>
     </parent>
     <artifactId>chicory-core</artifactId>
     <name>chicory-core</name>
