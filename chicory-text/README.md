@@ -22,6 +22,10 @@ Use maven dependency:
 Changelog
 ---------
 
+Since 0.24
+
+ - Add Layoutable and Layout classes, split Renderer class into Renderer class and RendererDefinition interface.
+
 Usage
 -----
 
