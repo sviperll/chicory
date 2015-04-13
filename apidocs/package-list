@@ -9,6 +9,7 @@ com.github.sviperll.logging
 com.github.sviperll.meta
 com.github.sviperll.meta.java.model
 com.github.sviperll.mime
+com.github.sviperll.text
 com.github.sviperll.text.formats
 com.github.sviperll.text.layout
 com.github.sviperll.time
