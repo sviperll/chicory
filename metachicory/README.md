@@ -14,13 +14,18 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>metachicory</artifactId>
-        <version>0.24</version>
+        <version>0.25</version>
     </dependency>
 ```
 
 
 Changelog
 ---------
+
+ * Since 0.25
+
+    - Full support for annotations as parameters to other annotations
+      when converting from javax.lang.model to jcodemodel.
 
  * Since 0.22
 
