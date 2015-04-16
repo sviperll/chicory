@@ -18,9 +18,22 @@ Use maven dependency:
     </dependency>
 ```
 
+You can use latest unstable version instead:
+
+```xml
+    <dependency>
+        <groupId>com.github.sviperll</groupId>
+        <artifactId>metachicory</artifactId>
+        <version>0.26-beta1</version>
+    </dependency>
+```
 
 Changelog
 ---------
+
+ * Since 0.26
+
+    - Add MethodEvaluation class
 
  * Since 0.25
 
