@@ -46,21 +46,23 @@ import javax.tools.Diagnostic;
 @SupportedAnnotationTypes("com.github.sviperll.meta.Visitor")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class VisitorProcessor extends AbstractProcessor {
-    private final List<String> errors = new ArrayList<String>();
+    private final List<ElementMessage> errors = new ArrayList<ElementMessage>();
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations,
                            RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
-            for (String error: errors) {
-                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error);
+            for (ElementMessage error: errors) {
+                TypeElement typeElement = processingEnv.getElementUtils().getTypeElement(error.qualifiedElementName());
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error.message(), typeElement);
             }
         } else {
             for (Element element: roundEnv.getElementsAnnotatedWith(Visitor.class)) {
+                TypeElement typeElement = (TypeElement)element;
                 try {
-                    validateVisitor((TypeElement)element);
+                    validateVisitor(typeElement);
                 } catch (SourceCodeValidationException ex) {
-                    errors.add(ex.getMessage());
+                    errors.add(ElementMessage.of(typeElement, ex.toString()));
                 }
             }
         }
@@ -105,6 +107,6 @@ public class VisitorProcessor extends AbstractProcessor {
                                                                element.getQualifiedName(),
                                                                Visitor.class.getName()));
         }
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found " + element.getQualifiedName() + " visitor");
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found " + element.getQualifiedName() + " visitor", element);
     }
 }

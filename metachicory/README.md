@@ -31,10 +31,6 @@ You can use latest unstable version instead:
 Changelog
 ---------
 
- * Since 0.26
-
-    - Add MethodEvaluation class
-
  * Since 0.25
 
     - Full support for annotations as parameters to other annotations

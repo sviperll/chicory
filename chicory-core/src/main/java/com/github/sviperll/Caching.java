@@ -27,36 +27,36 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll.meta;
+package com.github.sviperll;
 
 /**
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public enum MethodEvaluation {
-    /** Ordinary Java strict semantics, method is evaluated on each call */
-    ORDINARY,
+public enum Caching {
+    /** No caching. Method is evaluated on each call */
+    NONE,
 
     /**
-     * Lazy evaluation.
+     * Cache evaluation results.
      * Actual value is stored after first execution.
      * Single execution is not garanteed in the case of multi-threaded code
      */
-    CACHED,
+    SIMPLE,
 
     /**
      * Lazy evaluation with thread synchronization.
      * Value will be evaluated at most once.
      */
-    SYNCRONIZED_CACHED,
+    SYNCRONIZED,
 
-    /** Like cached, but method is evaluated on object construction */
-    ON_CONSTRUCTION;
+    /** Method is evaluated on object construction */
+    PRECOMPUTE;
 
-    public boolean isOrdinary() {
-        return this == ORDINARY;
+    public boolean enabled() {
+        return this != NONE;
     }
 
-    public boolean requiresSerialization() {
-        return this == SYNCRONIZED_CACHED;
+    public boolean synchronizes() {
+        return this == SYNCRONIZED;
     }
 }

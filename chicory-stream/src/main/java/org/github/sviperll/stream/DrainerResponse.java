@@ -34,9 +34,9 @@ abstract class DrainerResponse<T> {
     @SuppressWarnings("rawtypes")
     private static final DrainerResponseFactory FACTORY = new DrainerResponseFactory();
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"unchecked"})
     private static <T> DrainerResponseVisitor<T, DrainerResponse<T>> factory() {
-        return (DrainerResponseVisitor<T, DrainerResponse<T>>)FACTORY;
+        return FACTORY;
     }
 
     public static <T> DrainerResponse<T> fetched(T value) {
@@ -66,9 +66,9 @@ abstract class DrainerResponse<T> {
         }
 
         @Override
-        @SuppressWarnings({"rawtypes", "unchecked"})
+        @SuppressWarnings({"unchecked"})
         public DrainerResponse<T> closed() {
-            return (DrainerResponse<T>)CLOSED;
+            return CLOSED;
         }
 
         @Override

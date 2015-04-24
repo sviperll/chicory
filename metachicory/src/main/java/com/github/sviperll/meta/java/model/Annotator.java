@@ -114,7 +114,7 @@ class Annotator {
             else if (value instanceof Boolean)
                 annotationUse.param(name, (Boolean)value);
             else if (value instanceof Class)
-                annotationUse.param(name, (Class)value);
+                annotationUse.param(name, (Class<?>)value);
             else if (value instanceof DeclaredType) {
                 annotationUse.param(name, modelsAdapter.toJType((DeclaredType)value, typeEnvironment));
             } else if (value instanceof VariableElement) {
@@ -242,14 +242,12 @@ class Annotator {
                         }
                     } else if (element instanceof AnnotationMirror) {
                         JAnnotationArrayMember paramArray = annotationUse.paramArray(name);
-                        int i = 0;
                         for (AnnotationValue elementValue : list) {
-                            AnnotationMirror annotation = (AnnotationMirror)elementValue;
+                            AnnotationMirror annotation = (AnnotationMirror)elementValue.getValue();
                             AbstractJClass annotationClass = (AbstractJClass)modelsAdapter.toJType(annotation.getAnnotationType(), typeEnvironment);
                             JAnnotationUse annotationParam = paramArray.annotate(annotationClass);
                             ArgumentAdder adder = new ArgumentAdder(annotationParam);
                             adder.addArguments(annotation);
-                            i++;
                         }
                     } else {
                         throw new IllegalStateException(MessageFormat.format("Unknown annotation array argument: {0}: {1} ({2})",

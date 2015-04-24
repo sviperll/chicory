@@ -29,6 +29,7 @@
  */
 package com.github.sviperll.meta;
 
+import com.github.sviperll.Throwables;
 import com.helger.jcodemodel.AbstractCodeWriter;
 import com.helger.jcodemodel.JPackage;
 import java.io.IOException;
@@ -76,9 +77,9 @@ public class FilerCodeWriter extends AbstractCodeWriter {
 
     @Override
     public OutputStream openBinary(JPackage pkg, String fileName) throws IOException {
+        String className = fileName.substring(0, fileName.length() - JAVA_SOURCE_SUFFIX.length());
         if (!fileName.endsWith(JAVA_SOURCE_SUFFIX))
             throw new IllegalStateException("Unexpected file name passed to code writer: " + fileName);
-        String className = fileName.substring(0, fileName.length() - JAVA_SOURCE_SUFFIX.length());
         JavaFileObject fileObject = filer.createSourceFile(pkg.name() + "." + className);
         OutputStream stream = fileObject.openOutputStream();
         closeables.add(stream);
@@ -93,15 +94,15 @@ public class FilerCodeWriter extends AbstractCodeWriter {
                 stream.close();
             } catch (IOException ex) {
                 if (exception != null)
-                    messager.printMessage(Diagnostic.Kind.ERROR, exception.toString());
+                    messager.printMessage(Diagnostic.Kind.WARNING, Throwables.render(exception));
                 exception = ex;
-            }
-            catch (RuntimeException ex) {
+            } catch (RuntimeException ex) {
                 if (exception != null)
-                    messager.printMessage(Diagnostic.Kind.ERROR, exception.toString());
+                    messager.printMessage(Diagnostic.Kind.WARNING, Throwables.render(exception));
                 exception = ex;
             }
         }
+        closeables.clear();
         if (exception != null) {
             if (exception instanceof IOException) {
                 throw (IOException)exception;

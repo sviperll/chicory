@@ -22,6 +22,6 @@
             <groupId>com.github.sviperll</groupId>
             <artifactId>chicory-core</artifactId>
             <version>${project.version}</version>
-       </dependency>
+        </dependency>
     </dependencies>
 </project>

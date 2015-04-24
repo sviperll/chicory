@@ -54,14 +54,15 @@ import javax.tools.Diagnostic;
 @SupportedAnnotationTypes("com.github.sviperll.meta.TextFormat")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class TextFormatProcessor extends AbstractProcessor {
-    private final List<String> errors = new ArrayList<String>();
+    private final List<ElementMessage> errors = new ArrayList<ElementMessage>();
 
     @Override
     public boolean process(Set<? extends TypeElement> processEnnotations,
                            RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
-            for (String error: errors) {
-                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error);
+            for (ElementMessage error: errors) {
+                Element element = processingEnv.getElementUtils().getTypeElement(error.qualifiedElementName());
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, error.message(), element);
             }
         } else {
             for (Element element: roundEnv.getElementsAnnotatedWith(TextFormat.class)) {
@@ -76,15 +77,15 @@ public class TextFormatProcessor extends AbstractProcessor {
         if (!templateFormatElement.getTypeParameters().isEmpty()) {
             Object[] arguments = new Object[] {templateFormatElement.getQualifiedName(), TextFormat.class.getName()};
             String message = MessageFormat.format("{0} class annotated with {1} annotation should not contain type variables", arguments);
-            errors.add(message);
+            errors.add(ElementMessage.of(templateFormatElement, message));
         }
         ExecutableElement method = getCreateEscapingAppendableMethod(templateFormatElement, directive);
         if (method == null) {
             Object[] arguments = new Object[] {templateFormatElement.getQualifiedName(), TextFormat.class.getName(), directive.createEscapingAppendableMethodName()};
             String message = MessageFormat.format("{0} class annotated with {1} annotation should contain {2} method:\n    public static Appendable {2}(Appendable appendable)", arguments);
-            errors.add(message);
+            errors.add(ElementMessage.of(templateFormatElement, message));
         }
-        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found " + templateFormatElement.getQualifiedName() + " text format");
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Found " + templateFormatElement.getQualifiedName() + " text format", templateFormatElement);
     }
     private ExecutableElement getCreateEscapingAppendableMethod(TypeElement templateFormatElement, TextFormat directive) {
         List<? extends Element> elements = templateFormatElement.getEnclosedElements();

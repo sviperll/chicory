@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  */
 class StreamIterator<T> implements CloseableIterator<T> {
     @SuppressWarnings("rawtypes")
-    private static CloseableIterator EMPTY_INTERATOR = new EmptyIterator();
+    private static final CloseableIterator EMPTY_INTERATOR = new EmptyIterator();
 
     public static <T> CloseableIterator<T> createInstance(Streamable<T> streamable) {
         final Drainer<T> drainer = new Drainer<T>(streamable);
@@ -49,10 +49,10 @@ class StreamIterator<T> implements CloseableIterator<T> {
                 return iterator;
             }
 
-            @SuppressWarnings({"rawtypes", "unchecked"})
+            @SuppressWarnings({"unchecked"})
             @Override
             public CloseableIterator<T> closed() {
-                return (CloseableIterator<T>)EMPTY_INTERATOR;
+                return EMPTY_INTERATOR;
             }
 
             @Override
@@ -63,8 +63,8 @@ class StreamIterator<T> implements CloseableIterator<T> {
     }
     private final Drainer<T> drainer;
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private CloseableIterator<T> state = (CloseableIterator<T>)EMPTY_INTERATOR;
+    @SuppressWarnings({"unchecked"})
+    private CloseableIterator<T> state = EMPTY_INTERATOR;
 
     public StreamIterator(Drainer<T> drainer) {
         this.drainer = drainer;
@@ -74,9 +74,9 @@ class StreamIterator<T> implements CloseableIterator<T> {
         this.state = new HasNextValueState(value);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"unchecked"})
     private void setClosedState() {
-        this.state = (CloseableIterator<T>)EMPTY_INTERATOR;
+        this.state = EMPTY_INTERATOR;
     }
 
     private void setErrorState(RuntimeException exception) {

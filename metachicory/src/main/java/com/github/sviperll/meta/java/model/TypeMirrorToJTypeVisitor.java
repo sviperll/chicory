@@ -43,7 +43,6 @@ import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.NoType;
 import javax.lang.model.type.NullType;
 import javax.lang.model.type.PrimitiveType;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
@@ -163,12 +162,28 @@ class TypeMirrorToJTypeVisitor extends AbstractTypeVisitor6<AbstractJType, Void>
 
     @Override
     public AbstractJType visitNoType(NoType t, Void p) {
-        throw new IllegalArgumentException("'no type' can't be JClass.");
+        if (includesErrorTypes)
+            return codeModel.errorClass("'no type' in annotated source code");
+        else {
+            try {
+                throw new ErrorTypeFound();
+            } catch (ErrorTypeFound ex) {
+                throw new RuntimeErrorTypeFound(ex);
+            }
+        }
     }
 
     @Override
     public AbstractJType visitUnknown(TypeMirror t, Void p) {
-        throw new IllegalArgumentException("unknown can't be JClass.");
+        if (includesErrorTypes)
+            return codeModel.errorClass("'unknown type' in annotated source code");
+        else {
+            try {
+                throw new ErrorTypeFound();
+            } catch (ErrorTypeFound ex) {
+                throw new RuntimeErrorTypeFound(ex);
+            }
+        }
     }
 
 }

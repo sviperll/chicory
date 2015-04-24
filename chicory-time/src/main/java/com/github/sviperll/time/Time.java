@@ -35,7 +35,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.TimeZone;
 
 public class Time {
@@ -61,12 +60,16 @@ public class Time {
             hours -= 1;
         }
         Formatter formatter = new Formatter();
-        formatter.format("GMT%+03d%02d", hours, minutes);
-        TimeZone timeZone = TimeZone.getTimeZone(formatter.toString());
-        GregorianCalendar calendar = new GregorianCalendar(timeZone);
-        calendar.setGregorianChange(new Date(Long.MIN_VALUE));
-        calendar.clear();
-        return calendar;
+        try {
+            formatter.format("GMT%+03d%02d", hours, minutes);
+            TimeZone timeZone = TimeZone.getTimeZone(formatter.toString());
+            GregorianCalendar calendar = new GregorianCalendar(timeZone);
+            calendar.setGregorianChange(new Date(Long.MIN_VALUE));
+            calendar.clear();
+            return calendar;
+        } finally {
+            formatter.close();
+        }
     }
 
     private static HumanTime getHumanTime(Calendar calendar, TimeZoneOffset offset) {

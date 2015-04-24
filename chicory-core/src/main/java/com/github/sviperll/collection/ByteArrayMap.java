@@ -29,7 +29,6 @@ package com.github.sviperll.collection;
 import com.github.sviperll.ByteArray;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 public class ByteArrayMap<V> implements Map<ByteArray, V> {

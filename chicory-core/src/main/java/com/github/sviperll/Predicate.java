@@ -36,20 +36,20 @@ import java.util.List;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 public abstract class Predicate<T> implements Evaluatable<T> {
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes"})
     private static final Predicate TRUE = new TruePredicate();
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes"})
     private static final Predicate FALSE = new FalsePredicate();
 
     @SuppressWarnings("unchecked")
     public static <T> Predicate<T> truePredicate() {
-        return (Predicate<T>)TRUE;
+        return TRUE;
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Predicate<T> falsePredicate() {
-        return (Predicate<T>)FALSE;
+        return FALSE;
     }
 
     public static <T> Predicate<T> and(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
