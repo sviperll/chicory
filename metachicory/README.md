@@ -14,19 +14,10 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>metachicory</artifactId>
-        <version>0.25</version>
+        <version>0.26</version>
     </dependency>
 ```
 
-You can use latest unstable version instead:
-
-```xml
-    <dependency>
-        <groupId>com.github.sviperll</groupId>
-        <artifactId>metachicory</artifactId>
-        <version>0.26-beta1</version>
-    </dependency>
-```
 
 Changelog
 ---------
