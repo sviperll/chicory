@@ -2,8 +2,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.sviperll</groupId>
-        <artifactId>sviperll-maven-parent-6</artifactId>
-        <version>4</version>
+        <artifactId>maven-parent</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
     <groupId>com.github.sviperll</groupId>
     <artifactId>chicory-maven-parent</artifactId>
@@ -12,6 +12,7 @@
     <version>0.26-successor-SNAPSHOT</version>
     <url>https://github.com/sviperll/chicory</url>
     <properties>
+        <activateparentprofiles>java6,nexus-deploy</activateparentprofiles>
         <netbeans.hint.license>BSD3</netbeans.hint.license>
         <project.properties.file>project.properties</project.properties.file>
     </properties>
@@ -61,40 +62,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-            </plugin>
-            <plugin>
-                <groupId>com.github.sviperll</groupId>
-                <artifactId>mustache-maven-plugin</artifactId>
-                <version>0.2</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <contexts>
-                        <context>
-                            <file>${project.properties.file}</file>
-                            <type>properties</type>
-                            <templates>
-                                <template>
-                                    <inputFile>README.md.mustache</inputFile>
-                                    <outputFile>README.md</outputFile>
-                                </template>
-                            </templates>
-                        </context>
-                    </contexts>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>render-readme</id>
-                        <goals>
-                            <goal>render</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>com.github.sviperll</groupId>
                 <artifactId>versioning-maven-plugin</artifactId>
                 <version>0.3</version>
@@ -113,14 +80,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <version>1.6.5</version>
@@ -129,16 +88,6 @@
                     <serverId>oss-sonatype-nexus</serverId>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <!-- By default, this is the phase deploy goal will bind to -->
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -150,7 +99,8 @@
                     <!-- <pushChanges>false</pushChanges> -->
                     <!-- <localCheckout>true</localCheckout> -->
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
-                    <preparationGoals>-DdoReleasePreparation=true clean versioning:update-file verify scm:checkin</preparationGoals>
+                    <preparationGoals>-Pcommit-version-infromation clean versioning:update-file verify scm:checkin</preparationGoals>
+                    <releaseProfiles>bootclasspath</releaseProfiles>
                     <!-- <goals>deploy site-deploy</goals> -->
                 </configuration>
             </plugin>
@@ -163,12 +113,7 @@
     </build>
     <profiles>
         <profile>
-            <id>release-preparation</id>
-            <activation>
-                <property>
-                    <name>doReleasePreparation</name>
-                </property>
-            </activation>
+            <id>commit-version-infromation</id>
             <build>
                 <plugins>
                     <plugin>

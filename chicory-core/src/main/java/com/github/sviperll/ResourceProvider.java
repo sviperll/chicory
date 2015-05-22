@@ -26,6 +26,8 @@
  */
 package com.github.sviperll;
 
+import java.text.MessageFormat;
+
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
@@ -59,6 +61,37 @@ public class ResourceProvider<T> implements ResourceProviderDefinition<T> {
             return (ResourceProvider<T>)source;
         else
             return new ResourceProvider<T>(source);
+    }
+
+    public static <T> ResourceProvider<T> of(final InterruptibleResourceProviderDefinition<? extends T> source, InterruptedPolicy interruptedPolicy) {
+        switch (interruptedPolicy) {
+            case RETRY:
+                return new ResourceProvider<T>(new ResourceProviderDefinition<T>() {
+                    @Override
+                    public void provideResourceTo(Consumer<? super T> consumer) {
+                        for (;;) {
+                            try {
+                                source.provideResourceTo(consumer);
+                                break;
+                            } catch (InterruptedException ex) {
+                            }
+                        }
+                    }
+                });
+            case THROW_RUNTIME_INTERRUPTED:
+                return new ResourceProvider<T>(new ResourceProviderDefinition<T>() {
+                    @Override
+                    public void provideResourceTo(Consumer<? super T> consumer) {
+                        try {
+                            source.provideResourceTo(consumer);
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeInterruptedException(ex);
+                        }
+                    }
+                });
+            default:
+                throw new IllegalArgumentException(MessageFormat.format("Unsupported {0} InterruptedPolicy", interruptedPolicy));
+        }
     }
 
     private final ResourceProviderDefinition<? extends T> source;
