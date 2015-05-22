@@ -9,7 +9,7 @@
     <artifactId>chicory-maven-parent</artifactId>
     <name>chicory-maven-parent</name>
     <packaging>pom</packaging>
-    <version>0.27-rc1</version>
+    <version>0.27-rc1-successor-SNAPSHOT</version>
     <url>https://github.com/sviperll/chicory</url>
     <properties>
         <activateparentprofiles>java6,nexus-deploy</activateparentprofiles>
@@ -43,7 +43,7 @@
         <connection>scm:git:git://github.com/sviperll/chicory.git</connection>
         <developerConnection>scm:git:git@github.com:sviperll/chicory.git</developerConnection>
         <url>https://github.com/sviperll/chicory</url>
-        <tag>chicory-0.27-rc1</tag>
+        <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <site>
