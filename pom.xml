@@ -24,6 +24,13 @@
         <module>metachicory</module>
         <module>chicory-text</module>
     </modules>
+    <distributionManagement>
+        <site>
+            <id>github</id>
+            <name>GitHub Pages</name>
+            <url>github:http://sviperll.github.io/chicory/</url>
+        </site>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
