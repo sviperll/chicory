@@ -35,14 +35,12 @@ package com.github.sviperll;
  */
 @SuppressWarnings("serial")
 public class RuntimeInterruptedException extends RuntimeException {
-    private final InterruptedException cause;
     public RuntimeInterruptedException(InterruptedException cause) {
         super(cause);
-        this.cause = cause;
     }
 
     @Override
     public InterruptedException getCause() {
-        return cause;
+        return (InterruptedException)super.getCause();
     }
 }

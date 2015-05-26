@@ -26,6 +26,8 @@
  */
 package com.github.sviperll.daemon;
 
+import com.github.sviperll.RuntimeIOException;
+import com.github.sviperll.RuntimeInterruptedException;
 import com.github.sviperll.environment.JVM;
 import com.github.sviperll.environment.SignalWaiter;
 import com.github.sviperll.io.Charsets;
@@ -33,6 +35,8 @@ import com.github.sviperll.io.Files;
 import com.github.sviperll.logging.Loggers;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -78,7 +82,7 @@ public class Daemon {
 
     private void run() throws IOException {
         processPidFile();
-        Loggers.withRootHandler(log.handlerProvider(), new Runnable() {
+        Runnable startingRunnable = new Runnable() {
             @Override
             public void run() {
                 try {
@@ -96,10 +100,17 @@ public class Daemon {
                     }
                     runnable.run();
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    throw new RuntimeIOException(ex);
                 }
             }
-        });
+        };
+        try {
+            Loggers.withRootHandler(log.handlerProvider(), startingRunnable);
+        } catch (RuntimeIOException ex) {
+            throw ex.getCause();
+        } catch (InterruptedException ex) {
+            throw new IOException(ex);
+        }
     }
 
     private void processPidFile() throws IOException {

@@ -31,14 +31,12 @@ import java.util.concurrent.TimeoutException;
 
 @SuppressWarnings("serial")
 public class RuntimeTimeoutException extends RuntimeException {
-    private final TimeoutException cause;
     public RuntimeTimeoutException(String message, TimeoutException cause) {
         super(message, cause);
-        this.cause = cause;
     }
 
     @Override
     public TimeoutException getCause() {
-        return cause;
+        return (TimeoutException)super.getCause();
     }
 }

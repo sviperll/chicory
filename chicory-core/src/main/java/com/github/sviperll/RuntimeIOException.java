@@ -29,21 +29,20 @@
  */
 package com.github.sviperll;
 
+import java.io.IOException;
+
 /**
  *
  * @author vir
  */
-public class InterruptibleResourceProvider<T> {
-    public static <T> InterruptibleResourceProvider<T> of(InterruptibleResourceProviderDefinition<T> definition) {
-        return new InterruptibleResourceProvider<T>(definition);
+@SuppressWarnings("serial")
+public class RuntimeIOException extends RuntimeException {
+    public RuntimeIOException(IOException exception) {
+        super(exception);
     }
-    private final InterruptibleResourceProviderDefinition<T> definition;
     
-    private InterruptibleResourceProvider(InterruptibleResourceProviderDefinition<T> definition) {
-        this.definition = definition;
-    }
-
-    public ResourceProvider<T> forPolicy(InterruptedPolicy policy) {
-        return ResourceProvider.of(definition, policy);
+    @Override
+    public IOException getCause() {
+        return (IOException)super.getCause();
     }
 }

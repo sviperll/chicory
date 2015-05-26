@@ -37,13 +37,13 @@ import java.util.concurrent.TimeUnit;
  *
  * @author vir
  */
-public class PooledResourceProvider<T> implements InterruptibleResourceProviderDefinition<T> {
-    public static <T> InterruptibleResourceProvider<T> createInstance(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int maxPoolSize) {
+public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> {
+    public static <T> ResourceProvider<T> createInstance(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int maxPoolSize) {
         PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<T>();
         for (int i = 0; i < maxPoolSize; i++) {
             pooledResourceProvider.add(provider, maxIdleTimeMillis);
         }
-        return InterruptibleResourceProvider.of(pooledResourceProvider);
+        return ResourceProvider.of(pooledResourceProvider);
     }
 
     // availableQueue must be synchronous queue,
@@ -52,14 +52,14 @@ public class PooledResourceProvider<T> implements InterruptibleResourceProviderD
     // EmptyPoolElement should block as long as possible to
     // avoid premature resource allocation
     // See EmptyPoolElement.run implementation
-    private final BlockingQueue<InterruptibleResourceProviderDefinition<T>> availableQueue = new SynchronousQueue<InterruptibleResourceProviderDefinition<T>>();;
+    private final BlockingQueue<ResourceProviderDefinition<T>> availableQueue = new SynchronousQueue<ResourceProviderDefinition<T>>();;
 
     private PooledResourceProvider() {
     }
 
     @Override
     public void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException {
-        InterruptibleResourceProviderDefinition<T> provider = availableQueue.take();
+        ResourceProviderDefinition<T> provider = availableQueue.take();
         provider.provideResourceTo(consumer);
     }
 
@@ -72,7 +72,7 @@ public class PooledResourceProvider<T> implements InterruptibleResourceProviderD
         thread.start();
     }
 
-    private class EmptyPoolElement implements Runnable, InterruptibleResourceProviderDefinition<T> {
+    private class EmptyPoolElement implements Runnable, ResourceProviderDefinition<T> {
         private final ResourceProviderDefinition<T> provider;
         private final long maxIdleTimeMillis;
         private final BlockingQueue<PoolElement> responseQueue = new SynchronousQueue<PoolElement>();
@@ -94,20 +94,26 @@ public class PooledResourceProvider<T> implements InterruptibleResourceProviderD
                     } catch (InterruptedException ex) {
                     }
                 }
-                provider.provideResourceTo(new Consumer<T>() {
-                    @Override
-                    public void accept(T value) {
-                        PoolElement element = new PoolElement(value, maxIdleTimeMillis);
-                        for (;;) {
-                            try {
-                                responseQueue.put(element);
-                                break;
-                            } catch (InterruptedException ex) {
+                for (;;) {
+                    try {
+                        provider.provideResourceTo(new Consumer<T>() {
+                            @Override
+                            public void accept(T value) {
+                                PoolElement element = new PoolElement(value, maxIdleTimeMillis);
+                                for (;;) {
+                                    try {
+                                        responseQueue.put(element);
+                                        break;
+                                    } catch (InterruptedException ex) {
+                                    }
+                                }
+                                element.run();
                             }
-                        }
-                        element.run();
+                        });
+                        break;
+                    } catch (InterruptedException ex) {
                     }
-                });
+                }
             }
         }
 
@@ -118,7 +124,7 @@ public class PooledResourceProvider<T> implements InterruptibleResourceProviderD
         }
     }
 
-    private class PoolElement implements Runnable, InterruptibleResourceProviderDefinition<T> {
+    private class PoolElement implements Runnable, ResourceProviderDefinition<T> {
         private final BlockingQueue<T> consumedQueue = new SynchronousQueue<T>();
         private final T value;
         private final long idleTimeMillis;

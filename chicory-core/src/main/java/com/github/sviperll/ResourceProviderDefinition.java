@@ -31,5 +31,5 @@ package com.github.sviperll;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 public interface ResourceProviderDefinition<T> {
-    void provideResourceTo(Consumer<? super T> consumer);
+    void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException;
 }

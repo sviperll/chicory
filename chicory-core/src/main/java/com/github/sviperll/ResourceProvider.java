@@ -26,8 +26,6 @@
  */
 package com.github.sviperll;
 
-import java.text.MessageFormat;
-
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
@@ -44,13 +42,21 @@ public class ResourceProvider<T> implements ResourceProviderDefinition<T> {
     public static <T> ResourceProvider<T> flatten(final ResourceProviderDefinition<? extends ResourceProviderDefinition<? extends T>> provider) {
         return ResourceProvider.of(new ResourceProviderDefinition<T>() {
             @Override
-            public void provideResourceTo(final Consumer<? super T> consumer) {
-                provider.provideResourceTo(new Consumer<ResourceProviderDefinition<? extends T>>() {
-                    @Override
-                    public void accept(ResourceProviderDefinition<? extends T> innerProvider) {
-                        innerProvider.provideResourceTo(consumer);
-                    }
-                });
+            public void provideResourceTo(final Consumer<? super T> consumer) throws InterruptedException {
+                try {
+                    provider.provideResourceTo(new Consumer<ResourceProviderDefinition<? extends T>>() {
+                        @Override
+                        public void accept(ResourceProviderDefinition<? extends T> innerProvider) {
+                            try {
+                                innerProvider.provideResourceTo(consumer);
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeInterruptedException(ex);
+                            }
+                        }
+                    });
+                } catch (RuntimeInterruptedException ex) {
+                    throw ex.getCause();
+                }
             }
         });
     }
@@ -63,51 +69,20 @@ public class ResourceProvider<T> implements ResourceProviderDefinition<T> {
             return new ResourceProvider<T>(source);
     }
 
-    public static <T> ResourceProvider<T> of(final InterruptibleResourceProviderDefinition<? extends T> source, InterruptedPolicy interruptedPolicy) {
-        switch (interruptedPolicy) {
-            case RETRY:
-                return new ResourceProvider<T>(new ResourceProviderDefinition<T>() {
-                    @Override
-                    public void provideResourceTo(Consumer<? super T> consumer) {
-                        for (;;) {
-                            try {
-                                source.provideResourceTo(consumer);
-                                break;
-                            } catch (InterruptedException ex) {
-                            }
-                        }
-                    }
-                });
-            case THROW_RUNTIME_INTERRUPTED:
-                return new ResourceProvider<T>(new ResourceProviderDefinition<T>() {
-                    @Override
-                    public void provideResourceTo(Consumer<? super T> consumer) {
-                        try {
-                            source.provideResourceTo(consumer);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeInterruptedException(ex);
-                        }
-                    }
-                });
-            default:
-                throw new IllegalArgumentException(MessageFormat.format("Unsupported {0} InterruptedPolicy", interruptedPolicy));
-        }
-    }
-
     private final ResourceProviderDefinition<? extends T> source;
     private ResourceProvider(ResourceProviderDefinition<? extends T> source) {
         this.source = source;
     }
 
     @Override
-    public void provideResourceTo(Consumer<? super T> consumer) {
+    public void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException {
         source.provideResourceTo(consumer);
     }
 
     public <U> ResourceProvider<U> map(final Applicable<? super T, U> function) {
         return ResourceProvider.of(new ResourceProviderDefinition<U>() {
             @Override
-            public void provideResourceTo(final Consumer<? super U> consumer) {
+            public void provideResourceTo(final Consumer<? super U> consumer) throws InterruptedException {
                 source.provideResourceTo(new Consumer<T>() {
                     @Override
                     public void accept(T value) {

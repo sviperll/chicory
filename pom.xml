@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.github.sviperll</groupId>
         <artifactId>maven-parent</artifactId>
-        <version>0.6</version>
+        <version>0.6-successor-SNAPSHOT</version>
     </parent>
     <groupId>com.github.sviperll</groupId>
     <artifactId>chicory-maven-parent</artifactId>
@@ -52,13 +52,6 @@
         <url>https://github.com/sviperll/chicory</url>
         <tag>HEAD</tag>
     </scm>
-    <distributionManagement>
-        <site>
-            <id>github</id>
-            <name>GitHub Pages</name>
-            <url>github:http://sviperll.github.io/chicory/</url>
-        </site>
-    </distributionManagement>
     <licenses>
         <license>
             <name>The BSD 3-Clause License</name>

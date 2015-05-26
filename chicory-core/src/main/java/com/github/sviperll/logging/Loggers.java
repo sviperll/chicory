@@ -63,7 +63,7 @@ public class Loggers {
         }
     }
 
-    public static void withRootHandler(ResourceProviderDefinition<? extends Handler> source, final Runnable action) {
+    public static void withRootHandler(ResourceProviderDefinition<? extends Handler> source, final Runnable action) throws InterruptedException {
         source.provideResourceTo(new Consumer<Handler>() {
             @Override
             public void accept(Handler handler) {
