@@ -18,6 +18,15 @@ Use maven dependency:
     </dependency>
 ```
 
+You can use latest unstable version instead:
+
+```xml
+    <dependency>
+        <groupId>com.github.sviperll</groupId>
+        <artifactId>chicory-text</artifactId>
+        <version>0.27-rc2</version>
+    </dependency>
+```
 
 Changelog
 ---------

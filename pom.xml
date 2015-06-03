@@ -80,6 +80,35 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>com.github.sviperll</groupId>
+                <artifactId>mustache-maven-plugin</artifactId>
+                <version>0.2</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <contexts>
+                        <context>
+                            <file>${project.properties.file}</file>
+                            <type>properties</type>
+                            <templates>
+                                <template>
+                                    <inputFile>README.md.mustache</inputFile>
+                                    <outputFile>README.md</outputFile>
+                                </template>
+                            </templates>
+                        </context>
+                    </contexts>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>render-readme</id>
+                        <goals>
+                            <goal>render</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <configuration>
