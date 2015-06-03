@@ -24,7 +24,7 @@ You can use latest unstable version instead:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>metachicory</artifactId>
-        <version>0.27-rc2</version>
+        <version>0.27-rc3</version>
     </dependency>
 ```
 
