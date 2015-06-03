@@ -27,6 +27,7 @@
 
 package com.github.sviperll.concurrent;
 
+import java.text.MessageFormat;
 import java.util.concurrent.TimeoutException;
 
 @SuppressWarnings("serial")
@@ -37,6 +38,10 @@ public class RuntimeTimeoutException extends RuntimeException {
 
     @Override
     public TimeoutException getCause() {
-        return (TimeoutException)super.getCause();
+        Throwable cause = super.getCause();
+        if (cause instanceof TimeoutException)
+            return (TimeoutException)cause;
+        else
+            throw new IllegalStateException(MessageFormat.format("Cause should always be {0} for {1}, but {2} found", TimeoutException.class.getName(), RuntimeTimeoutException.class.getName(), cause));
     }
 }

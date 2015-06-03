@@ -30,6 +30,7 @@
 package com.github.sviperll;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 
 /**
  *
@@ -43,6 +44,10 @@ public class RuntimeIOException extends RuntimeException {
     
     @Override
     public IOException getCause() {
-        return (IOException)super.getCause();
+        Throwable cause = super.getCause();
+        if (cause instanceof IOException)
+            return (IOException)cause;
+        else
+            throw new IllegalStateException(MessageFormat.format("Cause should always be {0} for {1}, but {2} found", IOException.class.getName(), RuntimeIOException.class.getName(), cause));
     }
 }

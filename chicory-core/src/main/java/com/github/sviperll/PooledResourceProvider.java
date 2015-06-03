@@ -72,7 +72,7 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
         thread.start();
     }
 
-    private class EmptyPoolElement implements Runnable, ResourceProviderDefinition<T> {
+    private class EmptyPoolElement implements Runnable, ResourceProviderDefinition<T>, Consumer<T> {
         private final ResourceProviderDefinition<T> provider;
         private final long maxIdleTimeMillis;
         private final BlockingQueue<PoolElement> responseQueue = new SynchronousQueue<PoolElement>();
@@ -96,25 +96,25 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
                 }
                 for (;;) {
                     try {
-                        provider.provideResourceTo(new Consumer<T>() {
-                            @Override
-                            public void accept(T value) {
-                                PoolElement element = new PoolElement(value, maxIdleTimeMillis);
-                                for (;;) {
-                                    try {
-                                        responseQueue.put(element);
-                                        break;
-                                    } catch (InterruptedException ex) {
-                                    }
-                                }
-                                element.run();
-                            }
-                        });
+                        provider.provideResourceTo(this);
                         break;
                     } catch (InterruptedException ex) {
                     }
                 }
             }
+        }
+
+        @Override
+        public void accept(T value) {
+            PoolElement element = new PoolElement(value, maxIdleTimeMillis);
+            for (;;) {
+                try {
+                    responseQueue.put(element);
+                    break;
+                } catch (InterruptedException ex) {
+                }
+            }
+            element.run();
         }
 
         @Override

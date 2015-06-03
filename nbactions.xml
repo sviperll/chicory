@@ -7,4 +7,11 @@
                 <goal>coreext:install</goal>
             </goals>
         </action>
+        <action>
+            <actionName>CUSTOM-findbugs:check</actionName>
+            <displayName>findbugs:check</displayName>
+            <goals>
+                <goal>findbugs:check</goal>
+            </goals>
+        </action>
     </actions>

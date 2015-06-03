@@ -29,6 +29,9 @@
  */
 package com.github.sviperll;
 
+import java.text.MessageFormat;
+
+
 /**
  *
  * @author vir
@@ -41,6 +44,10 @@ public class RuntimeInterruptedException extends RuntimeException {
 
     @Override
     public InterruptedException getCause() {
-        return (InterruptedException)super.getCause();
+        Throwable cause = super.getCause();
+        if (cause instanceof InterruptedException)
+            return (InterruptedException)cause;
+        else
+            throw new IllegalStateException(MessageFormat.format("Cause should always be {0} for {1}, but {2} found", InterruptedException.class.getName(), RuntimeInterruptedException.class.getName(), cause));
     }
 }

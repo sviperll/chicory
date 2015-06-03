@@ -26,6 +26,7 @@
  */
 package org.github.sviperll.stream;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
@@ -116,6 +117,7 @@ class StreamIterator<T> implements CloseableIterator<T> {
         }
 
         @Override
+        @SuppressFBWarnings("IT_NO_SUCH_ELEMENT")
         public T next() {
             T result = value;
             DrainerResponse<T> response = drainer.fetch();
@@ -182,6 +184,7 @@ class StreamIterator<T> implements CloseableIterator<T> {
         }
 
         @Override
+        @SuppressFBWarnings("IT_NO_SUCH_ELEMENT")
         public T next() {
             setClosedState();
             throw exception;

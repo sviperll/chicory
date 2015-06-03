@@ -45,7 +45,7 @@ public class Function<T, R> implements Applicable<T, R> {
 
     @SuppressWarnings({"unchecked"})
     public static <R, T extends R> Function<T, R> typedIdentity() {
-        return (Function<T, R>)ID;
+        return ID;
     }
 
     @SuppressWarnings({"unchecked"})
@@ -94,7 +94,7 @@ public class Function<T, R> implements Applicable<T, R> {
     private static class ComposedApplicable<T, Q, R> implements Applicable<T, R> {
         private final Applicable<? super Q, ? extends R> f;
         private final Applicable<? super T, ? extends Q> g;
-        public ComposedApplicable(Applicable<? super Q, ? extends R> f, Applicable<? super T, ? extends Q> g) {
+        ComposedApplicable(Applicable<? super Q, ? extends R> f, Applicable<? super T, ? extends Q> g) {
             this.f = f;
             this.g = g;
         }
@@ -107,7 +107,7 @@ public class Function<T, R> implements Applicable<T, R> {
 
     private static class PassingNullThroughApplicable<T, R> implements Applicable<T, R> {
         private final Applicable<? super T, R> function;
-        public PassingNullThroughApplicable(Applicable<? super T, R> function) {
+        PassingNullThroughApplicable(Applicable<? super T, R> function) {
             this.function = function;
         }
 
@@ -122,7 +122,7 @@ public class Function<T, R> implements Applicable<T, R> {
 
     private static class ThrowingOnNullApplicable<T, R> implements Applicable<T, R> {
         private final Applicable<? super T, R> function;
-        public ThrowingOnNullApplicable(Applicable<? super T, R> function) {
+        ThrowingOnNullApplicable(Applicable<? super T, R> function) {
             this.function = function;
         }
 

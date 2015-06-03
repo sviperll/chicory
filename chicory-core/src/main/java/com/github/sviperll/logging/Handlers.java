@@ -89,7 +89,7 @@ public class Handlers {
 
     private static class LoggingFormatter extends java.util.logging.Formatter {
         private final DateFormat dateFormat;
-        public LoggingFormatter(DateFormat dateFormat) {
+        LoggingFormatter(DateFormat dateFormat) {
             this.dateFormat = dateFormat;
         }
 
@@ -121,7 +121,7 @@ public class Handlers {
 
 
     private static class FlushingHandler extends StreamHandler {
-        public FlushingHandler(OutputStream stream, java.util.logging.Formatter formatter) {
+        FlushingHandler(OutputStream stream, java.util.logging.Formatter formatter) {
             super(stream, formatter);
             setLevel(Level.ALL);
         }
@@ -137,7 +137,7 @@ public class Handlers {
         private volatile boolean doExit = false;
         private final long time;
         private final TimeUnit unit;
-        public PeriodicallyFlushingHandler(OutputStream stream, long time, TimeUnit unit, Formatter formatter) {
+        PeriodicallyFlushingHandler(OutputStream stream, long time, TimeUnit unit, Formatter formatter) {
             super(stream, formatter);
             setLevel(Level.ALL);
             this.time = time;
@@ -173,7 +173,7 @@ public class Handlers {
         private final Object stateLock = new Object();
         private State state = State.NOT_RUNNING;
 
-        public AsynchronousHandler(Handler handler, BlockingQueue<LogRecord> queue) {
+        AsynchronousHandler(Handler handler, BlockingQueue<LogRecord> queue) {
             this.handler = handler;
             this.queue = queue;
         }

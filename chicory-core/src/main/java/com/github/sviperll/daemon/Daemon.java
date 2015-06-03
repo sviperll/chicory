@@ -27,7 +27,6 @@
 package com.github.sviperll.daemon;
 
 import com.github.sviperll.RuntimeIOException;
-import com.github.sviperll.RuntimeInterruptedException;
 import com.github.sviperll.environment.JVM;
 import com.github.sviperll.environment.SignalWaiter;
 import com.github.sviperll.io.Charsets;
@@ -35,8 +34,6 @@ import com.github.sviperll.io.Files;
 import com.github.sviperll.logging.Loggers;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

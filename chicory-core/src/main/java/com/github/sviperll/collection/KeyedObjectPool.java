@@ -71,7 +71,7 @@ public class KeyedObjectPool {
     private static class HardKeyedObjectPool<K, V> implements KeyedObjectFactory<K, V> {
         private final Map<K, V> map = new HashMap<K, V>();
         private final KeyedObjectFactory<K, V> factory;
-        public HardKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
+        HardKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
             this.factory = factory;
         }
 
@@ -98,7 +98,7 @@ public class KeyedObjectPool {
         private final Map<K, KeyedSoftReference<K, V>> map = new HashMap<K, KeyedSoftReference<K, V>>();
         private final KeyedObjectFactory<K, V> factory;
         private WeakReference<SoftKeyedObjectPoolGarbageCollector> garbageCollector = new WeakReference<SoftKeyedObjectPoolGarbageCollector>(new SoftKeyedObjectPoolGarbageCollector());
-        public SoftKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
+        SoftKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
             this.factory = factory;
         }
 
@@ -147,7 +147,7 @@ public class KeyedObjectPool {
         private static class KeyedSoftReference<K, V> extends SoftReference<V> {
             private final K key;
 
-            public KeyedSoftReference(K key, V instance, ReferenceQueue<V> queue) {
+            KeyedSoftReference(K key, V instance, ReferenceQueue<V> queue) {
                 super(instance, queue);
                 this.key = key;
             }
@@ -166,7 +166,7 @@ public class KeyedObjectPool {
         private final Map<K, KeyedWeakReference<K, V>> map = new HashMap<K, KeyedWeakReference<K, V>>();
         private final KeyedObjectFactory<K, V> factory;
         private WeakReference<WeakKeyedObjectPoolGarbageCollector> garbageCollector = new WeakReference<WeakKeyedObjectPoolGarbageCollector>(new WeakKeyedObjectPoolGarbageCollector());
-        public WeakKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
+        WeakKeyedObjectPool(KeyedObjectFactory<K, V> factory) {
             this.factory = factory;
         }
 
@@ -215,7 +215,7 @@ public class KeyedObjectPool {
         private static class KeyedWeakReference<K, V> extends WeakReference<V> {
             private final K key;
 
-            public KeyedWeakReference(K key, V instance, ReferenceQueue<V> queue) {
+            KeyedWeakReference(K key, V instance, ReferenceQueue<V> queue) {
                 super(instance, queue);
                 this.key = key;
             }

@@ -66,7 +66,7 @@ public class ByteBufferPool {
     private static class HardByteBufferPool implements ByteBufferAllocator {
         private final Deque<HardCachedByteBuffer> cache = new ArrayDeque<HardCachedByteBuffer>();
         private final int size;
-        public HardByteBufferPool(int size) {
+        HardByteBufferPool(int size) {
             this.size = size;
         }
 
@@ -93,7 +93,7 @@ public class ByteBufferPool {
 
         private class HardCachedByteBuffer implements ByteBuffer {
             private final byte[] array;
-            public HardCachedByteBuffer(byte[] array) {
+            HardCachedByteBuffer(byte[] array) {
                 this.array = array;
             }
 
@@ -116,7 +116,7 @@ public class ByteBufferPool {
     private static class SoftByteBufferPool implements ByteBufferAllocator {
         private final Deque<SoftReference<SoftCachedByteBuffer>> cache = new ArrayDeque<SoftReference<SoftCachedByteBuffer>>();
         private final int size;
-        public SoftByteBufferPool(int size) {
+        SoftByteBufferPool(int size) {
             this.size = size;
         }
 
@@ -145,7 +145,7 @@ public class ByteBufferPool {
 
         private class SoftCachedByteBuffer implements ByteBuffer {
             private final byte[] array;
-            public SoftCachedByteBuffer(byte[] array) {
+            SoftCachedByteBuffer(byte[] array) {
                 this.array = array;
             }
 
@@ -168,7 +168,7 @@ public class ByteBufferPool {
     private static class WeakByteBufferPool implements ByteBufferAllocator {
         private final Deque<WeakReference<WeakCachedByteBuffer>> cache = new ArrayDeque<WeakReference<WeakCachedByteBuffer>>();
         private final int size;
-        public WeakByteBufferPool(int size) {
+        WeakByteBufferPool(int size) {
             this.size = size;
         }
 
@@ -197,7 +197,7 @@ public class ByteBufferPool {
 
         private class WeakCachedByteBuffer implements ByteBuffer {
             private final byte[] array;
-            public WeakCachedByteBuffer(byte[] array) {
+            WeakCachedByteBuffer(byte[] array) {
                 this.array = array;
             }
 

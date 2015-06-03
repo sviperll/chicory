@@ -32,11 +32,11 @@ package com.github.sviperll;
  */
 public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static Isomorphism ID = new Isomorphism(new IdIsomorphismDefinition());
+    private static final Isomorphism ID = new Isomorphism(new IdIsomorphismDefinition());
 
     @SuppressWarnings({"unchecked"})
     public static <T> Isomorphism<T, T> identity() {
-        return (Isomorphism<T, T>)ID;
+        return ID;
     }
 
     public static <T, U> Isomorphism<T, U> of(final Applicable<? super T, U> forward, final Applicable<? super U, T> backward) {

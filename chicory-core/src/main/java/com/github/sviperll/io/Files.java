@@ -43,8 +43,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Files {
-    public static String read(File passwordFile, Charset charset) throws FileNotFoundException, IOException {
-        InputStream stream = new BufferedInputStream(new FileInputStream(passwordFile));
+    private static final Logger logger = Logger.getLogger(Files.class.getName());
+    public static String read(File file, Charset charset) throws FileNotFoundException, IOException {
+        InputStream stream = new BufferedInputStream(new FileInputStream(file));
         try {
             InputStreamReader streamReader = new InputStreamReader(stream, charset);
             try {
@@ -60,21 +61,21 @@ public class Files {
                     try {
                         reader.close();
                     } catch (Exception ex) {
-                        Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             } finally {
                 try {
                     streamReader.close();
                 } catch (Exception ex) {
-                    Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         } finally {
             try {
                 stream.close();
             } catch (Exception ex) {
-                Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -95,21 +96,21 @@ public class Files {
                     try {
                         writer.close();
                     } catch (Exception ex) {
-                        Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.log(Level.SEVERE, null, ex);
                     }
                 }
             } finally {
                 try {
                     outputStream.close();
                 } catch (Exception ex) {
-                    Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.log(Level.SEVERE, null, ex);
                 }
             }
         } finally {
             try {
                 outputStream.close();
             } catch (Exception ex) {
-                Logger.getLogger(Files.class.getName()).log(Level.SEVERE, null, ex);
+                logger.log(Level.SEVERE, null, ex);
             }
         }
     }

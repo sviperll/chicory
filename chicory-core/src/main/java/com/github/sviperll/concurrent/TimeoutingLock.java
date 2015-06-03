@@ -38,7 +38,7 @@ import java.util.concurrent.locks.Lock;
  * TimeoutingLock#lock operation throws RuntimeTimeoutException when
  * lock can't be aquired in less then maximum wait time.
  *
- * TimeoutingLocks can be used when blocking is anacceptable.
+ * TimeoutingLocks can be used when blocking is unacceptable.
  * Applications can use TimeoutingLocks and inform user about
  * resource being blocked instead of blocking.
  */

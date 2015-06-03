@@ -64,7 +64,7 @@ public class SignalWaiter {
         public void handle(Signal sig) {
             synchronized (lock) {
                 isReceived = true;
-                lock.notify();
+                lock.notifyAll();
             }
         }
     }

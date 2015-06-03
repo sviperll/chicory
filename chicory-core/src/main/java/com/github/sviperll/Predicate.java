@@ -115,7 +115,7 @@ public abstract class Predicate<T> implements Evaluatable<T> {
 
     private static class SimplePredicate<T> extends Predicate<T> {
         private final Evaluatable<? super T> evaluatable;
-        public SimplePredicate(Evaluatable<? super T> evaluatable) {
+        SimplePredicate(Evaluatable<? super T> evaluatable) {
             this.evaluatable = evaluatable;
         }
 
@@ -186,7 +186,7 @@ public abstract class Predicate<T> implements Evaluatable<T> {
 
     private static class NotPredicate<T> extends Predicate<T> {
         private final Evaluatable<? super T> original;
-        public NotPredicate(Evaluatable<? super T> original) {
+        NotPredicate(Evaluatable<? super T> original) {
             this.original = original;
         }
 
@@ -214,7 +214,7 @@ public abstract class Predicate<T> implements Evaluatable<T> {
     private static class AndPredicate<T> extends Predicate<T> {
         private final Evaluatable<? super T> predicate1;
         private final Evaluatable<? super T> predicate2;
-        public AndPredicate(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
+        AndPredicate(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
             this.predicate1 = predicate1;
             this.predicate2 = predicate2;
         }
@@ -243,7 +243,7 @@ public abstract class Predicate<T> implements Evaluatable<T> {
     private static class OrPredicate<T> extends Predicate<T> {
         private final Evaluatable<? super T> predicate1;
         private final Evaluatable<? super T> predicate2;
-        public OrPredicate(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
+        OrPredicate(Evaluatable<? super T> predicate1, Evaluatable<? super T> predicate2) {
             this.predicate1 = predicate1;
             this.predicate2 = predicate2;
         }

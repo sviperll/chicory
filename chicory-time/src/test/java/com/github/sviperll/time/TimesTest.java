@@ -26,7 +26,8 @@
  */
 package com.github.sviperll.time;
 
-import static org.junit.Assert.*;
+import java.util.Random;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class TimesTest {
@@ -59,8 +60,9 @@ public class TimesTest {
     @Test
     public void testRandomTimes() throws Exception {
         TimeZoneOffset moscow = new TimeZoneOffset(4 * 60);
+        Random random = new Random();
         for (int i = 0; i < 300; i++) {
-            UnixTime unix1 = new UnixTime((int)(Math.random() * 1000000000) - 500000000);
+            UnixTime unix1 = new UnixTime(random.nextInt(1000000000) - 500000000);
             HumanTime human = Time.getHumanTime(unix1, moscow);
             UnixTime unix2 = Time.getUnixTime(human);
             assertEquals(unix1, unix2);

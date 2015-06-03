@@ -36,44 +36,44 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class Collections {
-    /** Created new mobifieble TreeMap instance */
+    /** Created new modifiable TreeMap instance */
     public static <K, V> Map<K, V> newTreeMap() {
         return new TreeMap<K, V>();
     }
 
-    /** Created new mobifieble HashMap instance */
+    /** Created new modifiable HashMap instance */
     public static <K, V> Map<K, V> newHashMap() {
         return new HashMap<K, V>();
     }
 
-    /** Created new mobifieble TreeSet instance */
+    /** Created new modifiable TreeSet instance */
     public static <E> Set<E> newTreeSet() {
         return new TreeSet<E>();
     }
 
-    /** Created new mobifieble HashSet instance */
+    /** Created new modifiable HashSet instance */
     public static <E> Set<E> newHashSet() {
         return new HashSet<E>();
     }
 
-    /** Created new mobifieble ArrayList instance */
+    /** Created new modifiable ArrayList instance */
     public static <E> List<E> newArrayList() {
         return new ArrayList<E>();
     }
 
-    /** Created new mobifieble ArrayList instance of given capacity */
+    /** Created new modifiable ArrayList instance of given capacity */
     public static <E> List<E> newArrayList(int capacity) {
         return new ArrayList<E>(capacity);
     }
 
-    /** Created new mobifieble ArrayList instance with one given element */
+    /** Created new modifiable ArrayList instance with one given element */
     public static <E> List<E> newArrayListOf(E e1) {
         List<E> elist = newArrayList(1);
         elist.add(e1);
         return elist;
     }
 
-    /** Created new mobifieble ArrayList instance with two given elements */
+    /** Created new modifiable ArrayList instance with two given elements */
     public static <E> List<E> newArrayListOf(E e1, E e2) {
         List<E> elist = newArrayList(2);
         elist.add(e1);
@@ -81,7 +81,7 @@ public class Collections {
         return elist;
     }
 
-    /** Created new mobifieble ArrayList instance with three given elements */
+    /** Created new modifiable ArrayList instance with three given elements */
     public static <E> List<E> newArrayListOf(E e1, E e2, E e3) {
         List<E> elist = newArrayList(3);
         elist.add(e1);

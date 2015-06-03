@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.github.sviperll</groupId>
         <artifactId>maven-parent</artifactId>
-        <version>0.6-successor-SNAPSHOT</version>
+        <version>0.7</version>
     </parent>
     <groupId>com.github.sviperll</groupId>
     <artifactId>chicory-maven-parent</artifactId>
@@ -12,7 +12,7 @@
     <version>0.27-rc1-successor-SNAPSHOT</version>
     <url>https://github.com/sviperll/chicory</url>
     <properties>
-        <activateparentprofiles>java6,nexus-deploy</activateparentprofiles>
+        <parent.profile.activate>java6,nexus-deploy</parent.profile.activate>
         <netbeans.hint.license>BSD3</netbeans.hint.license>
         <project.properties.file>project.properties</project.properties.file>
     </properties>
@@ -82,7 +82,6 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.5</version>
                 <configuration>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <serverId>oss-sonatype-nexus</serverId>
@@ -96,12 +95,10 @@
                 <configuration>
                     <releaseVersion>${release.version}</releaseVersion>
                     <developmentVersion>${release.version}-successor-SNAPSHOT</developmentVersion>
-                    <!-- <pushChanges>false</pushChanges> -->
-                    <!-- <localCheckout>true</localCheckout> -->
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
-                    <preparationGoals>-Pcommit-version-infromation clean versioning:update-file verify scm:checkin</preparationGoals>
-                    <releaseProfiles>bootclasspath</releaseProfiles>
-                    <!-- <goals>deploy site-deploy</goals> -->
+                    <preparationGoals>-Pcommit-version-infromation clean versioning:update-file verify findbugs:check scm:checkin</preparationGoals>
+                    <releaseProfiles>sonatype-oss-release</releaseProfiles>
+                    <arguments>-Pbootclasspath</arguments>
                 </configuration>
             </plugin>
             <plugin>
@@ -123,7 +120,6 @@
                             <execution>
                                 <id>default-cli</id>
                                 <configuration>
-                                    <!-- <pushChanges>false</pushChanges> -->
                                     <includes>${project.properties.file},README.md,*/README.md</includes>
                                     <message>[maven-release-plugin] update release version information</message>
                                 </configuration>

@@ -10,7 +10,7 @@ import com.github.sviperll.Predicate;
 import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -131,45 +131,63 @@ public class StreamTest {
 
     @Test
     public void testBasicPipeline() throws IOException {
-        Predicate<Integer> mod2 = Predicate.of(new Evaluatable<Integer>() {
-            @Override
-            public boolean evaluate(Integer t) {
-                return t % 2 == 0;
-            }
-        });
+        Predicate<Integer> mod2 = Predicate.of(new IsEven());
 
-        Predicate<Integer> mod3 = Predicate.of(new Evaluatable<Integer>() {
-            @Override
-            public boolean evaluate(Integer t) {
-                return t % 3 == 0;
-            }
-        });
+        Predicate<Integer> mod3 = Predicate.of(new IsMultipleOf3());
 
-        Function<Integer, Integer> doubleIt = Function.of(new Applicable<Integer, Integer>() {
-            @Override
-            public Integer apply(Integer t) {
-                return t * 2;
-            }
-        });
+        Function<Integer, Integer> doubleIt = Function.of(new DoubleIt());
 
         Stream<Integer> stream = Arrays.asStream(new Integer[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
-        int sum = stream.collect(Collector.summingInt()).intValue();
+        int sum = stream.collect(Collector.summingInt());
         assertEquals(45, sum);
 
-        int sum1 = stream.filter(mod2).collect(Collector.summingInt()).intValue();
+        int sum1 = stream.filter(mod2).collect(Collector.summingInt());
         assertEquals(20, sum1);
 
-        int sum2 = stream.filter(mod2).filter(mod3).collect(Collector.summingInt()).intValue();
+        int sum2 = stream.filter(mod2).filter(mod3).collect(Collector.summingInt());
         assertEquals(6, sum2);
 
-        int sum3 = stream.map(doubleIt).collect(Collector.summingInt()).intValue();
+        int sum3 = stream.map(doubleIt).collect(Collector.summingInt());
         assertEquals(90, sum3);
 
-        int sum4 = stream.map(doubleIt).map(doubleIt).collect(Collector.summingInt()).intValue();
+        int sum4 = stream.map(doubleIt).map(doubleIt).collect(Collector.summingInt());
         assertEquals(180, sum4);
     }
 
     @SuppressWarnings("serial")
     private static class ExpectedException extends RuntimeException {
+    }
+
+    private static class IsEven implements Evaluatable<Integer> {
+
+        public IsEven() {
+        }
+
+        @Override
+        public boolean evaluate(Integer t) {
+            return t % 2 == 0;
+        }
+    }
+
+    private static class IsMultipleOf3 implements Evaluatable<Integer> {
+
+        public IsMultipleOf3() {
+        }
+
+        @Override
+        public boolean evaluate(Integer t) {
+            return t % 3 == 0;
+        }
+    }
+
+    private static class DoubleIt implements Applicable<Integer, Integer> {
+
+        public DoubleIt() {
+        }
+
+        @Override
+        public Integer apply(Integer t) {
+            return t * 2;
+        }
     }
 }

@@ -26,7 +26,9 @@
  */
 package com.github.sviperll;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class ObjectsTest {
@@ -61,14 +63,14 @@ public class ObjectsTest {
 
     @Test
     public void testObjectsEqualityWithNonNulls() {
-        Integer i1 = Integer.valueOf(123);
-        Integer i2 = Integer.valueOf(123);
+        Integer i1 = 123;
+        Integer i2 = 123;
         assertTrue(Objects.equals(i1, i2));
     }
 
     @Test
     public void testObjectsEqualityWithOneNull() {
-        Integer i1 = Integer.valueOf(123);
+        Integer i1 = 123;
         assertFalse(Objects.equals(i1, null));
         assertFalse(Objects.equals(null, i1));
     }

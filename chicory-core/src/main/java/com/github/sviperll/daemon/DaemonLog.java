@@ -91,14 +91,14 @@ public class DaemonLog {
         public static final Applicable<OutputStream, ResourceProvider<Handler>> INSTANCE = new FlushingLoggingFactory();
         @Override
         public ResourceProvider<Handler> apply(final OutputStream stream) {
-            return ResourceProvider.of(new FlushingHandlerResourcePeovider(stream));
+            return ResourceProvider.of(new FlushingHandlerResourceProvider(stream));
         }
 
-        private static class FlushingHandlerResourcePeovider implements ResourceProviderDefinition<Handler> {
+        private static class FlushingHandlerResourceProvider implements ResourceProviderDefinition<Handler> {
 
             private final OutputStream stream;
 
-            public FlushingHandlerResourcePeovider(OutputStream stream) {
+            FlushingHandlerResourceProvider(OutputStream stream) {
                 this.stream = stream;
             }
 
