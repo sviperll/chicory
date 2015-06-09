@@ -6,6 +6,7 @@ package org.github.sviperll.stream;
 import com.github.sviperll.Applicable;
 import com.github.sviperll.Evaluatable;
 import com.github.sviperll.Function;
+import com.github.sviperll.OptionalVisitors;
 import com.github.sviperll.Predicate;
 import java.io.IOException;
 import org.junit.After;
@@ -152,6 +153,17 @@ public class StreamTest {
 
         int sum4 = stream.map(doubleIt).map(doubleIt).collect(Collector.summingInt());
         assertEquals(180, sum4);
+    }
+
+    @Test
+    public void testStringJoin() throws IOException {
+        Stream<String> stream = Stream.ofElements("a", "b", "c");
+        assertEquals("abc", stream.collect(Collector.joiningStrings()));
+        assertEquals("", Stream.<String>empty().collect(Collector.joiningStrings()));
+
+        Collector<String, String, RuntimeException> collector = Collector.joiningStrings(", ", OptionalVisitors.returnDefault("<empty>"));
+        assertEquals("a, b, c", stream.collect(collector));
+        assertEquals("<empty>", Stream.<String>empty().collect(collector));
     }
 
     @SuppressWarnings("serial")

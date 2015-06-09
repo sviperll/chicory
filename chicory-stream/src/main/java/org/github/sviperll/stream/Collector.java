@@ -73,6 +73,24 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
         });
     }
 
+    public static <R, E extends Exception> Collector<String, R, E> joiningStrings(final String separator, final OptionalVisitor<String, R, E> visitor) {
+        return new Collector<String, R, E>(new Supplier<Collecting<String, R, E>>() {
+            @Override
+            public Collecting<String, R, E> get() {
+                return CollectorState.joiningStrings(separator, visitor);
+            }
+        });
+    }
+
+    public static Collector<String, String, RuntimeException> joiningStrings() {
+        return new Collector<String, String, RuntimeException>(new Supplier<Collecting<String, String, RuntimeException>>() {
+            @Override
+            public Collecting<String, String, RuntimeException> get() {
+                return CollectorState.joiningStrings();
+            }
+        });
+    }
+
     public static <T> Collector<T, List<T>, RuntimeException> toList() {
         return new Collector<T, List<T>, RuntimeException>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
             @Override

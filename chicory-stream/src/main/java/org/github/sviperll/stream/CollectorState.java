@@ -47,7 +47,7 @@ import java.util.TreeSet;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
-    public static <T, U, R, E extends Exception> CollectorState<T, R, E> optional(final Applicable<? super T, Collecting<? super T, U, E>> notOptionalCollector, final OptionalVisitor<? super U, R, E> visitor) {
+    public static <T, U, R, E extends Exception> CollectorState<T, R, E> optional(final Applicable<? super T, ? extends Collecting<? super T, U, E>> notOptionalCollector, final OptionalVisitor<? super U, R, E> visitor) {
         StatefulCollecting<T, R, E> state = new StatefulCollecting<T, R, E>(null);
         NoResultCollecting<T, U, R, E> noResultCollectorState = new NoResultCollecting<T, U, R, E>(visitor, state, notOptionalCollector);
         state.setBehaviour(noResultCollectorState);
@@ -483,6 +483,54 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
         return optional(stateFactory, visitor);
     }
 
+    public static <R, E extends Exception> CollectorState<String, R, E> joiningStrings(final String separator, final OptionalVisitor<String, R, E> visitor) {
+        Applicable<String, Collecting<String, String, E>> stateFactory = new Applicable<String, Collecting<String, String, E>>() {
+            @Override
+            public Collecting<String, String, E> apply(final String firstElement) {
+                return new Collecting<String, String, E>() {
+                    private StringBuilder builder = new StringBuilder(firstElement);
+                    @Override
+                    public String get() {
+                        return builder.toString();
+                    }
+
+                    @Override
+                    public void accept(String value) {
+                        builder.append(separator);
+                        builder.append(value);
+                    }
+
+                    @Override
+                    public boolean needsMore() {
+                        return true;
+                    }
+                };
+            }
+        };
+        return optional(stateFactory, visitor);
+    }
+
+    public static CollectorState<String, String, RuntimeException> joiningStrings() {
+        Collecting<String, String, RuntimeException> collecting = new Collecting<String, String, RuntimeException>() {
+            private StringBuilder builder = new StringBuilder();
+            @Override
+            public String get() {
+                return builder.toString();
+            }
+
+            @Override
+            public void accept(String value) {
+                builder.append(value);
+            }
+
+            @Override
+            public boolean needsMore() {
+                return true;
+            }
+        };
+        return new CollectorState<String, String, RuntimeException>(collecting, collecting);
+    }
+
     public static <T, R, E extends Exception> CollectorState<T, R, E> of(Collecting<T, R, E> collecting) {
         if (collecting instanceof CollectorState)
             return (CollectorState<T, R, E>)collecting;
@@ -569,8 +617,8 @@ class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
     private static class NoResultCollecting<T, U, R, E extends Exception> implements Collecting<T, R, E> {
         private final OptionalVisitor<? super U, R, E> visitor;
         private final StatefulCollecting<T, R, E> state;
-        private final Applicable<? super T, Collecting<? super T, U, E>> collector;
-        public NoResultCollecting(OptionalVisitor<? super U, R, E> visitor, StatefulCollecting<T, R, E> state, Applicable<? super T, Collecting<? super T, U, E>> collector) {
+        private final Applicable<? super T, ? extends Collecting<? super T, U, E>> collector;
+        public NoResultCollecting(OptionalVisitor<? super U, R, E> visitor, StatefulCollecting<T, R, E> state, Applicable<? super T, ? extends Collecting<? super T, U, E>> collector) {
             this.visitor = visitor;
             this.state = state;
             this.collector = collector;
