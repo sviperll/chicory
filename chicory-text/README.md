@@ -24,7 +24,7 @@ You can use latest unstable version instead:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-text</artifactId>
-        <version>0.27-rc4</version>
+        <version>0.27-rc5</version>
     </dependency>
 ```
 
