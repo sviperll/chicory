@@ -41,6 +41,8 @@ import com.helger.jcodemodel.JPackage;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -57,39 +59,46 @@ import javax.lang.model.util.Elements;
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
 class DecidedErrorTypesModelsAdapter {
+    private static final Logger logger = Logger.getLogger(DecidedErrorTypesModelsAdapter.class.getName());
     static int toJMod(Collection<Modifier> modifierCollection) {
         int modifiers = 0;
         for (Modifier modifier: modifierCollection) {
-            modifiers |= toJMod(modifier);
+            switch (modifier) {
+                case ABSTRACT:
+                    modifiers |= JMod.ABSTRACT;
+                    break;
+                case FINAL:
+                    modifiers |= JMod.FINAL;
+                    break;
+                case NATIVE:
+                    modifiers |= JMod.NATIVE;
+                    break;
+                case PRIVATE:
+                    modifiers |= JMod.PRIVATE;
+                    break;
+                case PROTECTED:
+                    modifiers |= JMod.PROTECTED;
+                    break;
+                case PUBLIC:
+                    modifiers |= JMod.PUBLIC;
+                    break;
+                case STATIC:
+                    modifiers |= JMod.STATIC;
+                    break;
+                case SYNCHRONIZED:
+                    modifiers |= JMod.SYNCHRONIZED;
+                    break;
+                case TRANSIENT:
+                    modifiers |= JMod.TRANSIENT;
+                    break;
+                case VOLATILE:
+                    modifiers |= JMod.VOLATILE;
+                    break;
+                default:
+                    logger.log(Level.WARNING, "Skpping unsupported modifier: {0}", modifier);
+            }
         }
         return modifiers;
-    }
-
-    static int toJMod(Modifier modifier) {
-        switch (modifier) {
-            case ABSTRACT:
-                return JMod.ABSTRACT;
-            case FINAL:
-                return JMod.FINAL;
-            case NATIVE:
-                return JMod.NATIVE;
-            case PRIVATE:
-                return JMod.PRIVATE;
-            case PROTECTED:
-                return JMod.PROTECTED;
-            case PUBLIC:
-                return JMod.PUBLIC;
-            case STATIC:
-                return JMod.STATIC;
-            case SYNCHRONIZED:
-                return JMod.SYNCHRONIZED;
-            case TRANSIENT:
-                return JMod.TRANSIENT;
-            case VOLATILE:
-                return JMod.VOLATILE;
-            default:
-                throw new UnsupportedOperationException("Unsupported modifier: " + modifier);
-        }
     }
 
     private static EClassType toClassType(ElementKind kind) {
