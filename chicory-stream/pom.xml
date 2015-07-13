@@ -6,8 +6,18 @@
         <version>0.27-rc3-successor-SNAPSHOT</version>
     </parent>
     <artifactId>chicory-stream</artifactId>
-    <name>chicory-stream</name>
     <packaging>jar</packaging>
+    <name>chicory-stream</name>
+    <description>
+        Stream processing like Java 8 streams, but works with Java 6 and have slightly different design.
+
+         * Chicory-stream provides sequential-only streams, no parallel support.
+         * Chicory-stream allows easy forking and reuse of streams, unlike Java 8 where stream can be used only once.
+         * Chicory-stream automatically and transparently opens and closes resources each time stream is used, unlike Java 8 where stream should be manually closed.
+
+        Part of chicory.
+    </description>
+    <url>https://github.com/sviperll/chicory/tree/master/chicory-stream</url>
     <properties>
         <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
     </properties>

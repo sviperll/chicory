@@ -6,8 +6,14 @@
         <version>0.27-rc3-successor-SNAPSHOT</version>
     </parent>
     <artifactId>chicory-time</artifactId>
-    <name>chicory-time</name>
     <packaging>jar</packaging>
+    <name>chicory-time</name>
+    <description>
+        Simple facade for Java SE date-time classes to provide functionality close to Joda-time.
+
+        Part of chicory.
+    </description>
+    <url>https://github.com/sviperll/chicory/tree/master/chicory-time</url>
     <properties>
         <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
     </properties>

@@ -7,8 +7,14 @@
         <version>0.27-rc3-successor-SNAPSHOT</version>
     </parent>
     <artifactId>chicory-text</artifactId>
-    <name>chicory-text</name>
     <packaging>jar</packaging>
+    <name>chicory-text</name>
+    <description>
+        Rudimentary tools needed for text handling.
+
+        Part of chicory.
+    </description>
+    <url>https://github.com/sviperll/chicory/tree/master/chicory-text</url>
     <properties>
         <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
     </properties>

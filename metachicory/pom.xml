@@ -7,8 +7,14 @@
         <version>0.27-rc3-successor-SNAPSHOT</version>
     </parent>
     <artifactId>metachicory</artifactId>
-    <name>metachicory</name>
     <packaging>jar</packaging>
+    <name>metachicory</name>
+    <description>
+        Metaprogramming tools. Useful for annotation processors implementation.
+
+        Part of chicory.
+    </description>
+    <url>https://github.com/sviperll/chicory/tree/master/metachicory</url>
     <properties>
         <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
     </properties>

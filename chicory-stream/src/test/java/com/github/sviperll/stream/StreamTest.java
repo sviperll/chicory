@@ -1,8 +1,14 @@
 /*
  * Copyright 2014 Victor Nazarov <asviraspossible@gmail.com>.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
 
+import com.github.sviperll.stream.Streamable;
+import com.github.sviperll.stream.Stream;
+import com.github.sviperll.stream.CloseableIterator;
+import com.github.sviperll.stream.Arrays;
+import com.github.sviperll.stream.SaturableConsuming;
+import com.github.sviperll.stream.Collector;
 import com.github.sviperll.Applicable;
 import com.github.sviperll.Evaluatable;
 import com.github.sviperll.Function;
@@ -59,9 +65,9 @@ public class StreamTest {
         CloseableIterator<Integer> iterator = test.openIterator();
         try {
             assert(isOpened);
-            assertEquals(1, iterator.next().intValue());
-            assertEquals(2, iterator.next().intValue());
-            assertEquals(3, iterator.next().intValue());
+            assertEquals(1L, iterator.next().longValue());
+            assertEquals(2L, iterator.next().longValue());
+            assertEquals(3L, iterator.next().longValue());
             assert(!isOpened);
         } finally {
             iterator.close();
@@ -86,8 +92,8 @@ public class StreamTest {
         CloseableIterator<Integer> iterator = test.openIterator();
         try {
             assert(isOpened);
-            assertEquals(1, iterator.next().intValue());
-            assertEquals(2, iterator.next().intValue());
+            assertEquals(1, iterator.next().longValue());
+            assertEquals(2, iterator.next().longValue());
             assert(isOpened);
         } finally {
             iterator.close();
@@ -115,8 +121,8 @@ public class StreamTest {
         CloseableIterator<Integer> iterator = test.openIterator();
         try {
             assert(isOpened);
-            assertEquals(1, iterator.next().intValue());
-            assertEquals(2, iterator.next().intValue());
+            assertEquals(1, iterator.next().longValue());
+            assertEquals(2, iterator.next().longValue());
 
             try {
                 iterator.next();

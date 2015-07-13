@@ -3,49 +3,37 @@
     <parent>
         <groupId>com.github.sviperll</groupId>
         <artifactId>maven-parent</artifactId>
-        <version>0.7</version>
+        <version>0.9</version>
     </parent>
     <groupId>com.github.sviperll</groupId>
     <artifactId>chicory-maven-parent</artifactId>
-    <name>chicory-maven-parent</name>
-    <packaging>pom</packaging>
     <version>0.27-rc3-successor-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <url>https://github.com/sviperll/chicory</url>
-    <properties>
-        <parent.profile.activate>java6,nexus-deploy</parent.profile.activate>
-        <netbeans.hint.license>BSD3</netbeans.hint.license>
-        <project.properties.file>project.properties</project.properties.file>
-    </properties>
-    <modules>
-        <module>chicory-environment</module>
-        <module>chicory-core</module>
-        <module>chicory-time</module>
-        <module>chicory-stream</module>
-        <module>metachicory</module>
-        <module>chicory-text</module>
-    </modules>
+    <name>chicory-maven-parent</name>
+    <description>
+        This is an umbrella project that unifies several libraries. All libraries provides some basic most generic functionality.
+
+        This package is used to share generic code between more specialized projects.
+
+        All provided libraries tend to have as simple implementation as possible, basically some wrapping above Java SE.
+    </description>
     <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
         <site>
             <id>github</id>
             <name>GitHub Pages</name>
             <url>github:http://sviperll.github.io/chicory/</url>
         </site>
     </distributionManagement>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <developers>
-        <developer>
-            <id>sviperll</id>
-            <name>Victor Nazarov</name>
-            <email>asviraspossible@gmail.com</email>
-        </developer>
-    </developers>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/sviperll/chicory/issues</url>
+    </issueManagement>
     <scm>
         <connection>scm:git:git://github.com/sviperll/chicory.git</connection>
         <developerConnection>scm:git:git@github.com:sviperll/chicory.git</developerConnection>
@@ -59,6 +47,34 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <developers>
+        <developer>
+            <id>sviperll</id>
+            <name>Victor Nazarov</name>
+            <email>asviraspossible@gmail.com</email>
+        </developer>
+    </developers>
+    <properties>
+        <parent.profile.activate>java6,nexus-deploy</parent.profile.activate>
+        <netbeans.hint.license>BSD3</netbeans.hint.license>
+        <project.properties.file>project.properties</project.properties.file>
+    </properties>
+    <modules>
+        <module>chicory-environment</module>
+        <module>chicory-core</module>
+        <module>chicory-time</module>
+        <module>chicory-stream</module>
+        <module>metachicory</module>
+        <module>chicory-text</module>
+    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -125,9 +141,7 @@
                     <releaseVersion>${release.version}</releaseVersion>
                     <developmentVersion>${release.version}-successor-SNAPSHOT</developmentVersion>
                     <tagNameFormat>chicory-@{project.version}</tagNameFormat>
-                    <preparationGoals>-Pcommit-version-infromation clean versioning:update-file verify findbugs:check scm:checkin</preparationGoals>
-                    <releaseProfiles>sonatype-oss-release</releaseProfiles>
-                    <arguments>-Pbootclasspath</arguments>
+                    <preparationGoals>-Pcommit-version-infromation clean versioning:update-file verify scm:checkin</preparationGoals>
                 </configuration>
             </plugin>
             <plugin>

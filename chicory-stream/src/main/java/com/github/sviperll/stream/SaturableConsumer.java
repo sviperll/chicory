@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
 
 import com.github.sviperll.Applicable;
 import com.github.sviperll.Evaluatable;

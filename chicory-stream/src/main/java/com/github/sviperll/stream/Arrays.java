@@ -24,18 +24,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
-
-import java.io.File;
+package com.github.sviperll.stream;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public class Files {
-    public static StreamableFile asStreamable(File file) {
-        return new StreamableFile(file);
+public class Arrays {
+    public static <T> Stream<T> asStream(final T[] array) {
+        return Stream.of(new Streamable<T>() {
+
+            @Override
+            public void forEach(SaturableConsuming<? super T> consumer) {
+                for (T value: array)
+                    consumer.accept(value);
+            }
+        });
     }
-    private Files() {
+
+    private Arrays() {
     }
 }

@@ -24,14 +24,25 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-interface DrainerResponseVisitor<T, R> {
-    R fetched(T value);
-    R closed();
-    R error(RuntimeException exception);
+public interface SaturableConsuming<T> {
+    /**
+     * Accept value for processing.
+     * Can be called more than once.
+     * Can be called event if #needsMore method returns false
+     * @param value
+     */
+    void accept(T value);
+
+    /**
+     * Shows if consumer expects more values to process or
+     * consumer is saturated and need no more values
+     * @return true if consumer expects more values.
+     */
+    boolean needsMore();
 }

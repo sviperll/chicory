@@ -24,13 +24,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-interface DrainerRequestVisitor<R> {
-    R fetch();
-    R close();
+public interface ThrowingSupplier<T, E extends Exception> {
+    T get() throws E;
 }

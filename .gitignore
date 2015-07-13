@@ -4,4 +4,4 @@
 /.gradle
 *~
 /target/
-/versions.sh.next
+/.mvn/extensions.xml

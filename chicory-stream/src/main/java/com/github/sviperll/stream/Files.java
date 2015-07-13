@@ -24,12 +24,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
+
+import java.io.File;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public interface ThrowingSupplier<T, E extends Exception> {
-    T get() throws E;
+public class Files {
+    public static StreamableFile asStreamable(File file) {
+        return new StreamableFile(file);
+    }
+    private Files() {
+    }
 }

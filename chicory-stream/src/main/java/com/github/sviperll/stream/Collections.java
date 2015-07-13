@@ -24,25 +24,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public interface SaturableConsuming<T> {
-    /**
-     * Accept value for processing.
-     * Can be called more than once.
-     * Can be called event if #needsMore method returns false
-     * @param value
-     */
-    void accept(T value);
+public class Collections {
+    public static <T> Stream<T> asStream(final Iterable<T> collection) {
+        return Stream.of(new Streamable<T>() {
+            @Override
+            public void forEach(SaturableConsuming<? super T> consumer) {
+                for (T value: collection) {
+                    consumer.accept(value);
+                }
+            }
+        });
+    }
 
-    /**
-     * Shows if consumer expects more values to process or
-     * consumer is saturated and need no more values
-     * @return true if consumer expects more values.
-     */
-    boolean needsMore();
+    private Collections() {
+    }
 }

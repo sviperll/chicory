@@ -24,24 +24,64 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public class Collections {
-    public static <T> Stream<T> asStream(final Iterable<T> collection) {
-        return Stream.of(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                for (T value: collection) {
-                    consumer.accept(value);
-                }
-            }
-        });
+abstract class DrainerRequest {
+    private static DrainerRequestFactory FACTORY = new DrainerRequestFactory();
+
+    public static DrainerRequestVisitor<DrainerRequest> factory() {
+        return FACTORY;
+    }
+    public static DrainerRequest fetch() {
+        return FACTORY.fetch();
+    }
+    public static DrainerRequest close() {
+        return FACTORY.close();
     }
 
-    private Collections() {
+    private DrainerRequest() {
+    }
+
+    public abstract <R> R accept(DrainerRequestVisitor<R> visitor);
+
+    private static class DrainerRequestFactory implements DrainerRequestVisitor<DrainerRequest> {
+	private static final DrainerRequest FETCH = new FetchDrainerRequest();
+	private static final DrainerRequest CLOSE = new CloseDrainerRequest();
+
+        @Override
+        public DrainerRequest fetch() {
+            return FETCH;
+        }
+
+        @Override
+        public DrainerRequest close() {
+            return CLOSE;
+        }
+
+        private static class FetchDrainerRequest extends DrainerRequest {
+
+            public FetchDrainerRequest() {
+            }
+
+            @Override
+            public <R> R accept(DrainerRequestVisitor<R> visitor) {
+                return visitor.fetch();
+            }
+        }
+
+        private static class CloseDrainerRequest extends DrainerRequest {
+
+            public CloseDrainerRequest() {
+            }
+
+            @Override
+            public <R> R accept(DrainerRequestVisitor<R> visitor) {
+                return visitor.close();
+            }
+        }
     }
 }

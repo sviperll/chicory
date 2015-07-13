@@ -6,8 +6,14 @@
         <version>0.27-rc3-successor-SNAPSHOT</version>
     </parent>
     <artifactId>chicory-environment</artifactId>
-    <name>chicory-environment</name>
     <packaging>jar</packaging>
+    <name>chicory-environment</name>
+    <description>
+        Not portable part of chicory. This package should be as small as possible. Classes used for talking to operating system.
+
+        Part of chicory.
+    </description>
+    <url>https://github.com/sviperll/chicory/tree/master/chicory-environment</url>
     <properties>
         <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
     </properties>

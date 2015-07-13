@@ -24,12 +24,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
 
 /**
+ * Minimal implementation of stream like object.
  *
+ * Use {@link Stream#of(Streamable) Stream#of} to create actual streams
+ * 
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public interface Collecting<T, R, E extends Exception> extends SaturableConsuming<T>, ThrowingSupplier<R, E> {
-
+public interface Streamable<T> {
+    void forEach(SaturableConsuming<? super T> consumer);
 }

@@ -24,24 +24,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.github.sviperll.stream;
+package com.github.sviperll.stream;
 
 /**
  *
  * @author Victor Nazarov <asviraspossible@gmail.com>
  */
-public class Arrays {
-    public static <T> Stream<T> asStream(final T[] array) {
-        return Stream.of(new Streamable<T>() {
-
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                for (T value: array)
-                    consumer.accept(value);
-            }
-        });
-    }
-
-    private Arrays() {
-    }
+interface DrainerResponseVisitor<T, R> {
+    R fetched(T value);
+    R closed();
+    R error(RuntimeException exception);
 }
