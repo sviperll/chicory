@@ -19,6 +19,15 @@ Use maven dependency:
     </dependency>
 ```
 
+You can use latest unstable version instead:
+
+```xml
+    <dependency>
+        <groupId>com.github.sviperll</groupId>
+        <artifactId>chicory-environment</artifactId>
+        <version>0.29-rc1</version>
+    </dependency>
+```
 
 Changelog
 ---------
