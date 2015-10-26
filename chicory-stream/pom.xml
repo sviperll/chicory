@@ -19,6 +19,7 @@
     </description>
     <url>https://github.com/sviperll/chicory/tree/master/chicory-stream</url>
     <properties>
+        <parent.profile.activate>pitest-cover</parent.profile.activate>
         <project.properties.file>${project.parent.basedir}/project.properties</project.properties.file>
     </properties>
     <dependencies>
