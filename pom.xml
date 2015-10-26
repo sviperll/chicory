@@ -27,7 +27,7 @@
         <site>
             <id>github</id>
             <name>GitHub Pages</name>
-            <url>github:http://sviperll.github.io/chicory/</url>
+            <url>git:gh-pages://git@github.com:sviperll/chicory.git</url>
         </site>
     </distributionManagement>
     <issueManagement>
