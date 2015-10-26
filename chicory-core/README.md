@@ -14,19 +14,10 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-core</artifactId>
-        <version>0.28</version>
+        <version>0.29</version>
     </dependency>
 ```
 
-You can use latest unstable version instead:
-
-```xml
-    <dependency>
-        <groupId>com.github.sviperll</groupId>
-        <artifactId>chicory-core</artifactId>
-        <version>0.29-rc2</version>
-    </dependency>
-```
 
 Changelog
 ---------
