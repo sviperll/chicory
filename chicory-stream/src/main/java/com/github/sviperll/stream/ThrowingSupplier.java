@@ -28,7 +28,7 @@ package com.github.sviperll.stream;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public interface ThrowingSupplier<T, E extends Exception> {
     T get() throws E;

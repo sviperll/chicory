@@ -33,7 +33,7 @@ import com.github.sviperll.meta.TextFormat;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 @TextFormat
 public class PlainText {

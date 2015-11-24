@@ -41,7 +41,7 @@ import com.github.sviperll.UnaryOperatorDefinition;
  *
  * @see Streamable
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class Stream<T> implements Streamable<T> {
     public static <T> Stream<T> of(final Streamable<T> streamable) {

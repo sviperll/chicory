@@ -37,7 +37,7 @@ package com.github.sviperll.text;
  *
  * @param <T> marks given renderable with it's format
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public interface Layoutable<T> {
     Renderer createHeaderRenderer(Appendable appendable);

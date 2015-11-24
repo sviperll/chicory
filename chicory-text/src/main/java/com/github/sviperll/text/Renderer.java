@@ -33,7 +33,7 @@ import java.io.IOException;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class Renderer implements RendererDefinition {
     private static final Renderer BLANK = new Renderer(new BlankRendererDefinition());

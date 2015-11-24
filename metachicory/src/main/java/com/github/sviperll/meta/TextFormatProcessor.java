@@ -49,7 +49,7 @@ import javax.tools.Diagnostic;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 @SupportedAnnotationTypes("com.github.sviperll.meta.TextFormat")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)

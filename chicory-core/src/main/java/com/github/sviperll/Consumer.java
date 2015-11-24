@@ -28,7 +28,7 @@ package com.github.sviperll;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public interface Consumer<T> {
     void accept(T value);

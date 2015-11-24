@@ -31,7 +31,7 @@ package com.github.sviperll;
  *
  * Use {@link Predicate#of(Evaluatable) Predicate#of} to construct actual predicate objects.
  * 
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  * @param <T>
  */
 public interface Evaluatable<T> {

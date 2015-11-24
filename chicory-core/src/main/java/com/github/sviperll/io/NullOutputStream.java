@@ -34,7 +34,7 @@ import java.io.OutputStream;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class NullOutputStream extends OutputStream {
     private static final NullOutputStream INSTANCE = new NullOutputStream();

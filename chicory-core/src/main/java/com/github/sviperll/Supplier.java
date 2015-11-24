@@ -28,7 +28,7 @@ package com.github.sviperll;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public interface Supplier<T> {
     T get();

@@ -44,7 +44,7 @@ import java.util.TreeSet;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 class CollectorState<T, R, E extends Exception> implements Collecting<T, R, E> {
     public static <T, U, R, E extends Exception> CollectorState<T, R, E> optional(final Applicable<? super T, ? extends Collecting<? super T, U, E>> notOptionalCollector, final OptionalVisitor<? super U, R, E> visitor) {

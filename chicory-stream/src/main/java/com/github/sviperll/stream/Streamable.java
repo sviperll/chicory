@@ -31,7 +31,7 @@ package com.github.sviperll.stream;
  *
  * Use {@link Stream#of(Streamable) Stream#of} to create actual streams
  * 
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public interface Streamable<T> {
     void forEach(SaturableConsuming<? super T> consumer);

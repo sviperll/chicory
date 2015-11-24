@@ -31,7 +31,7 @@ import java.util.concurrent.SynchronousQueue;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 class Drainer<T> implements Runnable, SaturableConsuming<T> {
     private final Streamable<T> streamable;

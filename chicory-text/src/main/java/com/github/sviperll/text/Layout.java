@@ -39,7 +39,7 @@ import com.github.sviperll.Applicable;
  *
  * @param <T> marks given renderable with it's format
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class Layout<T> implements Layoutable<T> {
     @SuppressWarnings({"rawtypes", "unchecked"})

@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class DaemonLog {
     private static final DaemonLog STANDARD_OUT = new DaemonLog(ResourceProvider.forExisting(System.out).flatMap(FlushingLoggingFactory.INSTANCE), false, false);

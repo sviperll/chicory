@@ -30,7 +30,7 @@ import java.io.File;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class Files {
     public static StreamableFile asStreamable(File file) {

@@ -28,7 +28,7 @@ package com.github.sviperll.stream;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class Collections {
     public static <T> Stream<T> asStream(final Iterable<T> collection) {

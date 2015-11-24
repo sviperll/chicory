@@ -45,7 +45,7 @@ import java.util.logging.StreamHandler;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class Handlers {
 

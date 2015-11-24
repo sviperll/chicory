@@ -31,7 +31,7 @@ import java.util.Iterator;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public interface CloseableIterator<T> extends Iterator<T>, Closeable {
 

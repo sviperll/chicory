@@ -33,7 +33,7 @@ import com.github.sviperll.Predicate;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 abstract class SaturableConsumer<T> implements SaturableConsuming<T> {
     public static <T> SaturableConsumer<T> of(final SaturableConsuming<T> consuming) {

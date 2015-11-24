@@ -31,7 +31,7 @@ package com.github.sviperll;
  *
  * Use {@link Function#of(Applicable) Function#of} method to create actual function objects.
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  * @param <T> argument type
  * @param <R> result type
  */

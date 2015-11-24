@@ -55,7 +55,7 @@ import javax.tools.JavaFileObject;
  * @see com.helger.jcodemodel.AbstractCodeWriter
  * @see javax.annotation.processing.Filer
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class FilerCodeWriter extends AbstractCodeWriter {
     private static final String JAVA_SOURCE_SUFFIX = ".java";

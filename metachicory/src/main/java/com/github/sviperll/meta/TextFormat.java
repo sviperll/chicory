@@ -70,7 +70,7 @@ import java.lang.annotation.Target;
  *  if a &lt; b &amp; b &lt; c then a &lt; c
  * }</pre>
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
 */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

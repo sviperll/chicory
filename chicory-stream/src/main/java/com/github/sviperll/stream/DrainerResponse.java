@@ -28,7 +28,7 @@ package com.github.sviperll.stream;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 abstract class DrainerResponse<T> {
     @SuppressWarnings("rawtypes")

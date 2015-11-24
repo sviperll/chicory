@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @see Evaluatable
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public abstract class Predicate<T> implements Evaluatable<T> {
     @SuppressWarnings({"rawtypes"})

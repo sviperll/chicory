@@ -38,7 +38,7 @@ import sun.misc.SignalHandler;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class HUPReopeningFileOutputStream extends OutputStream {
     private final static Logger logger = Logger.getLogger(HUPReopeningFileOutputStream.class.getName());

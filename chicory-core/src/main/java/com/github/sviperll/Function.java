@@ -31,7 +31,7 @@ package com.github.sviperll;
  *
  * @see Applicable
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  * @param <T> argument type
  * @param <R> result type
  */

@@ -32,7 +32,7 @@ import java.util.NoSuchElementException;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 class StreamIterator<T> implements CloseableIterator<T> {
     @SuppressWarnings("rawtypes")

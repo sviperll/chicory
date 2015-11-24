@@ -33,7 +33,7 @@ import javax.lang.model.element.TypeElement;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 
 public class ElementMessage {

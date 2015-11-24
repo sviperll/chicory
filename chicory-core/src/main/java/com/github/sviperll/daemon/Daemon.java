@@ -37,7 +37,7 @@ import java.io.IOException;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class Daemon {
     private static final SignalWaiter signalWaiter = new SignalWaiter();

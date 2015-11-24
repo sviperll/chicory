@@ -31,7 +31,7 @@ import sun.misc.SignalHandler;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class SignalWaiter {
     private final Object lock = new Object();

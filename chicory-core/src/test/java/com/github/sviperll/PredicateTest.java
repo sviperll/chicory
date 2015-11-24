@@ -13,7 +13,7 @@ import org.junit.Test;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class PredicateTest {
 

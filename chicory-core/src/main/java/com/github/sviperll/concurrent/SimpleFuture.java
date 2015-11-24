@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class SimpleFuture<V> implements Future<V> {
     private final Object lock = new Object();

@@ -34,7 +34,7 @@ import java.io.StringWriter;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class Throwables {
     public static String render(Throwable exception) {

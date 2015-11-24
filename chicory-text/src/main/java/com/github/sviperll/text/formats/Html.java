@@ -34,7 +34,7 @@ import java.io.IOException;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 @TextFormat
 public class Html {

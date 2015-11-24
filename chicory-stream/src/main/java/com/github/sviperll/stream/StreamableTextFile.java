@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Victor Nazarov <asviraspossible@gmail.com>
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class StreamableTextFile {
     private final File file;
