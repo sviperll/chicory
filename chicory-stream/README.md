@@ -19,7 +19,7 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-stream</artifactId>
-        <version>0.29</version>
+        <version>0.30</version>
     </dependency>
 ```
 
