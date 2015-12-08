@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.github.sviperll</groupId>
         <artifactId>universal-maven-parent</artifactId>
-        <version>0.20</version>
+        <version>0.21</version>
     </parent>
     <groupId>com.github.sviperll</groupId>
     <artifactId>chicory-maven-parent</artifactId>
@@ -80,7 +80,7 @@
             <plugin>
                 <groupId>com.github.sviperll</groupId>
                 <artifactId>versioning-maven-plugin</artifactId>
-                <version>0.3</version>
+                <version>0.22</version>
                 <configuration>
                     <version>${project.version}</version>
                     <decidedVersionPropertyName>release.version</decidedVersionPropertyName>
@@ -98,7 +98,7 @@
             <plugin>
                 <groupId>com.github.sviperll</groupId>
                 <artifactId>mustache-maven-plugin</artifactId>
-                <version>0.2</version>
+                <version>0.22</version>
                 <inherited>true</inherited>
                 <configuration>
                     <encoding>UTF-8</encoding>
