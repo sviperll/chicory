@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, vir
+ * Copyright (c) 2015, Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -27,152 +27,119 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.github.sviperll;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  *
- * @author vir
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> {
-    public static <T> ResourceProvider<T> createInstance(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int maxPoolSize) {
-        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<T>();
-        for (int i = 0; i < maxPoolSize; i++) {
-            pooledResourceProvider.add(provider, maxIdleTimeMillis);
+@ParametersAreNonnullByDefault
+public class PooledResourceProvider<T> implements ResourceProviderDefinition<T>, Runnable {
+    private static final Logger logger = Logger.getLogger(PooledResourceProvider.class.getName());
+    public static <T> ResourceProvider<T> createInstance(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int poolSize) {
+        Executor executor = Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r);
+                thread.setName(PooledResourceProvider.class.getName() + " pool thread");
+                thread.setDaemon(true);
+                return thread;
+            }
+        });
+        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<T>(provider, maxIdleTimeMillis, new SynchronousQueue<SyncronousValue<T>>());
+        for (int i = 0; i < poolSize; i++) {
+            executor.execute(pooledResourceProvider);
         }
         return ResourceProvider.of(pooledResourceProvider);
     }
 
-    // availableQueue must be synchronous queue,
-    // to allow EmptyPoolElement to block until
-    // it's actually taken out of the queue.
-    // EmptyPoolElement should block as long as possible to
-    // avoid premature resource allocation
-    // See EmptyPoolElement.run implementation
-    private final BlockingQueue<ResourceProviderDefinition<T>> availableQueue = new SynchronousQueue<ResourceProviderDefinition<T>>();;
+    private final ResourceProviderDefinition<T> provider;
+    private final long idleTimeoutMillis;
+    private final BlockingQueue<SyncronousValue<T>> availableValues;
+    private final Semaphore currentValueExpectations = new Semaphore(0);
 
-    private PooledResourceProvider() {
+    private PooledResourceProvider(ResourceProviderDefinition<T> provider, long idleTimeoutMillis, BlockingQueue<SyncronousValue<T>> availableValues) {
+        this.provider = provider;
+        this.idleTimeoutMillis = idleTimeoutMillis;
+        this.availableValues = availableValues;
     }
 
     @Override
     public void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException {
-        ResourceProviderDefinition<T> provider = availableQueue.take();
-        provider.provideResourceTo(consumer);
+        currentValueExpectations.release();
+        SyncronousValue<T> value = availableValues.take();
+        try {
+            consumer.accept(value.value());
+        } finally {
+            value.release();
+        }
     }
 
-    void add(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis) {
-        EmptyPoolElement element = new EmptyPoolElement(provider, maxIdleTimeMillis);
-        Thread thread = new Thread(element);
-
-        // Will automatically shut down on application shut down.
-        thread.setDaemon(true);
-        thread.start();
-    }
-
-    private class EmptyPoolElement implements Runnable, ResourceProviderDefinition<T>, Consumer<T> {
-        private final ResourceProviderDefinition<T> provider;
-        private final long maxIdleTimeMillis;
-        private final BlockingQueue<PoolElement> responseQueue = new SynchronousQueue<PoolElement>();
-
-        EmptyPoolElement(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis) {
-            this.provider = provider;
-            this.maxIdleTimeMillis = maxIdleTimeMillis;
-        }
-
-        @Override
-        public void run() {
-            for (;;) {
-                for (;;) {
-                    try {
-                        // We should block as long as possible to
-                        // avoid premature resource allocation
-                        availableQueue.put(this);
-                        break;
-                    } catch (InterruptedException ex) {
-                    }
-                }
-                for (;;) {
-                    try {
-                        provider.provideResourceTo(this);
-                        break;
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void accept(T value) {
-            PoolElement element = new PoolElement(value, maxIdleTimeMillis);
+    @Override
+    public void run() {
+        for (;;) {
+            currentValueExpectations.acquireUninterruptibly();
             for (;;) {
                 try {
-                    responseQueue.put(element);
+                    provider.provideResourceTo(new Consumer<T>() {
+                        @Override
+                        public void accept(T value) {
+                            SyncronousValue<T> syncronousValue = new SyncronousValue<T>(value);
+                            try {
+                                syncronousValue.acquire();
+                                for (;;) {
+                                    availableValues.put(syncronousValue);
+                                    syncronousValue.acquire();
+                                    boolean isAcquired = currentValueExpectations.tryAcquire(idleTimeoutMillis, TimeUnit.MICROSECONDS);
+                                    if (!isAcquired)
+                                        break;
+                                }
+                            } catch (InterruptedException ex) {
+                            }
+                        }
+                    });
                     break;
                 } catch (InterruptedException ex) {
+                } catch (RuntimeException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                    try {
+                        Thread.sleep(TimeUnit.SECONDS.toMillis(10));
+                    } catch (InterruptedException ex1) {
+                    }
                 }
             }
-            element.run();
-        }
-
-        @Override
-        public void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException {
-            PoolElement element = responseQueue.take();
-            element.provideResourceTo(consumer);
         }
     }
 
-    private class PoolElement implements Runnable, ResourceProviderDefinition<T> {
-        private final BlockingQueue<T> consumedQueue = new SynchronousQueue<T>();
+    private static class SyncronousValue<T> {
+        private final Semaphore semaphore = new Semaphore(1);
         private final T value;
-        private final long idleTimeMillis;
-
-        PoolElement(T value, long idleTimeMillis) {
+        SyncronousValue(T value) {
             this.value = value;
-            this.idleTimeMillis = idleTimeMillis;
         }
-
-        @Override
-        public void provideResourceTo(Consumer<? super T> consumer) {
-            try {
-                consumer.accept(value);
-            } finally {
-                // InterruptedException shouldn't be thrown out here
-                // sinse we can't retry potentially not side-effect free
-                // consumer action.
-                for (;;) {
-                    try {
-                        consumedQueue.put(value);
-                        break;
-                    } catch (InterruptedException ex) {
-                    }
-                }
-            }
+        @Nonnull
+        T value() throws InterruptedException {
+            return value;
         }
-
-        @Override
-        public void run() {
-            for (;;) {
-                for (;;) {
-                    try {
-                        consumedQueue.take();
-                        break;
-                    } catch (InterruptedException ex) {
-                    }
-                }
-                boolean used;
-                for (;;) {
-                    try {
-                        used = availableQueue.offer(this, idleTimeMillis, TimeUnit.MILLISECONDS);
-                        break;
-                    } catch (InterruptedException ex) {
-                    }
-                }
-                if (!used)
-                    break;
-            }
+        void acquire() throws InterruptedException {
+            semaphore.acquire();
+        }
+        void release() {
+            semaphore.release();
         }
     }
+
 }
