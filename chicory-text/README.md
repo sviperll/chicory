@@ -14,7 +14,7 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-text</artifactId>
-        <version>0.32</version>
+        <version>0.33</version>
     </dependency>
 ```
 
