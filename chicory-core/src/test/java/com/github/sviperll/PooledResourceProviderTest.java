@@ -60,6 +60,20 @@ public class PooledResourceProviderTest {
     }
 
     @Test
+    public void testIdleTime() throws InterruptedException {
+        final long maxIdleTimeMillis = 337;
+        final long maxIdleTimeMillisThreashold = 10;
+        final CountingResourceProvider providerDefinition = new CountingResourceProvider();
+        final ResourceProvider<AtomicInteger> provider = PooledResourceProvider.createInstance(providerDefinition, maxIdleTimeMillis, 10);
+        provider.provideResourceTo(new DoNothingConsumer());
+        Assert.assertEquals(1, providerDefinition.count.get());
+        Thread.sleep(maxIdleTimeMillis - maxIdleTimeMillisThreashold);
+        Assert.assertEquals(1, providerDefinition.count.get());
+        Thread.sleep(maxIdleTimeMillisThreashold);
+        Assert.assertEquals(0, providerDefinition.count.get());
+    }
+
+    @Test
     public void testIsAllocated() {
         final int maxAllocatedResources = 3;
         final long maxIdleTimeMillis = 500;
@@ -306,11 +320,13 @@ public class PooledResourceProviderTest {
         }
     }
 
-    private static class NotAllocatableResourceProvider implements ResourceProviderDefinition<Object> {
-
-        public NotAllocatableResourceProvider() {
+    private static class DoNothingConsumer implements Consumer<AtomicInteger> {
+        @Override
+        public void accept(AtomicInteger value) {
         }
+    }
 
+    private static class NotAllocatableResourceProvider implements ResourceProviderDefinition<Object> {
         @Override
         public void provideResourceTo(Consumer<Object> consumer) throws InterruptedException {
             throw new NotAllocatableException();

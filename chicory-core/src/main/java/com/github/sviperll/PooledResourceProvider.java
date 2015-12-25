@@ -172,7 +172,7 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
             currentValueExpectations.acquireUninterruptibly();
         }
         boolean waitForExpectationBoundedTime() throws InterruptedException {
-            return currentValueExpectations.tryAcquire(idleTimeoutMillis, TimeUnit.MICROSECONDS);
+            return currentValueExpectations.tryAcquire(idleTimeoutMillis, TimeUnit.MILLISECONDS);
         }
         void expect() {
             currentValueExpectations.release();
