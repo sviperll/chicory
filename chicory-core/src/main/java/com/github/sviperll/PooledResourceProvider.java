@@ -37,8 +37,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -47,99 +45,154 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 @ParametersAreNonnullByDefault
-public class PooledResourceProvider<T> implements ResourceProviderDefinition<T>, Runnable {
-    private static final Logger logger = Logger.getLogger(PooledResourceProvider.class.getName());
+public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> {
     public static <T> ResourceProvider<T> createInstance(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int poolSize) {
         Executor executor = Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
                 Thread thread = new Thread(r);
-                thread.setName(PooledResourceProvider.class.getName() + " pool thread");
+                thread.setName(PooledResourceProvider.class.getName() + "-pool-thread");
                 thread.setDaemon(true);
                 return thread;
             }
         });
-        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<T>(provider, maxIdleTimeMillis, new SynchronousQueue<SyncronousValue<T>>());
+        Queue<T> queue = new Queue<T>(maxIdleTimeMillis);
+        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<T>(provider, queue);
         for (int i = 0; i < poolSize; i++) {
-            executor.execute(pooledResourceProvider);
+            executor.execute(pooledResourceProvider.createThreadRunnable());
         }
         return ResourceProvider.of(pooledResourceProvider);
     }
 
     private final ResourceProviderDefinition<T> provider;
-    private final long idleTimeoutMillis;
-    private final BlockingQueue<SyncronousValue<T>> availableValues;
-    private final Semaphore currentValueExpectations = new Semaphore(0);
+    private final Queue<T> queue;
 
-    private PooledResourceProvider(ResourceProviderDefinition<T> provider, long idleTimeoutMillis, BlockingQueue<SyncronousValue<T>> availableValues) {
+    private PooledResourceProvider(ResourceProviderDefinition<T> provider, Queue<T> queue) {
         this.provider = provider;
-        this.idleTimeoutMillis = idleTimeoutMillis;
-        this.availableValues = availableValues;
+        this.queue = queue;
     }
 
     @Override
     public void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException {
-        currentValueExpectations.release();
-        SyncronousValue<T> value = availableValues.take();
-        try {
-            consumer.accept(value.value());
-        } finally {
-            value.release();
-        }
+        queue.expect();
+        queue.takeValueAndPassTo(consumer);
     }
 
-    @Override
-    public void run() {
-        for (;;) {
-            currentValueExpectations.acquireUninterruptibly();
+    @Nonnull
+    private Runnable createThreadRunnable() {
+        return new ThreadRunnable();
+    }
+
+    private class ThreadRunnable implements Runnable, Consumer<T> {
+        private final Semaphore semaphore = new Semaphore(1);
+        boolean isExpected = true;
+
+        @Override
+        public void run() {
             for (;;) {
-                try {
-                    provider.provideResourceTo(new Consumer<T>() {
-                        @Override
-                        public void accept(T value) {
-                            SyncronousValue<T> syncronousValue = new SyncronousValue<T>(value);
-                            try {
-                                syncronousValue.acquire();
-                                for (;;) {
-                                    availableValues.put(syncronousValue);
-                                    syncronousValue.acquire();
-                                    boolean isAcquired = currentValueExpectations.tryAcquire(idleTimeoutMillis, TimeUnit.MICROSECONDS);
-                                    if (!isAcquired)
-                                        break;
-                                }
-                            } catch (InterruptedException ex) {
-                            }
-                        }
-                    });
-                    break;
-                } catch (InterruptedException ex) {
-                } catch (RuntimeException ex) {
-                    logger.log(Level.SEVERE, null, ex);
+                queue.waitForExpectationIndefinitlyUninterruptibly();
+                isExpected = true;
+                while (isExpected) {
                     try {
-                        Thread.sleep(TimeUnit.SECONDS.toMillis(10));
-                    } catch (InterruptedException ex1) {
+                        provider.provideResourceTo(this);
+                    } catch (InterruptedException ex) {
+                    } catch (RuntimeException ex) {
+                        try {
+                            queue.putElement(new ExceptionElement(ex));
+                            isExpected = false;
+                        } catch (InterruptedException ex1) {
+                        }
                     }
                 }
             }
         }
+
+        @Override
+        public void accept(T value) {
+            ValueElement element = new ValueElement(value);
+            try {
+                semaphore.acquire();
+                try {
+                    while (isExpected) {
+                        queue.putElement(element);
+                        isExpected = false;
+                        semaphore.acquire();
+                        isExpected = queue.waitForExpectationBoundedTime();
+                    }
+                } finally {
+                    semaphore.release();
+                }
+            } catch (InterruptedException ex) {
+            }
+        }
+
+        private class ValueElement extends Queue.Element<T> {
+            private final T value;
+            ValueElement(T value) {
+                this.value = value;
+            }
+
+            @Nonnull
+            @Override
+            T value() {
+                return value;
+            }
+
+            @Override
+            void release() {
+                semaphore.release();
+            }
+        }
+        private class ExceptionElement extends Queue.Element<T> {
+            private final RuntimeException exception;
+            ExceptionElement(RuntimeException exception) {
+                this.exception = exception;
+            }
+
+            @Nonnull
+            @Override
+            T value() {
+                throw exception;
+            }
+
+            @Override
+            void release() {
+            }
+        }
     }
 
-    private static class SyncronousValue<T> {
-        private final Semaphore semaphore = new Semaphore(1);
-        private final T value;
-        SyncronousValue(T value) {
-            this.value = value;
+    private static class Queue<T> {
+        private final long idleTimeoutMillis;
+        private final BlockingQueue<Element<T>> availableValues = new SynchronousQueue<Element<T>>();
+        private final Semaphore currentValueExpectations = new Semaphore(0);
+        Queue(long idleTimeoutMillis) {
+            this.idleTimeoutMillis = idleTimeoutMillis;
         }
-        @Nonnull
-        T value() throws InterruptedException {
-            return value;
+        void waitForExpectationIndefinitlyUninterruptibly() {
+            currentValueExpectations.acquireUninterruptibly();
         }
-        void acquire() throws InterruptedException {
-            semaphore.acquire();
+        boolean waitForExpectationBoundedTime() throws InterruptedException {
+            return currentValueExpectations.tryAcquire(idleTimeoutMillis, TimeUnit.MICROSECONDS);
         }
-        void release() {
-            semaphore.release();
+        void expect() {
+            currentValueExpectations.release();
+        }
+        void putElement(Element<T> queueElement) throws InterruptedException {
+            availableValues.put(queueElement);
+        }
+        void takeValueAndPassTo(Consumer<? super T> consumer) throws InterruptedException {
+            Element<T> value = availableValues.take();
+            try {
+                consumer.accept(value.value());
+            } finally {
+                value.release();
+            }
+        }
+
+        private static abstract class Element<T> {
+            @Nonnull
+            abstract T value();
+            abstract void release();
         }
     }
-
 }
