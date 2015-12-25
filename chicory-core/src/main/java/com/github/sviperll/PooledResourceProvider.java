@@ -30,6 +30,7 @@
 
 package com.github.sviperll;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -56,8 +57,7 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
                 return thread;
             }
         });
-        Queue<T> queue = new Queue<T>(maxIdleTimeMillis);
-        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<T>(provider, queue);
+        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<T>(provider, new Queue<T>(), maxIdleTimeMillis);
         for (int i = 0; i < poolSize; i++) {
             executor.execute(pooledResourceProvider.createThreadRunnable());
         }
@@ -66,10 +66,12 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
 
     private final ResourceProviderDefinition<T> provider;
     private final Queue<T> queue;
+    private final long maxIdleTimeMillis;
 
-    private PooledResourceProvider(ResourceProviderDefinition<T> provider, Queue<T> queue) {
+    private PooledResourceProvider(ResourceProviderDefinition<T> provider, Queue<T> queue, long maxIdleTimeMillis) {
         this.provider = provider;
         this.queue = queue;
+        this.maxIdleTimeMillis = maxIdleTimeMillis;
     }
 
     @Override
@@ -90,19 +92,22 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
         @Override
         public void run() {
             for (;;) {
-                queue.waitForExpectationIndefinitlyUninterruptibly();
-                isExpected = true;
-                while (isExpected) {
-                    try {
-                        provider.provideResourceTo(this);
-                    } catch (InterruptedException ex) {
-                    } catch (RuntimeException ex) {
+                try {
+                    queue.waitForExpectationWhenNotReady();
+                    isExpected = true;
+                    while (isExpected) {
                         try {
-                            queue.putElement(new ExceptionElement(ex));
-                            isExpected = false;
-                        } catch (InterruptedException ex1) {
+                            provider.provideResourceTo(this);
+                        } catch (InterruptedException ex) {
+                        } catch (RuntimeException ex) {
+                            try {
+                                queue.putElement(new ExceptionElement(ex));
+                                isExpected = false;
+                            } catch (InterruptedException ex1) {
+                            }
                         }
                     }
+                } catch (InterruptedException ex) {
                 }
             }
         }
@@ -117,7 +122,7 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
                         queue.putElement(element);
                         isExpected = false;
                         semaphore.acquire();
-                        isExpected = queue.waitForExpectationBoundedTime();
+                        isExpected = queue.waitForExpectationWhenReady(maxIdleTimeMillis, TimeUnit.MILLISECONDS);
                     }
                 } finally {
                     semaphore.release();
@@ -162,20 +167,74 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
     }
 
     private static class Queue<T> {
-        private final long idleTimeoutMillis;
-        private final BlockingQueue<Element<T>> availableValues = new SynchronousQueue<Element<T>>();
-        private final Semaphore currentValueExpectations = new Semaphore(0);
-        Queue(long idleTimeoutMillis) {
-            this.idleTimeoutMillis = idleTimeoutMillis;
+        private final Object lockReady = new Object();
+        private final Object lockExpected = new Object();
+        private BlockingQueue<Element<T>> availableValues = new SynchronousQueue<Element<T>>();
+        private int nValuesExpected = 0;
+        private int nValuesReady = 0;
+
+        Queue() {
         }
-        void waitForExpectationIndefinitlyUninterruptibly() {
-            currentValueExpectations.acquireUninterruptibly();
+
+        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
+                            justification = "Really want to wake single thread only")
+        void waitForExpectationWhenNotReady() throws InterruptedException {
+            for (;;) {
+                synchronized(lockReady) {
+                    while (nValuesReady > 0)
+                        lockReady.wait();
+                }
+                synchronized(lockExpected) {
+                    while (nValuesExpected == 0) {
+                        lockExpected.wait();
+                    }
+                    synchronized(lockReady) {
+                        if (nValuesReady > 0) {
+                            lockExpected.notify();
+                        } else {
+                            nValuesExpected--;
+                            return;
+                        }
+                    }
+                }
+            }
         }
-        boolean waitForExpectationBoundedTime() throws InterruptedException {
-            return currentValueExpectations.tryAcquire(idleTimeoutMillis, TimeUnit.MILLISECONDS);
+
+        boolean waitForExpectationWhenReady(long timeout, TimeUnit unit) throws InterruptedException {
+            long deadline = System.currentTimeMillis() + unit.toMillis(timeout);
+            synchronized(lockExpected) {
+                synchronized(lockReady) {
+                    nValuesReady++;
+                }
+                try {
+                    while (nValuesExpected == 0) {
+                        long time = System.currentTimeMillis();
+                        if (time >= deadline)
+                            break;
+                        lockExpected.wait(deadline - time);
+                    }
+                    if (nValuesExpected == 0)
+                        return false;
+                    else {
+                        nValuesExpected--;
+                        return true;
+                    }
+                } finally {
+                    synchronized(lockReady) {
+                        nValuesReady--;
+                        if (nValuesReady == 0)
+                            lockReady.notifyAll();
+                    }
+                }
+            }
         }
+        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
+                            justification = "Really want to wake single thread only")
         void expect() {
-            currentValueExpectations.release();
+            synchronized(lockExpected) {
+                nValuesExpected++;
+                lockExpected.notify();
+            }
         }
         void putElement(Element<T> queueElement) throws InterruptedException {
             availableValues.put(queueElement);
