@@ -40,7 +40,6 @@ public class Throwables {
     public static String render(Throwable exception) {
         StringWriter message = new StringWriter();
         PrintWriter writer = new PrintWriter(message);
-        writer.append(exception.toString()).append(":\n");
         exception.printStackTrace(writer);
         writer.flush();
         return message.toString();
