@@ -70,7 +70,7 @@ public class FilerCodeWriter extends AbstractCodeWriter {
      * @param messager is only used for error reporting
      */
     public FilerCodeWriter(Filer filer, Messager messager) {
-        super(Charset.defaultCharset());
+        super(Charset.defaultCharset(), System.lineSeparator());
         this.filer = filer;
         this.messager = messager;
     }
