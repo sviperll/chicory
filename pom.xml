@@ -55,7 +55,7 @@
         </developer>
     </developers>
     <properties>
-        <parent.profile.activate>!java6,!pitest-report,java7,nexus-deploy</parent.profile.activate>
+        <parent.profile.activate>!java6,!pitest-report,!java7,java8,nexus-deploy</parent.profile.activate>
         <netbeans.hint.license>BSD3</netbeans.hint.license>
         <project.properties.file>project.properties</project.properties.file>
     </properties>
