@@ -13,7 +13,7 @@ Use maven dependency:
     <dependency>
         <groupId>com.github.sviperll</groupId>
         <artifactId>chicory-time</artifactId>
-        <version>0.35</version>
+        <version>0.36</version>
     </dependency>
 ```
 
