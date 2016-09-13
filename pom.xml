@@ -7,7 +7,7 @@
     </parent>
     <groupId>com.github.sviperll</groupId>
     <artifactId>chicory-maven-parent</artifactId>
-    <version>0.36</version>
+    <version>0.36-successor-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.com/sviperll/chicory</url>
     <name>chicory-maven-parent</name>
@@ -38,7 +38,7 @@
         <connection>scm:git:git://github.com/sviperll/chicory.git</connection>
         <developerConnection>scm:git:git@github.com:sviperll/chicory.git</developerConnection>
         <url>https://github.com/sviperll/chicory</url>
-        <tag>chicory-0.36</tag>
+        <tag>HEAD</tag>
     </scm>
     <licenses>
         <license>
