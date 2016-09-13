@@ -78,7 +78,7 @@ public class TruncatedInputStream extends InputStream {
             return -1;
         else {
             int res = is.read();
-            if (res > 0)
+            if (res >= 0)
                 remained--;
             return res;
         }
