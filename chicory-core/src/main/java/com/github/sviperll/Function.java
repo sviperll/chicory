@@ -48,14 +48,11 @@ public class Function<T, R> implements Applicable<T, R> {
         return ID;
     }
 
-    @SuppressWarnings({"unchecked"})
-    public static <T, R> Function<T, R> of(Applicable<? super T, R> function) {
+    public static <T, R> Function<T, R> of(Applicable<T, R> function) {
         if (function instanceof Function) {
-            // Applicable is covariant in it's first argument
-            // so this cast is safe
             return (Function<T, R>)function;
         } else
-            return new Function<T, R>(function);
+            return new Function<>(function);
     }
 
     private final Applicable<? super T, R> function;
@@ -69,19 +66,19 @@ public class Function<T, R> implements Applicable<T, R> {
     }
 
     public <U> Function<U, R> composeWith(Applicable<U, ? extends T> thatFunction) {
-        return new Function<U, R>(new ComposedApplicable<U, T, R>(this.function, thatFunction));
+        return new Function<>(new ComposedApplicable<>(this.function, thatFunction));
     }
 
     public <U> Function<T, U> andThen(Applicable<? super R, U> thatFunction) {
-        return new Function<T, U>(new ComposedApplicable<T, R, U>(thatFunction, this.function));
+        return new Function<>(new ComposedApplicable<>(thatFunction, this.function));
     }
 
     public Function<T, R> passNullThrough() {
-        return new Function<T, R>(new PassingNullThroughApplicable<T, R>(function));
+        return new Function<>(new PassingNullThroughApplicable<>(function));
     }
 
     public Function<T, R> throwOnNull() {
-        return new Function<T, R>(new ThrowingOnNullApplicable<T, R>(function));
+        return new Function<>(new ThrowingOnNullApplicable<>(function));
     }
 
     private static class IdApplicable<R, T extends R> implements Applicable<T, R> {
@@ -92,9 +89,9 @@ public class Function<T, R> implements Applicable<T, R> {
     }
 
     private static class ComposedApplicable<T, Q, R> implements Applicable<T, R> {
-        private final Applicable<? super Q, ? extends R> f;
-        private final Applicable<? super T, ? extends Q> g;
-        ComposedApplicable(Applicable<? super Q, ? extends R> f, Applicable<? super T, ? extends Q> g) {
+        private final Applicable<? super Q, R> f;
+        private final Applicable<T, Q> g;
+        ComposedApplicable(Applicable<? super Q, R> f, Applicable<T, Q> g) {
             this.f = f;
             this.g = g;
         }

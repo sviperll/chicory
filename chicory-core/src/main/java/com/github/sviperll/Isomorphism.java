@@ -57,7 +57,7 @@ public class Isomorphism<T, U> implements IsomorphismDefinition<T, U> {
         if (isomorphism instanceof Isomorphism)
             return (Isomorphism<T, U>)isomorphism;
         else
-            return new Isomorphism<T, U>(isomorphism);
+            return new Isomorphism<>(isomorphism);
     }
 
     private final IsomorphismDefinition<T, U> isomorphism;

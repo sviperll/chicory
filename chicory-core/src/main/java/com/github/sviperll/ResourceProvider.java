@@ -61,16 +61,15 @@ public class ResourceProvider<T> implements ResourceProviderDefinition<T> {
         });
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> ResourceProvider<T> of(ResourceProviderDefinition<? extends T> source) {
+    public static <T> ResourceProvider<T> of(ResourceProviderDefinition<T> source) {
         if (source instanceof ResourceProvider)
             return (ResourceProvider<T>)source;
         else
-            return new ResourceProvider<T>(source);
+            return new ResourceProvider<>(source);
     }
 
-    private final ResourceProviderDefinition<? extends T> source;
-    private ResourceProvider(ResourceProviderDefinition<? extends T> source) {
+    private final ResourceProviderDefinition<T> source;
+    private ResourceProvider(ResourceProviderDefinition<T> source) {
         this.source = source;
     }
 
@@ -80,16 +79,10 @@ public class ResourceProvider<T> implements ResourceProviderDefinition<T> {
     }
 
     public <U> ResourceProvider<U> map(final Applicable<? super T, U> function) {
-        return ResourceProvider.of(new ResourceProviderDefinition<U>() {
-            @Override
-            public void provideResourceTo(final Consumer<? super U> consumer) throws InterruptedException {
-                source.provideResourceTo(new Consumer<T>() {
-                    @Override
-                    public void accept(T value) {
-                        consumer.accept(function.apply(value));
-                    }
-                });
-            }
+        return ResourceProvider.of((Consumer<? super U> consumer) -> {
+            source.provideResourceTo((T value) -> {
+                consumer.accept(function.apply(value));
+            });
         });
     }
     public <U> ResourceProvider<U> flatMap(final Applicable<? super T, ? extends ResourceProviderDefinition<? extends U>> function) {

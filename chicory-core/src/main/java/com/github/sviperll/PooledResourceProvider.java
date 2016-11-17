@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Victor Nazarov &lt;asviraspossible@gmail.com&gt;
+ * Copyright (c) 2016, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -30,228 +30,149 @@
 
 package com.github.sviperll;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
+ * @param <T>
  */
-@ParametersAreNonnullByDefault
 public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> {
-    public static <T> ResourceProvider<T> createInstance(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int poolSize) {
-        Executor executor = Executors.newFixedThreadPool(poolSize, new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r);
-                thread.setName(PooledResourceProvider.class.getName() + "-pool-thread");
-                thread.setDaemon(true);
-                return thread;
-            }
-        });
-        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<T>(provider, new Queue<T>(), maxIdleTimeMillis);
-        for (int i = 0; i < poolSize; i++) {
-            executor.execute(pooledResourceProvider.createThreadRunnable());
-        }
+    public static <T> ResourceProvider<T> createInstance(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int maxOpened) {
+        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<>(provider, maxIdleTimeMillis, maxOpened);
         return ResourceProvider.of(pooledResourceProvider);
     }
 
     private final ResourceProviderDefinition<T> provider;
-    private final Queue<T> queue;
     private final long maxIdleTimeMillis;
+    private final BlockingQueue<Consumable<T>> queue = new SynchronousQueue<>();
+    private final Semaphore threads;
 
-    private PooledResourceProvider(ResourceProviderDefinition<T> provider, Queue<T> queue, long maxIdleTimeMillis) {
+    private PooledResourceProvider(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int maxOpened) {
         this.provider = provider;
-        this.queue = queue;
         this.maxIdleTimeMillis = maxIdleTimeMillis;
+        this.threads = new Semaphore(maxOpened);
     }
 
     @Override
     public void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException {
-        queue.expect();
-        queue.takeValueAndPassTo(consumer);
+        try (Consumable<T> entry = openConsumable()) {
+            consumer.accept(entry.value());
+        }
     }
 
-    @Nonnull
-    private Runnable createThreadRunnable() {
-        return new ThreadRunnable();
+    private Consumable<T> openConsumable() throws InterruptedException {
+        Consumable<T> entry = queue.poll();
+        while (entry == null) {
+            if (threads.tryAcquire()) {
+                Thread thread = new Thread(new ConsumableCreator());
+                thread.start();
+            }
+            entry = queue.poll(5, TimeUnit.SECONDS);
+        }
+        return entry;
     }
 
-    private class ThreadRunnable implements Runnable, Consumer<T> {
-        private final Semaphore semaphore = new Semaphore(1);
-        boolean isExpected = true;
-
+    private class ConsumableCreator implements Runnable {
         @Override
         public void run() {
-            for (;;) {
-                try {
-                    queue.waitForExpectationWhenNotReady();
-                    isExpected = true;
-                    while (isExpected) {
-                        try {
-                            provider.provideResourceTo(this);
-                        } catch (InterruptedException ex) {
-                        } catch (RuntimeException ex) {
-                            try {
-                                queue.putElement(new ExceptionElement(ex));
-                                isExpected = false;
-                            } catch (InterruptedException ex1) {
-                            }
-                        }
-                    }
-                } catch (InterruptedException ex) {
+            try {
+                provider.provideResourceTo(this::processValue);
+            } catch (RuntimeException ex) {
+                NotAllocatedWithException notAllocated = new NotAllocatedWithException(ex);
+                notAllocated.run();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            } finally {
+                threads.release();
+            }
+        }
+
+        private void processValue(T value) {
+            Allocated entry = new Allocated(value);
+            try {
+                entry.run();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    private static abstract class Consumable<T> implements AutoCloseable {
+        private Consumable() {
+        }
+        
+        abstract T value();
+
+        @Override
+        abstract public void close();
+
+        abstract void run() throws InterruptedException;
+    }
+
+    private class NotAllocatedWithException extends Consumable<T> {
+
+        private final RuntimeException exception;
+
+        NotAllocatedWithException(RuntimeException exception) {
+            this.exception = exception;
+        }
+
+        @Override
+        T value() {
+            throw exception;
+        }
+
+        @Override
+        public void close() {
+        }
+
+        @Override
+        void run() {
+            while (queue.offer(this))
+                ;
+        }
+    }
+
+    private class Allocated extends Consumable<T> {
+        private final T value;
+        private boolean isUsed = false;
+        private final Object lock = new Object();
+        Allocated(T value) {
+            this.value = value;
+
+        }
+
+        @Override
+        public void close() {
+            synchronized(lock) {
+                if (isUsed) {
+                    isUsed = false;
+                    lock.notifyAll();
                 }
             }
         }
 
         @Override
-        public void accept(T value) {
-            ValueElement element = new ValueElement(value);
-            try {
-                semaphore.acquire();
-                try {
-                    while (isExpected) {
-                        queue.putElement(element);
-                        isExpected = false;
-                        semaphore.acquire();
-                        isExpected = queue.waitForExpectationWhenReady(maxIdleTimeMillis, TimeUnit.MILLISECONDS);
-                    }
-                } finally {
-                    semaphore.release();
-                }
-            } catch (InterruptedException ex) {
-            }
-        }
-
-        private class ValueElement extends Queue.Element<T> {
-            private final T value;
-            ValueElement(T value) {
-                this.value = value;
-            }
-
-            @Nonnull
-            @Override
-            T value() {
-                return value;
-            }
-
-            @Override
-            void release() {
-                semaphore.release();
-            }
-        }
-        private class ExceptionElement extends Queue.Element<T> {
-            private final RuntimeException exception;
-            ExceptionElement(RuntimeException exception) {
-                this.exception = exception;
-            }
-
-            @Nonnull
-            @Override
-            T value() {
-                throw exception;
-            }
-
-            @Override
-            void release() {
-            }
-        }
-    }
-
-    private static class Queue<T> {
-        private final Object lockReady = new Object();
-        private final Object lockExpected = new Object();
-        private BlockingQueue<Element<T>> availableValues = new SynchronousQueue<Element<T>>();
-        private int nValuesExpected = 0;
-        private int nValuesReady = 0;
-
-        Queue() {
-        }
-
-        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                            justification = "Really want to wake single thread only")
-        void waitForExpectationWhenNotReady() throws InterruptedException {
+        synchronized void run() throws InterruptedException {
             for (;;) {
-                synchronized(lockReady) {
-                    while (nValuesReady > 0)
-                        lockReady.wait();
+                synchronized(lock) {
+                    while (isUsed)
+                        lock.wait();
+                    isUsed = true;
                 }
-                synchronized(lockExpected) {
-                    while (nValuesExpected == 0) {
-                        lockExpected.wait();
-                    }
-                    synchronized(lockReady) {
-                        if (nValuesReady > 0) {
-                            lockExpected.notify();
-                        } else {
-                            nValuesExpected--;
-                            return;
-                        }
-                    }
-                }
+                boolean consumed = queue.offer(this, maxIdleTimeMillis, TimeUnit.MILLISECONDS);
+                if (!consumed)
+                    break;
             }
         }
 
-        boolean waitForExpectationWhenReady(long timeout, TimeUnit unit) throws InterruptedException {
-            long deadline = System.currentTimeMillis() + unit.toMillis(timeout);
-            synchronized(lockExpected) {
-                synchronized(lockReady) {
-                    nValuesReady++;
-                }
-                try {
-                    while (nValuesExpected == 0) {
-                        long time = System.currentTimeMillis();
-                        if (time >= deadline)
-                            break;
-                        lockExpected.wait(deadline - time);
-                    }
-                    if (nValuesExpected == 0)
-                        return false;
-                    else {
-                        nValuesExpected--;
-                        return true;
-                    }
-                } finally {
-                    synchronized(lockReady) {
-                        nValuesReady--;
-                        if (nValuesReady == 0)
-                            lockReady.notifyAll();
-                    }
-                }
-            }
-        }
-        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                            justification = "Really want to wake single thread only")
-        void expect() {
-            synchronized(lockExpected) {
-                nValuesExpected++;
-                lockExpected.notify();
-            }
-        }
-        void putElement(Element<T> queueElement) throws InterruptedException {
-            availableValues.put(queueElement);
-        }
-        void takeValueAndPassTo(Consumer<? super T> consumer) throws InterruptedException {
-            Element<T> value = availableValues.take();
-            try {
-                consumer.accept(value.value());
-            } finally {
-                value.release();
-            }
-        }
-
-        private static abstract class Element<T> {
-            @Nonnull
-            abstract T value();
-            abstract void release();
+        @Override
+        T value() {
+            return value;
         }
     }
 }

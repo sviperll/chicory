@@ -60,21 +60,21 @@ public class Files {
                 } finally {
                     try {
                         reader.close();
-                    } catch (Exception ex) {
+                    } catch (RuntimeException|IOException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
                 }
             } finally {
                 try {
                     streamReader.close();
-                } catch (Exception ex) {
+                } catch (RuntimeException|IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
         } finally {
             try {
                 stream.close();
-            } catch (Exception ex) {
+            } catch (RuntimeException|IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
@@ -95,21 +95,21 @@ public class Files {
                 } finally {
                     try {
                         writer.close();
-                    } catch (Exception ex) {
+                    } catch (RuntimeException|IOException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
                 }
             } finally {
                 try {
                     outputStream.close();
-                } catch (Exception ex) {
+                } catch (RuntimeException|IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
         } finally {
             try {
                 outputStream.close();
-            } catch (Exception ex) {
+            } catch (RuntimeException|IOException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
         }
