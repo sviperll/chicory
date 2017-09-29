@@ -43,20 +43,6 @@ public class ObjectsTest {
     }
 
     @Test
-    public void testHashCode() {
-        assertTrue(Objects.hashCode(1, 2, 3) != Objects.hashCode(2, 2, 3));
-        assertTrue(Objects.hashCode(1, 2, 3) != Objects.hashCode(1, 3, 3));
-        assertTrue(Objects.hashCode(1, 2, 3) != Objects.hashCode(1, 2, 4));
-    }
-
-    @Test
-    public void testHashCodeWithNull() {
-        assertTrue(Objects.hashCode(1, 2, 3) != Objects.hashCode(null, 2, 3));
-        assertTrue(Objects.hashCode(1, 2, 3) != Objects.hashCode(1, null, 3));
-        assertTrue(Objects.hashCode(1, 2, 3) != Objects.hashCode(1, 2, null));
-    }
-
-    @Test
     public void testObjectsEqualityWithNulls() {
         assertTrue(Objects.equals(null, null));
     }

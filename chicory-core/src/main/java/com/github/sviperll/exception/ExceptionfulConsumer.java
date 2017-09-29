@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, vir
+ * Copyright (c) 2017, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -27,27 +27,14 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll;
 
-import java.text.MessageFormat;
-
+package com.github.sviperll.exception;
 
 /**
  *
- * @author vir
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-@SuppressWarnings("serial")
-public class RuntimeInterruptedException extends RuntimeException {
-    public RuntimeInterruptedException(InterruptedException cause) {
-        super(cause);
-    }
-
-    @Override
-    public InterruptedException getCause() {
-        Throwable cause = super.getCause();
-        if (cause instanceof InterruptedException)
-            return (InterruptedException)cause;
-        else
-            throw new IllegalStateException(MessageFormat.format("Cause should always be {0} for {1}, but {2} found", InterruptedException.class.getName(), RuntimeInterruptedException.class.getName(), cause));
-    }
+@FunctionalInterface
+public interface ExceptionfulConsumer<T, X extends Throwable> {
+    void accept(T value) throws X;
 }

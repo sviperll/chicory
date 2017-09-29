@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Victor Nazarov <asviraspossible@gmail.com>
+ * Copyright (c) 2013, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,14 +24,28 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll;
 
-public interface TypeStructure3<T, U, V, W> {
-    U getField1(T instance);
+package com.github.sviperll.concurrent;
 
-    V getField2(T instance);
+import java.text.MessageFormat;
+import java.util.concurrent.TimeoutException;
 
-    W getField3(T instance);
+@SuppressWarnings("serial")
+public class UncheckedTimeoutException extends RuntimeException {
+    public UncheckedTimeoutException(String message) {
+        this(new TimeoutException(message));
+    }
 
-    T createValue(U field1, V field2, W field3);
+    public UncheckedTimeoutException(TimeoutException cause) {
+        super(cause);
+    }
+
+    @Override
+    public TimeoutException getCause() {
+        Throwable cause = super.getCause();
+        if (cause instanceof TimeoutException)
+            return (TimeoutException)cause;
+        else
+            throw new IllegalStateException(MessageFormat.format("Cause should always be {0} for {1}, but {2} found", TimeoutException.class.getName(), UncheckedTimeoutException.class.getName(), cause));
+    }
 }

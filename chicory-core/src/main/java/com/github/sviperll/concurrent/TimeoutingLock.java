@@ -53,25 +53,22 @@ public class TimeoutingLock implements Lock {
     }
 
     @Override
-    public void lock() throws RuntimeTimeoutException {
+    public void lock() throws UncheckedTimeoutException {
         for (;;) {
             try {
                 lockInterruptibly();
                 return;
             } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
             }
         }
     }
 
     @Override
-    public void lockInterruptibly() throws RuntimeTimeoutException, InterruptedException {
-        try {
-            boolean success = lock.tryLock(time, unit);
-            if (!success)
-                throw new TimeoutException("Lock timeouted");
-        } catch (TimeoutException ex) {
-            throw new RuntimeTimeoutException("Lock timouting in TimeoutingLock", ex);
-        }
+    public void lockInterruptibly() throws UncheckedTimeoutException, InterruptedException {
+        boolean success = lock.tryLock(time, unit);
+        if (!success)
+            throw new UncheckedTimeoutException("Lock timeouted");
     }
 
     @Override
@@ -85,7 +82,7 @@ public class TimeoutingLock implements Lock {
     }
 
     @Override
-    public void unlock() throws RuntimeTimeoutException {
+    public void unlock() throws UncheckedTimeoutException {
         lock.unlock();
     }
 

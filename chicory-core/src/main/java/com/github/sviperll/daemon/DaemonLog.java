@@ -26,8 +26,6 @@
  */
 package com.github.sviperll.daemon;
 
-import com.github.sviperll.Applicable;
-import com.github.sviperll.Consumer;
 import com.github.sviperll.ResourceProvider;
 import com.github.sviperll.ResourceProviderDefinition;
 import com.github.sviperll.environment.HUPReopeningFileOutputStream;
@@ -36,17 +34,25 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class DaemonLog {
-    private static final DaemonLog STANDARD_OUT = new DaemonLog(ResourceProvider.forExisting(System.out).flatMap(FlushingLoggingFactory.INSTANCE), false, false);
-    private static final DaemonLog STANDARD_ERR = new DaemonLog(ResourceProvider.forExisting(System.err).flatMap(FlushingLoggingFactory.INSTANCE), false, false);
+    private static final DaemonLog STANDARD_OUT =
+            new DaemonLog(
+                    ResourceProvider.forExisting(System.out).flatMap(DaemonLog::createFlushingHandler),
+                    false,
+                    false);
+    private static final DaemonLog STANDARD_ERR =
+            new DaemonLog(
+                    ResourceProvider.forExisting(System.err).flatMap(DaemonLog::createFlushingHandler),
+                    false,
+                    false);
 
     public static DaemonLog standardOut() {
         return STANDARD_OUT;
@@ -57,10 +63,14 @@ public class DaemonLog {
     }
 
     public static DaemonLog createInstance(File file) {
-        return createInstance(file, FlushingLoggingFactory.INSTANCE);
+        return createInstance(file, DaemonLog::createFlushingHandler);
     }
 
-    public static DaemonLog createInstance(File file, Applicable<? super OutputStream, ? extends ResourceProviderDefinition<? extends Handler>> loggingHandlerFactory) {
+    private static ResourceProvider<Handler> createFlushingHandler(OutputStream stream) {
+        return ResourceProvider.of(new FlushingHandlerResourceProvider(stream));
+    }
+
+    public static DaemonLog createInstance(File file, Function<? super OutputStream, ? extends ResourceProviderDefinition<? extends Handler>> loggingHandlerFactory) {
         ResourceProvider<OutputStream> streamProvider = ResourceProvider.of(new LogFileStreamProvider(file));
         ResourceProvider<? extends Handler> handlerProvider = streamProvider.flatMap(loggingHandlerFactory);
         return new DaemonLog(handlerProvider, true, true);
@@ -87,60 +97,37 @@ public class DaemonLog {
         return closesStandardErr;
     }
 
-    private static class FlushingLoggingFactory implements Applicable<OutputStream, ResourceProvider<Handler>> {
-        public static final Applicable<OutputStream, ResourceProvider<Handler>> INSTANCE = new FlushingLoggingFactory();
-        @Override
-        public ResourceProvider<Handler> apply(final OutputStream stream) {
-            return ResourceProvider.of(new FlushingHandlerResourceProvider(stream));
+    private static class FlushingHandlerResourceProvider implements ResourceProviderDefinition<Handler> {
+
+        private final OutputStream stream;
+
+        FlushingHandlerResourceProvider(OutputStream stream) {
+            this.stream = stream;
         }
 
-        private static class FlushingHandlerResourceProvider implements ResourceProviderDefinition<Handler> {
-
-            private final OutputStream stream;
-
-            FlushingHandlerResourceProvider(OutputStream stream) {
-                this.stream = stream;
-            }
-
-            @Override
-            public void provideResourceTo(Consumer<? super Handler> consumer) {
-                Handler handler = Handlers.createFlushingHandler(stream);
-                try {
-                    consumer.accept(handler);
-                } finally {
-                    handler.close();
-                }
+        @Override
+        public void provideResourceTo(Consumer<? super Handler> consumer) {
+            Handler handler = Handlers.createFlushingHandler(stream);
+            try {
+                consumer.accept(handler);
+            } finally {
+                handler.close();
             }
         }
     }
-
     private static class LogFileStreamProvider implements ResourceProviderDefinition<OutputStream> {
         private final File file;
+
         LogFileStreamProvider(File file) {
             this.file = file;
         }
+
         @Override
         public void provideResourceTo(Consumer<? super OutputStream> consumer) {
-            try {
-                OutputStream stream = new HUPReopeningFileOutputStream(file);
-                try {
-                    BufferedOutputStream bufferedStream = new BufferedOutputStream(stream);
-                    try {
-                        consumer.accept(bufferedStream);
-                    } finally {
-                        try {
-                            bufferedStream.close();
-                        } catch (Exception ex) {
-                            Logger.getLogger(LogFileStreamProvider.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                } finally {
-                    try {
-                        stream.close();
-                    } catch (Exception ex) {
-                        Logger.getLogger(LogFileStreamProvider.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+            try (OutputStream stream = new HUPReopeningFileOutputStream(file);
+                    BufferedOutputStream bufferedStream = new BufferedOutputStream(stream)) {
+
+                consumer.accept(bufferedStream);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

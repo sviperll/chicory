@@ -26,7 +26,6 @@
  */
 package com.github.sviperll.daemon;
 
-import com.github.sviperll.RuntimeIOException;
 import com.github.sviperll.environment.JVM;
 import com.github.sviperll.environment.SignalWaiter;
 import com.github.sviperll.io.Charsets;
@@ -34,6 +33,7 @@ import com.github.sviperll.io.Files;
 import com.github.sviperll.logging.Loggers;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /**
  *
@@ -97,13 +97,13 @@ public class Daemon {
                     }
                     runnable.run();
                 } catch (IOException ex) {
-                    throw new RuntimeIOException(ex);
+                    throw new UncheckedIOException(ex);
                 }
             }
         };
         try {
             Loggers.withRootHandler(log.handlerProvider(), startingRunnable);
-        } catch (RuntimeIOException ex) {
+        } catch (UncheckedIOException ex) {
             throw ex.getCause();
         } catch (InterruptedException ex) {
             throw new IOException(ex);

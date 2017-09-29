@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Victor Nazarov &lt;asviraspossible@gmail.com&gt;
+ * Copyright (c) 2017, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,22 +28,21 @@
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.sviperll.collection;
+package com.github.sviperll.collection.snapshotable;
 
-import com.github.sviperll.collection.snapshotable.ImmutableCollectors;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collector;
-import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-@ParametersAreNonnullByDefault
-public class CCollectors {
+public class ImmutableCollectors {
     public static <T> Collector<T, ?, List<? extends T>> toImmutableList() {
-        return ImmutableCollectors.toImmutableList();
+        return Collectors.collectingAndThen(Collectors.toList(), l -> UnsafeReferenceOwnership.unmodifiableWrapperForListWithNoOtherReferencesAnywhere(Collections.unmodifiableList(l)));
     }
-    private CCollectors() {
+    private ImmutableCollectors() {
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, vir
+ * Copyright (c) 2017, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -27,27 +27,14 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll;
 
-import java.io.IOException;
-import java.text.MessageFormat;
+package com.github.sviperll.exception;
 
 /**
  *
- * @author vir
+ * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-@SuppressWarnings("serial")
-public class RuntimeIOException extends RuntimeException {
-    public RuntimeIOException(IOException exception) {
-        super(exception);
-    }
-    
-    @Override
-    public IOException getCause() {
-        Throwable cause = super.getCause();
-        if (cause instanceof IOException)
-            return (IOException)cause;
-        else
-            throw new IllegalStateException(MessageFormat.format("Cause should always be {0} for {1}, but {2} found", IOException.class.getName(), RuntimeIOException.class.getName(), cause));
-    }
+@FunctionalInterface
+public interface ExceptionfulRunnable<X extends Throwable> {
+    void run() throws X;
 }

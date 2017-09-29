@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Victor Nazarov <asviraspossible@gmail.com>
+ * Copyright (c) 2017, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -27,24 +27,27 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.sviperll;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+package com.github.sviperll.collection.snapshotable;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- *
+ * It is known to be the only reference.
+ * 
+ * It is known to be the only object alias,
+ * no other references exists to this object.
+ * <p>
+ * Object can be modified from current thread from this reference only.
+ * <p>
+ * Compiler can not infer this, so it's a programmer duty to guarantee above properties.
+ * 
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-public class Throwables {
-    public static String render(Throwable exception) {
-        StringWriter message = new StringWriter();
-        PrintWriter writer = new PrintWriter(message);
-        exception.printStackTrace(writer);
-        writer.flush();
-        return message.toString();
-    }
-
-    private Throwables() {
-    }
+@Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.METHOD, ElementType.PARAMETER})
+public @interface OnlyReference {
 }

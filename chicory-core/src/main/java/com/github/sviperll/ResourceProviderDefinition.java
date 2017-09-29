@@ -26,10 +26,12 @@
  */
 package com.github.sviperll;
 
+import java.util.function.Consumer;
+
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public interface ResourceProviderDefinition<T> {
-    void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException;
+    void provideResourceTo(Consumer<? super T> consumer);
 }

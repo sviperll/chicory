@@ -26,38 +26,24 @@
  */
 package com.github.sviperll;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 public class ResourceProvider<T> implements ResourceProviderDefinition<T> {
     public static <T> ResourceProvider<T> forExisting(final T resource) {
-        return ResourceProvider.of(new ResourceProviderDefinition<T>() {
-            @Override
-            public void provideResourceTo(Consumer<? super T> consumer) {
-                consumer.accept(resource);
-            }
+        return ResourceProvider.of((Consumer<? super T> consumer) -> {
+            consumer.accept(resource);
         });
     }
     public static <T> ResourceProvider<T> flatten(final ResourceProviderDefinition<? extends ResourceProviderDefinition<? extends T>> provider) {
-        return ResourceProvider.of(new ResourceProviderDefinition<T>() {
-            @Override
-            public void provideResourceTo(final Consumer<? super T> consumer) throws InterruptedException {
-                try {
-                    provider.provideResourceTo(new Consumer<ResourceProviderDefinition<? extends T>>() {
-                        @Override
-                        public void accept(ResourceProviderDefinition<? extends T> innerProvider) {
-                            try {
-                                innerProvider.provideResourceTo(consumer);
-                            } catch (InterruptedException ex) {
-                                throw new RuntimeInterruptedException(ex);
-                            }
-                        }
-                    });
-                } catch (RuntimeInterruptedException ex) {
-                    throw ex.getCause();
-                }
-            }
+        return ResourceProvider.of((Consumer<? super T> consumer) -> {
+            provider.provideResourceTo((ResourceProviderDefinition<? extends T> innerProvider) -> {
+                innerProvider.provideResourceTo(consumer);
+            });
         });
     }
 
@@ -74,18 +60,18 @@ public class ResourceProvider<T> implements ResourceProviderDefinition<T> {
     }
 
     @Override
-    public void provideResourceTo(Consumer<? super T> consumer) throws InterruptedException {
+    public void provideResourceTo(Consumer<? super T> consumer) {
         source.provideResourceTo(consumer);
     }
 
-    public <U> ResourceProvider<U> map(final Applicable<? super T, U> function) {
+    public <U> ResourceProvider<U> map(Function<? super T, U> function) {
         return ResourceProvider.of((Consumer<? super U> consumer) -> {
             source.provideResourceTo((T value) -> {
                 consumer.accept(function.apply(value));
             });
         });
     }
-    public <U> ResourceProvider<U> flatMap(final Applicable<? super T, ? extends ResourceProviderDefinition<? extends U>> function) {
+    public <U> ResourceProvider<U> flatMap(Function<? super T, ? extends ResourceProviderDefinition<? extends U>> function) {
         return flatten(map(function));
     }
 }

@@ -52,17 +52,6 @@ public class Objects {
         return ssb.toString();
     }
 
-    /** Computes hash code from given fields
-     * @param fields
-     * @return hash code from given fields
-     */
-    public static int hashCode(Object... fields) {
-        int hash = 7;
-        for (Object field: fields)
-            hash = 73 * hash + (field == null ? 0 : field.hashCode());
-        return hash;
-    }
-
     public static boolean equals(int a, int b) {
         return a == b;
     }

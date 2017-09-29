@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Victor Nazarov &lt;asviraspossible@gmail.com&gt;
+ * Copyright (c) 2017, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,22 +28,26 @@
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.sviperll.collection;
+package com.github.sviperll.collection.snapshotable;
 
-import com.github.sviperll.collection.snapshotable.ImmutableCollectors;
-import java.util.List;
-import java.util.stream.Collector;
-import javax.annotation.ParametersAreNonnullByDefault;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- *
+ * Specify that parameter takes ownership over object.
+ * 
+ * Object should not be referenced or modified through any other references
+ * after passing it as an argument to method when
+ * parameter is annotated with this annotation.
+ * <p>
+ * Compiler can not force this, so it's a programmer duty to guarantee above properties.
+ * 
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
- */
-@ParametersAreNonnullByDefault
-public class CCollectors {
-    public static <T> Collector<T, ?, List<? extends T>> toImmutableList() {
-        return ImmutableCollectors.toImmutableList();
-    }
-    private CCollectors() {
-    }
+*/
+@Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.PARAMETER})
+public @interface TakesOwnership {
+
 }

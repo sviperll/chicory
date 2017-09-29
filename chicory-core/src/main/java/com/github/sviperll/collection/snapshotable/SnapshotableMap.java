@@ -28,11 +28,11 @@
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.sviperll.collection;
+package com.github.sviperll.collection.snapshotable;
 
+import com.github.sviperll.collection.MapFactory;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -41,19 +41,19 @@ import java.util.Set;
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
- class SnapshotableMap<K, V> extends AbstractMap<K, V> {
+ public class SnapshotableMap<K, V> extends AbstractMap<K, V> {
 
     private final MapFactory<K, V> factory;
     private Map<K, V> map;
     private Set<Entry<K, V>> entrySet = null;
     private boolean shouldCopyOnWrite = false;
 
-    SnapshotableMap(MapFactory<K, V> factory) {
+    public SnapshotableMap(MapFactory<K, V> factory) {
         this.factory = factory;
         map = factory.createInitialMap();
     }
 
-    SnapshotableMap(MapFactory<K, V> factory, Map<? extends K, ? extends V> m) {
+    public SnapshotableMap(MapFactory<K, V> factory, Map<? extends K, ? extends V> m) {
         this.factory = factory;
         map = factory.createCopyOf(m);
     }
@@ -61,7 +61,7 @@ import java.util.Set;
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     Map<? extends K, ? extends V> snapshot() {
         if (!shouldCopyOnWrite) {
-            map = Snapshot.markedAsKnownToBeImmutableMap(Collections.unmodifiableMap(map));
+            map = UnsafeReferenceOwnership.unmodifiableWrapperForMapWithNoOtherReferencesAnywhere(map);
             entrySet = null;
             shouldCopyOnWrite = true;
         }

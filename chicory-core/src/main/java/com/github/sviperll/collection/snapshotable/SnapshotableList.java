@@ -28,37 +28,37 @@
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.sviperll.collection;
+package com.github.sviperll.collection.snapshotable;
 
+import com.github.sviperll.collection.ListFactory;
 import java.text.MessageFormat;
 import java.util.AbstractList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-class SnapshotableList<T> extends AbstractList<T> {
+public class SnapshotableList<T> extends AbstractList<T> {
 
     private List<T> list;
     private boolean shouldCopyOnWrite = false;
     private ListFactory<T> factory;
 
-    SnapshotableList(ListFactory<T> factory) {
+    public SnapshotableList(ListFactory<T> factory) {
         this.factory = factory;
         list = factory.createInitialList();
     }
 
-    SnapshotableList(ListFactory<T> factory, Collection<? extends T> c) {
+    public SnapshotableList(ListFactory<T> factory, Collection<? extends T> c) {
         list = factory.createCopyOf(c);
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     List<? extends T> snapshot() {
         if (!shouldCopyOnWrite) {
-            list = Snapshot.markedAsKnownToBeImmutableList(Collections.unmodifiableList(list));
+            list = UnsafeReferenceOwnership.unmodifiableWrapperForListWithNoOtherReferencesAnywhere(list);
             shouldCopyOnWrite = true;
         }
         return list;

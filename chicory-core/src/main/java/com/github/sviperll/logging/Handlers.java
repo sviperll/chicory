@@ -29,11 +29,14 @@
  */
 package com.github.sviperll.logging;
 
-import com.github.sviperll.DateFormats;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -50,8 +53,7 @@ import java.util.logging.StreamHandler;
 public class Handlers {
 
     public static java.util.logging.Formatter createDefaultFormatter() {
-        DateFormat dateFormat = DateFormats.ISO8601.createDateFormatInstance();
-        return new LoggingFormatter(dateFormat);
+        return new LoggingFormatter(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     public static java.util.logging.Handler createFlushingHandler(OutputStream stream) {
@@ -88,9 +90,9 @@ public class Handlers {
     }
 
     private static class LoggingFormatter extends java.util.logging.Formatter {
-        private final DateFormat dateFormat;
-        LoggingFormatter(DateFormat dateFormat) {
-            this.dateFormat = dateFormat;
+        private final DateTimeFormatter dateTimeFormatter;
+        LoggingFormatter(DateTimeFormatter dateTimeFormatter) {
+            this.dateTimeFormatter = dateTimeFormatter;
         }
 
         @Override
@@ -101,7 +103,9 @@ public class Handlers {
                 printWriter.append(record.getSourceClassName());
                 printWriter.append("\n");
             }
-            printWriter.append(dateFormat.format(record.getMillis()));
+            OffsetDateTime dateTime =
+                    Instant.ofEpochMilli(record.getMillis()).atZone(ZoneId.systemDefault()).toOffsetDateTime();
+            printWriter.append(dateTimeFormatter.format(dateTime));
             printWriter.append(" ");
             printWriter.append(record.getLevel().toString());
             if (record.getMessage() != null) {

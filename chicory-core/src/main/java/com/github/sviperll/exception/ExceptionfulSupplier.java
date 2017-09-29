@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Victor Nazarov &lt;asviraspossible@gmail.com&gt;
+ * Copyright (c) 2017, Victor Nazarov <asviraspossible@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,22 +28,13 @@
  *  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.github.sviperll.collection;
-
-import com.github.sviperll.collection.snapshotable.ImmutableCollectors;
-import java.util.List;
-import java.util.stream.Collector;
-import javax.annotation.ParametersAreNonnullByDefault;
+package com.github.sviperll.exception;
 
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-@ParametersAreNonnullByDefault
-public class CCollectors {
-    public static <T> Collector<T, ?, List<? extends T>> toImmutableList() {
-        return ImmutableCollectors.toImmutableList();
-    }
-    private CCollectors() {
-    }
+@FunctionalInterface
+public interface ExceptionfulSupplier<T, X extends Throwable> {
+    T get() throws X;
 }

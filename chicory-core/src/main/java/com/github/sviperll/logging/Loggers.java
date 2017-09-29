@@ -27,7 +27,6 @@
 
 package com.github.sviperll.logging;
 
-import com.github.sviperll.Consumer;
 import com.github.sviperll.ResourceProviderDefinition;
 import java.util.Arrays;
 import java.util.logging.Handler;
@@ -64,11 +63,8 @@ public class Loggers {
     }
 
     public static void withRootHandler(ResourceProviderDefinition<? extends Handler> source, final Runnable action) throws InterruptedException {
-        source.provideResourceTo(new Consumer<Handler>() {
-            @Override
-            public void accept(Handler handler) {
-                withRootHandler(handler, action);
-            }
+        source.provideResourceTo((Handler handler) -> {
+            withRootHandler(handler, action);
         });
     }
 
