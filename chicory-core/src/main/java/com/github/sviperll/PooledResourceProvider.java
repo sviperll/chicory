@@ -32,12 +32,10 @@ package com.github.sviperll;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.LongFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 /**
  *
@@ -49,113 +47,119 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
     private static final Logger logger = Logger.getLogger(PooledResourceProvider.class.getName());
 
     public static <T> ResourceProvider<T> createInstance(
-            ResourceProviderDefinition<T> provider,
+            int maxAllocated,
             long maxIdleTimeMillis,
-            int maxAllocated) {
+            ResourceProviderDefinition<T> provider) {
 
-        PooledResourceProvider<T> pooledResourceProvider = new PooledResourceProvider<>(provider, maxIdleTimeMillis, maxAllocated);
+        PooledResourceProvider<T> pooledResourceProvider =
+                new PooledResourceProvider<>(maxAllocated, () -> new Worker<>(provider, maxIdleTimeMillis));
         return ResourceProvider.of(pooledResourceProvider);
     }
 
-    private final ResourceProviderDefinition<T> provider;
-    private final long maxIdleTimeMillis;
-    private final int maxAllocated;
-    private final WorkerCollection<Worker> workers = new WorkerCollection<>();
+    private final Deque<Worker<T>> allocatedWorkers = new ArrayDeque<>();
+    private final Deque<Worker<T>> unallocatedWorkers = new ArrayDeque<>();
+    private final Object lock = new Object();
 
-    private PooledResourceProvider(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis, int maxAllocated) {
-        this.provider = provider;
-        this.maxIdleTimeMillis = maxIdleTimeMillis;
-        this.maxAllocated = maxAllocated;
+    private PooledResourceProvider(int maxAllocated, Supplier<Worker<T>> workerFactory) {
+        IntStream.range(0, maxAllocated).forEach(i -> unallocatedWorkers.push(workerFactory.get()));
     }
 
     @Override
     public void provideResourceTo(Consumer<? super T> consumer) {
-        Worker worker = null;
-        synchronized (workers) {
-            while (worker == null) {
-                worker = workers.poll();
-                if (worker == null) {
-                    if (workers.size() >= maxAllocated) {
-                        try {
-                            workers.wait();
-                        } catch (InterruptedException ex) {
-                            Thread.currentThread().interrupt();
-                        }
-                    } else {
-                        worker = workers.put(workerID -> new Worker(workerID));
-                        Thread thread = new Thread(worker);
-                        thread.start();
-                    }
+        Worker<T> worker = null;
+        synchronized (lock) {
+            for (;;) {
+                worker = allocatedWorkers.poll();
+                if (worker != null && !worker.isAllocated()) {
+                    unallocatedWorkers.push(worker);
+                    lock.notifyAll();
+                    continue;
+                }
+                if (worker == null)
+                    worker = unallocatedWorkers.poll();
+                if (worker != null)
+                    break;
+                try {
+                    lock.wait();
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
-        worker.provideResourceTo(consumer);
+        if (!worker.isAllocated()) {
+            Thread thread = new Thread(worker);
+            thread.start();
+        }
+        try {
+            worker.provideResourceTo(consumer);
+        } finally {
+            synchronized (lock) {
+                allocatedWorkers.add(worker);
+                lock.notifyAll();
+            }
+        }
     }
 
-    private class Worker implements Runnable {
+    private static class Worker<T> implements Runnable {
+        private final ResourceProviderDefinition<T> provider;
+        private final long maxIdleTimeMillis;
+        private WorkerState state = WorkerState.UNALLOCATED;
         private T value = null;
         private RuntimeException exception = null;
-        private WorkerState state = WorkerState.UNALLOCATED;
-        private final long workerID;
 
-        Worker(long workerID) {
-            this.workerID = workerID;
+        private Worker(ResourceProviderDefinition<T> provider, long maxIdleTimeMillis) {
+            this.provider = provider;
+            this.maxIdleTimeMillis = maxIdleTimeMillis;
         }
 
         @Override
         public void run() {
-            logger.log(Level.FINE, "[Worker {0}]: allocating resource", workerID);
+            logger.log(Level.FINE, "[Worker {0}]: allocating resource", this);
             try {
                 provider.provideResourceTo(this::withValue);
             } catch (RuntimeException ex) {
-                switchToError(ex);
+                synchronized (this) {
+                    logger.log(Level.FINE, "[Worker {0}]: switching to error state", this);
+                    exception = ex;
+                    switchToState(WorkerState.UNCONSUMED_ALLOCATION_ERROR);
+                }
             }
-            logger.log(Level.FINE, "[Worker {0}]: exiting", workerID);
+            logger.log(Level.FINE, "[Worker {0}]: exiting", this);
         }
 
         private synchronized void withValue(T value) {
-            logger.log(Level.FINE, "[Worker {0}]: resource allocating waiting for consumers", workerID);
-            switchToInitialized(value);
+            logger.log(Level.FINE, "[Worker {0}]: switching to allocated state: waiting for consumers", this);
+            this.value = value;
+            switchToState(WorkerState.UNCONSUMED);
 
             for (;;) {
-                sleepDuringActualJob();
-                waitMaximumIdleTime();
-                if (state == WorkerState.IDLE) {
-                    logger.log(Level.FINE, "[Worker {0}]: idle for too long: exiting", workerID);
-                    switchToUninitialized();
-                    workers.unregister(workerID);
-                    return;
+                sleepWhileConsumed();
+                waitMaximumUnconsumedTime();
+                if (state == WorkerState.UNCONSUMED) {
+                    logger.log(Level.FINE, "[Worker {0}]: idle for too long: exiting", this);
+                    switchToUnallocated();
+                    break;
                 }
             }
         }
 
-        private synchronized void switchToError(RuntimeException ex) {
-            logger.log(Level.FINE, "[Worker {0}]: switching to error state", workerID);
-            exception = ex;
-            switchToState(WorkerState.SHOULD_THROW);
-        }
 
         private synchronized void switchToState(WorkerState state) {
-            logger.log(Level.FINE, "[Worker {0}]: switching to {1} state", new Object[]{workerID, state});
+            logger.log(Level.FINE, "[Worker {0}]: switching to {1} state", new Object[]{this, state});
             this.state = state;
             notifyAll();
         }
-        
-        private synchronized void switchToInitialized(T value) {
-            logger.log(Level.FINE, "[Worker {0}]: switching to initialized state", workerID);
-            this.value = value;
-            switchToState(WorkerState.IDLE);
-        }
-        
-        private synchronized void switchToUninitialized() {
-            logger.log(Level.FINE, "[Worker {0}]: switching to uninitialized state", workerID);
+                
+        private synchronized void switchToUnallocated() {
+            logger.log(Level.FINE, "[Worker {0}]: switching to uninitialized state", this);
+            this.exception = null;
             this.value = null;
             switchToState(WorkerState.UNALLOCATED);
         }
 
-        private synchronized void sleepDuringActualJob() {
-            logger.log(Level.FINE, "[Worker {0}]: waiting for ready (IDLE or ERROR) state", workerID);
-            while (state != WorkerState.IDLE && state != WorkerState.SHOULD_THROW) {
+        private synchronized void sleepWhileConsumed() {
+            logger.log(Level.FINE, "[Worker {0}]: waiting for ready (IDLE or ERROR) state", this);
+            while (state != WorkerState.UNCONSUMED && state != WorkerState.UNCONSUMED_ALLOCATION_ERROR) {
                 try {
                     wait();
                 } catch (InterruptedException ex) {
@@ -164,13 +168,13 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
             }
         }
 
-        private synchronized void waitMaximumIdleTime() {
-            logger.log(Level.FINE, "[Worker {0}]: sleeping while idle until maxIdleTimeMillis", workerID);
+        private synchronized void waitMaximumUnconsumedTime() {
+            logger.log(Level.FINE, "[Worker {0}]: sleeping while idle until maxIdleTimeMillis", this);
             long startTime = System.currentTimeMillis();
             long endTime = startTime + maxIdleTimeMillis;
             long now = System.currentTimeMillis();
-            while (state == WorkerState.IDLE && now < endTime) {
-                logger.log(Level.FINE, "[Worker {0}]: sleeping for {1} ms", new Object[]{workerID, endTime - now});
+            while (state == WorkerState.UNCONSUMED && now < endTime) {
+                logger.log(Level.FINE, "[Worker {0}]: sleeping for {1} ms", new Object[]{this, endTime - now});
                 try {
                     wait(endTime - now);
                 } catch (InterruptedException ex) {
@@ -181,74 +185,35 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
         }
         
         void provideResourceTo(Consumer<? super T> consumer) {
-            logger.log(Level.FINE, "[Worker {0}]: consumer found: trying to provide resources", workerID);
+            logger.log(Level.FINE, "[Worker {0}]: consumer found: trying to provide resources", this);
             T initializedValue;
             synchronized(this) {
-                sleepDuringActualJob();
-                if (state == WorkerState.SHOULD_THROW) {
-                    logger.log(Level.FINE, "[Worker {0}]: error was found: throwing exception to client", workerID);
-                    workers.unregister(workerID);
+                sleepWhileConsumed();
+                if (state == WorkerState.UNCONSUMED_ALLOCATION_ERROR) {
+                    logger.log(Level.FINE, "[Worker {0}]: error was found: throwing exception to client", this);
+                    RuntimeException exception = this.exception;
+                    switchToUnallocated();
                     throw exception;
                 }
                 initializedValue = value;
-                switchToState(WorkerState.WORKING);
+                switchToState(WorkerState.CONSUMED);
             }
             try {
                 consumer.accept(initializedValue);
             } finally {
-                logger.log(Level.FINE, "[Worker {0}]: consumer finished: making thyself available for future requests", workerID);
+                logger.log(Level.FINE, "[Worker {0}]: consumer finished: making thyself available for future requests", this);
                 synchronized(this) {
-                    workers.enqueue(workerID);
-                    switchToState(WorkerState.IDLE);
+                    switchToState(WorkerState.UNCONSUMED);
                 }
             }
+        }
+
+        private synchronized boolean isAllocated() {
+            return state != WorkerState.UNALLOCATED;
         }
     }
 
     private enum WorkerState {
-        UNALLOCATED, IDLE, WORKING, SHOULD_THROW;
-    }
-
-    private static class WorkerCollection<W> {
-        private final Map<Long, W> workerMap = new HashMap<>();
-        private final Deque<Long> idleQueue = new ArrayDeque<>();
-        private long nextWorkerID = 1;
-
-        private synchronized W put(LongFunction<W> factory) {
-            long id = nextWorkerID++;
-            logger.log(Level.FINE, "[POOL]: allocating new worker: Worker {0}", id);
-            W worker = factory.apply(id);
-            workerMap.put(id, worker);
-            return worker;
-        }
-
-        private synchronized void unregister(long workerID) {
-            logger.log(Level.FINE, "[POOL]: removing worker: Worker {0}", workerID);
-            workerMap.remove(workerID);
-            notifyAll();
-        }
-
-        private synchronized void enqueue(long workerID) {
-            logger.log(Level.FINE, "[POOL]: making worker available for future requests: Worker {0}", workerID);
-            idleQueue.addLast(workerID);
-            notifyAll();
-        }
-
-        private synchronized W poll() {
-            Long workerID = idleQueue.pollLast();
-            while (workerID != null) {
-                W worker = workerMap.get(workerID);
-                if (worker != null) {
-                    logger.log(Level.FINE, "[POOL]: found idle worker: Worker {0}", workerID);
-                    return worker;
-                }
-                workerID = idleQueue.pollLast();
-            }
-            return null;
-        }
-
-        private synchronized int size() {
-            return workerMap.size();
-        }
+        UNALLOCATED, UNCONSUMED, CONSUMED, UNCONSUMED_ALLOCATION_ERROR;
     }
 }

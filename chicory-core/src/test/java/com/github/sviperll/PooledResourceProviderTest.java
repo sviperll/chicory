@@ -29,14 +29,14 @@
  */
 package com.github.sviperll;
 
-import java.util.Random;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.util.Duration;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,288 +51,191 @@ public class PooledResourceProviderTest {
     }
 
     @Test
-    public void testThreadLimit() {
-        final int maxAllocatedResources = 3;
-        final CountingResourceProvider providerDefinition = new CountingResourceProvider();
-        final ResourceProvider<AtomicInteger> provider = PooledResourceProvider.createInstance(providerDefinition, 500, maxAllocatedResources);
-        final Random random = new Random();
-        ThreadLimitTester tester = new ThreadLimitTester(provider, providerDefinition, maxAllocatedResources, random, false);
-        tester.test();
+    public void testResourceLimit() {
+        Duration runTimeMax = Duration.seconds(2);
+        int nAllocatedMax = 3;
+        AtomicInteger nAllocated = new AtomicInteger(0);
+        ResourceProvider<Void> provider = PooledResourceProvider.createInstance(nAllocatedMax, 500, (consumer) -> {
+            nAllocated.incrementAndGet();
+            try {
+                consumer.accept(null);
+            } finally {
+                nAllocated.decrementAndGet();
+            }
+        });
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        long start = System.currentTimeMillis();
+        long duration = (long)runTimeMax.toMillis();
+        for (int i = 0; i < 10; i++) {
+            threadPool.execute(() -> {
+                while (System.currentTimeMillis() - start < duration) {
+                    try {
+                        Thread.sleep(ThreadLocalRandom.current().nextLong(100));
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    provider.provideResourceTo((value) -> {
+                        try {
+                            Thread.sleep(ThreadLocalRandom.current().nextLong(100));
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
+                    });
+                }
+            });
+        }
+        while (System.currentTimeMillis() - start < duration) {
+            Assert.assertTrue(nAllocated.get() <= nAllocatedMax);
+            try {
+                Thread.sleep(ThreadLocalRandom.current().nextLong(100));
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        threadPool.shutdown();
+    }
+
+    @Test
+    public void testResourceLimitInPresenceOfConsumerExceptions() {
+        Duration runTimeMax = Duration.seconds(2);
+        int nAllocatedMax = 3;
+        AtomicInteger nAllocated = new AtomicInteger(0);
+        ResourceProvider<Void> provider = PooledResourceProvider.createInstance(nAllocatedMax, 500, (consumer) -> {
+            nAllocated.incrementAndGet();
+            try {
+                consumer.accept(null);
+            } finally {
+                nAllocated.decrementAndGet();
+            }
+        });
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        long start = System.currentTimeMillis();
+        long duration = (long)runTimeMax.toMillis();
+        for (int i = 0; i < 10; i++) {
+            threadPool.execute(() -> {
+                while (System.currentTimeMillis() - start < duration) {
+                    try {
+                        Thread.sleep(ThreadLocalRandom.current().nextLong(100));
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    try {
+                        provider.provideResourceTo((value) -> {
+                            throw new IllegalStateException();
+                        });
+                    } catch (IllegalStateException ex) {
+                        // ignore
+                    }
+                }
+            });
+        }
+        while (System.currentTimeMillis() - start < duration) {
+            Assert.assertTrue(nAllocated.get() <= nAllocatedMax);
+            try {
+                Thread.sleep(ThreadLocalRandom.current().nextLong(100));
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        threadPool.shutdown();
+    }
+
+    @Test
+    public void testConcurrencyLimit() {
+        Duration runTimeMax = Duration.seconds(2);
+        int nRunningMax = 3;
+        AtomicInteger nRunning = new AtomicInteger(0);
+        ResourceProvider<Void> provider =
+                PooledResourceProvider.createInstance(nRunningMax, 500, (consumer) -> consumer.accept(null));
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        long start = System.currentTimeMillis();
+        long duration = (long)runTimeMax.toMillis();
+        for (int i = 0; i < 10; i++) {
+            threadPool.execute(() -> {
+                while (System.currentTimeMillis() - start < duration) {
+                    try {
+                        Thread.sleep(ThreadLocalRandom.current().nextLong(100));
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                    provider.provideResourceTo((value) -> {
+                        nRunning.incrementAndGet();
+                        try {
+                            Thread.sleep(ThreadLocalRandom.current().nextLong(100));
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        } finally {
+                            nRunning.decrementAndGet();
+                        }
+                    });
+                }
+            });
+        }
+        while (System.currentTimeMillis() - start < duration) {
+            Assert.assertTrue(nRunning.get() <= nRunningMax);
+            try {
+                Thread.sleep(ThreadLocalRandom.current().nextLong(100));
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        threadPool.shutdown();
     }
 
     @Test
     public void testIdleTime() throws InterruptedException {
         final long maxIdleTimeMillis = 337;
-        final long maxIdleTimeMillisThreashold = 10;
-        final CountingResourceProvider providerDefinition = new CountingResourceProvider();
-        final ResourceProvider<AtomicInteger> provider = PooledResourceProvider.createInstance(providerDefinition, maxIdleTimeMillis, 10);
+        final long maxIdleTimeMillisThreashold = 5;
+        AtomicInteger nAllocated = new AtomicInteger(0);
+        ResourceProvider<Void> provider = PooledResourceProvider.createInstance(10, maxIdleTimeMillis, (consumer) -> {
+            nAllocated.incrementAndGet();
+            try {
+                consumer.accept(null);
+            } finally {
+                nAllocated.decrementAndGet();
+            }
+        });
         provider.provideResourceTo(value -> {});
-        Assert.assertEquals(1, providerDefinition.count.get());
+        Assert.assertEquals(1, nAllocated.get());
         Thread.sleep(maxIdleTimeMillis - maxIdleTimeMillisThreashold);
-        Assert.assertEquals(1, providerDefinition.count.get());
+        Assert.assertEquals(1, nAllocated.get());
         Thread.sleep(maxIdleTimeMillisThreashold + maxIdleTimeMillisThreashold);
-        Assert.assertEquals(0, providerDefinition.count.get());
+        Assert.assertEquals(0, nAllocated.get());
     }
 
     @Test
     public void testIsAllocated() {
-        final int maxAllocatedResources = 3;
-        final long maxIdleTimeMillis = 500;
-        final CountingResourceProvider providerDefinition = new CountingResourceProvider();
-        final ResourceProvider<AtomicInteger> provider = PooledResourceProvider.createInstance(providerDefinition, maxIdleTimeMillis, maxAllocatedResources);
-        final Random random = new Random();
-        IsAllocatedTester tester = new IsAllocatedTester(provider, providerDefinition, random, false);
-        tester.test(maxIdleTimeMillis, maxAllocatedResources);
-    }
-
-    @Test
-    public void testThreadLimitInPresenceOfExceptions() {
-        final int maxAllocatedResources = 3;
-        final CountingResourceProvider providerDefinition = new CountingResourceProvider();
-        final ResourceProvider<AtomicInteger> provider = PooledResourceProvider.createInstance(providerDefinition, 500, maxAllocatedResources);
-        final Random random = new Random();
-        ThreadLimitTester tester = new ThreadLimitTester(provider, providerDefinition, maxAllocatedResources, random, true);
-        tester.test();
-    }
-
-    @Test
-    public void testIsAllocatedInPresenceOfExceptions() {
-        final int maxAllocatedResources = 3;
-        final long maxIdleTimeMillis = 500;
-        final CountingResourceProvider providerDefinition = new CountingResourceProvider();
-        final ResourceProvider<AtomicInteger> provider = PooledResourceProvider.createInstance(providerDefinition, maxIdleTimeMillis, maxAllocatedResources);
-        final Random random = new Random();
-        IsAllocatedTester tester = new IsAllocatedTester(provider, providerDefinition, random, true);
-        tester.test(maxIdleTimeMillis, maxAllocatedResources);
-    }
-
-    @Test
-    public void testNotAllocatable() {
-        final int maxAllocatedResources = 3;
-        final long maxIdleTimeMillis = 500;
-        final ResourceProvider<Object> provider = PooledResourceProvider.createInstance(new NotAllocatableResourceProvider(), maxIdleTimeMillis, maxAllocatedResources);
-        final Random random = new Random();
-        NotAllocatableTester tester = new NotAllocatableTester(provider, random);
-        tester.test(maxAllocatedResources);
-    }
-
-    private static class IsAllocatedTester implements Runnable {
-        private final ResourceProvider<AtomicInteger> provider;
-        private final CountingResourceProvider providerDefinition;
-        private final Random random;
-        private final boolean withExceptions;
-        private volatile AssertionError error = null;
-        private volatile boolean catchedException = false;
-
-        public IsAllocatedTester(ResourceProvider<AtomicInteger> provider, CountingResourceProvider providerDefinition, Random random, boolean withExceptions) {
-            this.provider = provider;
-            this.providerDefinition = providerDefinition;
-            this.random = random;
-            this.withExceptions = withExceptions;
-        }
-
-        void test(long maxIdleTimeMillis, int maxAllocatedResources) {
-            ExecutorService executor = Executors.newFixedThreadPool(maxAllocatedResources * 10);
-            for (int i = 0; i < 100; i++) {
-                executor.execute(this);
-            }
-            executor.shutdown();
-            boolean isTerminated = false;
-            while (!isTerminated) {
-                try {
-                    isTerminated = executor.awaitTermination(random.nextInt(200), TimeUnit.MILLISECONDS);
-                } catch (InterruptedException ex) {
-                    isTerminated = false;
-                }
-                // FIXME: Seems that we can't be sure that test executor is still not terminated...
-                // if (!isTerminated && providerDefinition.count.get() == 0) {
-                //    Assert.assertTrue(false);
-                //}
-            }
-            if (error != null)
-                throw error;
+        AtomicInteger nAllocated = new AtomicInteger(0);
+        ResourceProvider<Void> provider = PooledResourceProvider.createInstance(10, 500, (consumer) -> {
+            nAllocated.incrementAndGet();
             try {
-                Thread.sleep(maxIdleTimeMillis + 100);
-                Assert.assertTrue(providerDefinition.count.get() == 0);
-            } catch (InterruptedException ex) {
-                Assert.assertTrue("interrupted", false);
-            }
-            Assert.assertEquals(withExceptions, catchedException);
-        }
-
-        @Override
-        public void run() {
-            try {
-                provider.provideResourceTo((AtomicInteger resource) -> {
-                    try {
-                        Assert.assertTrue(providerDefinition.count.get() >= 1);
-                        resource.incrementAndGet();
-                        Assert.assertTrue(resource.get() == 1);
-                        Thread.sleep(random.nextInt(200));
-                        Assert.assertTrue(resource.get() == 1);
-                        resource.decrementAndGet();
-                        Assert.assertTrue(providerDefinition.count.get() >= 1);
-                        if (withExceptions)
-                            throw new TestConsumerException();
-                    } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    } catch (AssertionError ex) {
-                        if (error == null)
-                            error = ex;
-                    }
-                });
-            } catch (AssertionError ex) {
-                if (error == null)
-                    error = ex;
-            } catch (TestConsumerException ex) {
-                catchedException = true;
-            }
-        }
-    }
-
-    private static class ThreadLimitTester implements Runnable {
-        private final ResourceProvider<AtomicInteger> provider;
-        private final CountingResourceProvider providerDefinition;
-        private final int maxAllocatedResources;
-        private final Random random;
-        private final boolean withExceptions;
-        private volatile AssertionError error;
-        private volatile boolean catchedException = false;
-
-        public ThreadLimitTester(ResourceProvider<AtomicInteger> provider, CountingResourceProvider providerDefinition, int maxAllocatedResources, Random random, boolean withExceptions) {
-            this.provider = provider;
-            this.providerDefinition = providerDefinition;
-            this.maxAllocatedResources = maxAllocatedResources;
-            this.random = random;
-            this.withExceptions = withExceptions;
-        }
-
-        void test() {
-            ExecutorService executor = Executors.newFixedThreadPool(maxAllocatedResources * 10);
-            for (int i = 0; i < 100; i++) {
-                executor.execute(this);
-                Assert.assertTrue(providerDefinition.count.get() <= maxAllocatedResources);
-            }
-            executor.shutdown();
-            boolean isTerminated = false;
-            while (!isTerminated) {
-                Assert.assertTrue(providerDefinition.count.get() <= maxAllocatedResources);
-                try {
-                    isTerminated = executor.awaitTermination(random.nextInt(200), TimeUnit.MILLISECONDS);
-                } catch (InterruptedException ex) {
-                    isTerminated = false;
-                }
-            }
-            if (error != null)
-                throw error;
-            Assert.assertTrue(providerDefinition.count.get() <= maxAllocatedResources);
-            Assert.assertEquals(withExceptions, catchedException);
-        }
-
-        @Override
-        public void run() {
-            try {
-                provider.provideResourceTo((AtomicInteger resource) -> {
-                    try {
-                        Assert.assertTrue(providerDefinition.count.get() <= maxAllocatedResources);
-                        resource.incrementAndGet();
-                        Assert.assertTrue(resource.get() == 1);
-                        Thread.sleep(random.nextInt(200));
-                        Assert.assertTrue(resource.get() == 1);
-                        resource.decrementAndGet();
-                        Assert.assertTrue(providerDefinition.count.get() <= maxAllocatedResources);
-                        if (withExceptions)
-                            throw new TestConsumerException();
-                    } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    } catch (AssertionError ex) {
-                        if (error == null)
-                            error = ex;
-                    }
-                });
-            } catch (TestConsumerException ex) {
-                catchedException = true;
-            } catch (AssertionError ex) {
-                if (error == null)
-                    error = ex;
-            }
-        }
-    }
-
-    private static class NotAllocatableTester implements Runnable {
-        private final ResourceProvider<Object> provider;
-        private final Random random;
-        private volatile boolean hasRunned = false;
-        private volatile boolean hasException = false;
-
-        public NotAllocatableTester(ResourceProvider<Object> provider, Random random) {
-            this.provider = provider;
-            this.random = random;
-        }
-
-        private void test(int maxAllocatedResources) {
-            ExecutorService executor = Executors.newFixedThreadPool(maxAllocatedResources * 10);
-            for (int i = 0; i < 100; i++) {
-                executor.execute(this);
-                Assert.assertFalse(hasRunned);
-            }
-            executor.shutdown();
-            boolean isTerminated = false;
-            while (!isTerminated) {
-                Assert.assertFalse(hasRunned);
-                try {
-                    isTerminated = executor.awaitTermination(random.nextInt(200), TimeUnit.MILLISECONDS);
-                } catch (InterruptedException ex) {
-                    isTerminated = false;
-                }
-            }
-            Assert.assertFalse(hasRunned);
-            Assert.assertTrue(hasException);
-        }
-
-        @Override
-        public void run() {
-            try {
-                provider.provideResourceTo((Object value) -> {
-                    hasRunned = true;
-                    try {
-                        Thread.sleep(random.nextInt(200));
-                    } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                });
-            } catch (NotAllocatableException ex) {
-                hasException = true;
-            }
-        }
-    }
-
-    private static class NotAllocatableResourceProvider implements ResourceProviderDefinition<Object> {
-        @Override
-        public void provideResourceTo(Consumer<Object> consumer) {
-            throw new NotAllocatableException();
-        }
-    }
-
-    private static class CountingResourceProvider implements ResourceProviderDefinition<AtomicInteger> {
-        AtomicInteger count = new AtomicInteger(0);
-
-        @Override
-        public void provideResourceTo(Consumer<? super AtomicInteger> consumer) {
-            count.incrementAndGet();
-            try {
-                consumer.accept(new AtomicInteger(0));
+                consumer.accept(null);
             } finally {
-                count.decrementAndGet();
+                nAllocated.decrementAndGet();
             }
-        }
+        });
+        provider.provideResourceTo(value -> {
+            Assert.assertThat(nAllocated.get(), CoreMatchers.equalTo(1));
+        });
     }
 
-    @SuppressWarnings("serial")
-    private static class NotAllocatableException extends RuntimeException {
+    @Test(expected = NoSuchElementException.class)
+    public void testAllocationExceptionIsThrown() {
+        ResourceProvider<Void> provider = PooledResourceProvider.createInstance(10, 500, (consumer) -> {
+            throw new NoSuchElementException("Should never allocate");
+        });
+        provider.provideResourceTo(value -> {
+            Assert.fail("Should never be executed");
+        });
     }
 
-    @SuppressWarnings("serial")
-    private static class TestConsumerException extends RuntimeException {
+    @Test(expected = IllegalArgumentException.class)
+    public void testConsumerExceptionIsThrown() {
+        ResourceProvider<Void> provider = PooledResourceProvider.createInstance(10, 500, (consumer) -> {
+            consumer.accept(null);
+        });
+        provider.provideResourceTo(value -> {
+            throw new IllegalArgumentException();
+        });
     }
 }
