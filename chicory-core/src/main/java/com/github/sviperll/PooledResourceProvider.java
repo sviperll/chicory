@@ -30,14 +30,14 @@
 
 package com.github.sviperll;
 
-import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -45,6 +45,9 @@ import java.util.function.LongFunction;
  * @param <T>
  */
 public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> {
+
+    private static final Logger logger = Logger.getLogger(PooledResourceProvider.class.getName());
+
     public static <T> ResourceProvider<T> createInstance(
             ResourceProviderDefinition<T> provider,
             long maxIdleTimeMillis,
@@ -92,7 +95,7 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
     private class Worker implements Runnable {
         private T value = null;
         private RuntimeException exception = null;
-        private WorkerState state = WorkerState.UNINITIALIZED;
+        private WorkerState state = WorkerState.UNALLOCATED;
         private final long workerID;
 
         Worker(long workerID) {
@@ -101,24 +104,24 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
 
         @Override
         public void run() {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: allocating resource");
+            logger.log(Level.FINE, "[Worker {0}]: allocating resource", workerID);
             try {
                 provider.provideResourceTo(this::withValue);
             } catch (RuntimeException ex) {
                 switchToError(ex);
             }
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: exiting");
+            logger.log(Level.FINE, "[Worker {0}]: exiting", workerID);
         }
 
         private synchronized void withValue(T value) {
-            System.out.println("[" + LocalDateTime.now() + "]" + Thread.currentThread().getId() + "][Worker " + workerID + "]: resource allocating waiting for consumers");
+            logger.log(Level.FINE, "[Worker {0}]: resource allocating waiting for consumers", workerID);
             switchToInitialized(value);
 
             for (;;) {
                 sleepDuringActualJob();
                 waitMaximumIdleTime();
                 if (state == WorkerState.IDLE) {
-                    System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: idle for too long: exiting");
+                    logger.log(Level.FINE, "[Worker {0}]: idle for too long: exiting", workerID);
                     switchToUninitialized();
                     workers.unregister(workerID);
                     return;
@@ -127,32 +130,32 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
         }
 
         private synchronized void switchToError(RuntimeException ex) {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: switching to error state");
+            logger.log(Level.FINE, "[Worker {0}]: switching to error state", workerID);
             exception = ex;
-            switchToState(WorkerState.ERROR);
+            switchToState(WorkerState.SHOULD_THROW);
         }
 
         private synchronized void switchToState(WorkerState state) {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: switching to " + state + " state");
+            logger.log(Level.FINE, "[Worker {0}]: switching to {1} state", new Object[]{workerID, state});
             this.state = state;
             notifyAll();
         }
         
         private synchronized void switchToInitialized(T value) {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: switching to initialized state");
+            logger.log(Level.FINE, "[Worker {0}]: switching to initialized state", workerID);
             this.value = value;
             switchToState(WorkerState.IDLE);
         }
         
         private synchronized void switchToUninitialized() {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: switching to uninitialized state");
+            logger.log(Level.FINE, "[Worker {0}]: switching to uninitialized state", workerID);
             this.value = null;
-            switchToState(WorkerState.UNINITIALIZED);
+            switchToState(WorkerState.UNALLOCATED);
         }
 
         private synchronized void sleepDuringActualJob() {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: waiting for ready (IDLE or ERROR) state");
-            while (state != WorkerState.IDLE && state != WorkerState.ERROR) {
+            logger.log(Level.FINE, "[Worker {0}]: waiting for ready (IDLE or ERROR) state", workerID);
+            while (state != WorkerState.IDLE && state != WorkerState.SHOULD_THROW) {
                 try {
                     wait();
                 } catch (InterruptedException ex) {
@@ -162,12 +165,12 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
         }
 
         private synchronized void waitMaximumIdleTime() {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: sleeping while idle until maxIdleTimeMillis");
+            logger.log(Level.FINE, "[Worker {0}]: sleeping while idle until maxIdleTimeMillis", workerID);
             long startTime = System.currentTimeMillis();
             long endTime = startTime + maxIdleTimeMillis;
             long now = System.currentTimeMillis();
             while (state == WorkerState.IDLE && now < endTime) {
-                System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: sleeping for " + (endTime - now) + " ms");
+                logger.log(Level.FINE, "[Worker {0}]: sleeping for {1} ms", new Object[]{workerID, endTime - now});
                 try {
                     wait(endTime - now);
                 } catch (InterruptedException ex) {
@@ -178,12 +181,12 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
         }
         
         void provideResourceTo(Consumer<? super T> consumer) {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: consumer found: trying to provide resources");
+            logger.log(Level.FINE, "[Worker {0}]: consumer found: trying to provide resources", workerID);
             T initializedValue;
             synchronized(this) {
                 sleepDuringActualJob();
-                if (state == WorkerState.ERROR) {
-                    System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: error was found: throwing exception to client");
+                if (state == WorkerState.SHOULD_THROW) {
+                    logger.log(Level.FINE, "[Worker {0}]: error was found: throwing exception to client", workerID);
                     workers.unregister(workerID);
                     throw exception;
                 }
@@ -193,7 +196,7 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
             try {
                 consumer.accept(initializedValue);
             } finally {
-                System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][Worker " + workerID + "]: consumer finished: making thyself available for future requests");
+                logger.log(Level.FINE, "[Worker {0}]: consumer finished: making thyself available for future requests", workerID);
                 synchronized(this) {
                     workers.enqueue(workerID);
                     switchToState(WorkerState.IDLE);
@@ -203,30 +206,30 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
     }
 
     private enum WorkerState {
-        UNINITIALIZED, IDLE, WORKING, ERROR;
+        UNALLOCATED, IDLE, WORKING, SHOULD_THROW;
     }
 
     private static class WorkerCollection<W> {
-        private Map<Long, W> workerMap = new HashMap<>();
-        private Deque<Long> idleQueue = new ArrayDeque<>();
+        private final Map<Long, W> workerMap = new HashMap<>();
+        private final Deque<Long> idleQueue = new ArrayDeque<>();
         private long nextWorkerID = 1;
 
         private synchronized W put(LongFunction<W> factory) {
             long id = nextWorkerID++;
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][POOL]: allocating new worker: Worker " + id);
+            logger.log(Level.FINE, "[POOL]: allocating new worker: Worker {0}", id);
             W worker = factory.apply(id);
             workerMap.put(id, worker);
             return worker;
         }
 
         private synchronized void unregister(long workerID) {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][POOL]: removing worker: Worker " + workerID);
+            logger.log(Level.FINE, "[POOL]: removing worker: Worker {0}", workerID);
             workerMap.remove(workerID);
             notifyAll();
         }
 
         private synchronized void enqueue(long workerID) {
-            System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][POOL]: making worker available for future requests: Worker " + workerID);
+            logger.log(Level.FINE, "[POOL]: making worker available for future requests: Worker {0}", workerID);
             idleQueue.addLast(workerID);
             notifyAll();
         }
@@ -236,7 +239,7 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
             while (workerID != null) {
                 W worker = workerMap.get(workerID);
                 if (worker != null) {
-                    System.out.println("[" + LocalDateTime.now() + "][" + Thread.currentThread().getId() + "][POOL]: found idle worker: Worker " + workerID);
+                    logger.log(Level.FINE, "[POOL]: found idle worker: Worker {0}", workerID);
                     return worker;
                 }
                 workerID = idleQueue.pollLast();
