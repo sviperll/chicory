@@ -26,10 +26,13 @@
  */
 package com.github.sviperll.stream;
 
+import java.util.function.Supplier;
+
+
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-public interface Collecting<T, R, E extends Exception> extends SaturableConsuming<T>, ThrowingSupplier<R, E> {
+public interface Collecting<T, R> extends SaturableConsuming<T>, Supplier<R> {
 
 }

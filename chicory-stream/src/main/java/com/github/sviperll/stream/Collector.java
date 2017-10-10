@@ -26,87 +26,53 @@
  */
 package com.github.sviperll.stream;
 
-import com.github.sviperll.Applicable;
-import com.github.sviperll.BiApplicable;
-import com.github.sviperll.BinaryOperatorDefinition;
-import com.github.sviperll.Evaluatable;
-import com.github.sviperll.OptionalVisitor;
-import com.github.sviperll.Supplier;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  *
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
-public class Collector<T, R, E extends Exception> implements Supplier<Collecting<T, R, E>> {
-    public static <T, U, R, E extends Exception> Collector<T, R, E> optional(final Applicable<? super T, Collecting<? super T, U, E>> notOptionalCollector, final OptionalVisitor<? super U, R, E> visitor) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.optional(notOptionalCollector, visitor);
-            }
-        });
+public class Collector<T, R> implements Supplier<Collecting<T, R>> {
+    public static <T, R> Collector<T, Optional<R>> optional(
+            Function<? super T, Collecting<? super T, R>> notOptionalCollector) {
+        return new Collector<>(() -> CollectorState.optional(notOptionalCollector));
     }
 
-    public static <T, U> Collector<T, U, RuntimeException> reducing(final U seed, final BiApplicable<U, ? super T, U> function) {
-        return new Collector<T, U, RuntimeException>(new Supplier<Collecting<T, U, RuntimeException>>() {
-            @Override
-            public Collecting<T, U, RuntimeException> get() {
-                return CollectorState.reducing(seed, function);
-            }
-        });
+    public static <T, U> Collector<T, U> reducing(U seed, BiFunction<U, ? super T, U> function) {
+        return new Collector<>(() -> CollectorState.reducing(seed, function));
     }
 
-    public static <T, R, E extends Exception> Collector<T, R, E> reducing(final BinaryOperatorDefinition<T> operator, final OptionalVisitor<? super T, R, E> visitor) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.reducing(operator, visitor);
-            }
-        });
+    public static <T> Collector<T, Optional<T>> reducing(BinaryOperator<T> operator) {
+        return new Collector<>(() -> CollectorState.reducing(operator));
     }
 
-    public static <R, E extends Exception> Collector<String, R, E> joiningStrings(final String separator, final OptionalVisitor<String, R, E> visitor) {
-        return new Collector<String, R, E>(new Supplier<Collecting<String, R, E>>() {
-            @Override
-            public Collecting<String, R, E> get() {
-                return CollectorState.joiningStrings(separator, visitor);
-            }
-        });
+    public static Collector<String, Optional<String>> joiningStrings(String separator) {
+        return new Collector<>(() -> CollectorState.joiningStrings(separator));
     }
 
-    public static Collector<String, String, RuntimeException> joiningStrings() {
-        return new Collector<String, String, RuntimeException>(new Supplier<Collecting<String, String, RuntimeException>>() {
-            @Override
-            public Collecting<String, String, RuntimeException> get() {
-                return CollectorState.joiningStrings();
-            }
-        });
+    public static Collector<String, String> joiningStrings() {
+        return new Collector<>(() -> CollectorState.joiningStrings());
     }
 
-    public static <T> Collector<T, List<T>, RuntimeException> toList() {
-        return new Collector<T, List<T>, RuntimeException>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
-            @Override
-            public Collecting<T, List<T>, RuntimeException> get() {
-                return CollectorState.toList();
-            }
-        });
+    public static <T> Collector<T, List<T>> toList() {
+        return new Collector<>(() -> CollectorState.toList());
     }
 
-    public static <T extends Comparable<? super T>> Collector<T, List<T>, RuntimeException> toSortedList() {
-        return new Collector<T, List<T>, RuntimeException>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
-            @Override
-            public Collecting<T, List<T>, RuntimeException> get() {
-                return CollectorState.<T>toSortedList();
-            }
-        });
+    public static <T extends Comparable<? super T>> Collector<T, List<T>> toSortedList() {
+        return new Collector<>(() -> CollectorState.<T>toSortedList());
     }
 
     /**
@@ -115,230 +81,117 @@ public class Collector<T, R, E extends Exception> implements Supplier<Collecting
      *
      * @return the list of several first minimal elements
      */
-    public static <T extends Comparable<? super T>> Collector<T, List<T>, RuntimeException> toSortedList(final int limit) {
-        return new Collector<T, List<T>, RuntimeException>(new Supplier<Collecting<T, List<T>, RuntimeException>>() {
-            @Override
-            public Collecting<T, List<T>, RuntimeException> get() {
-                return CollectorState.<T>toSortedList(limit);
-            }
-        });
+    public static <T extends Comparable<? super T>> Collector<T, List<T>> toSortedList(final int limit) {
+        return new Collector<>(() -> CollectorState.<T>toSortedList(limit));
     }
 
-    public static <T> Collector<T, HashSet<T>, RuntimeException> toHashSet() {
-        return new Collector<T, HashSet<T>, RuntimeException>(new Supplier<Collecting<T, HashSet<T>, RuntimeException>>() {
-            @Override
-            public Collecting<T, HashSet<T>, RuntimeException> get() {
-                return CollectorState.toHashSet();
-            }
-        });
+    public static <T> Collector<T, HashSet<T>> toHashSet() {
+        return new Collector<>(() -> CollectorState.toHashSet());
     }
 
-    public static <T> Collector<T, TreeSet<T>, RuntimeException> toTreeSet() {
-        return new Collector<T, TreeSet<T>, RuntimeException>(new Supplier<Collecting<T, TreeSet<T>, RuntimeException>>() {
-            @Override
-            public Collecting<T, TreeSet<T>, RuntimeException> get() {
-                return CollectorState.toTreeSet();
-            }
-        });
+    public static <T> Collector<T, TreeSet<T>> toTreeSet() {
+        return new Collector<>(() -> CollectorState.toTreeSet());
     }
 
-    public static <T, R, E extends Exception> Collector<T, R, E> findFirst(final OptionalVisitor<? super T, R, E> visitor) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.findFirst(visitor);
-            }
-        });
+    public static <T> Collector<T, Optional<T>> findFirst() {
+        return new Collector<>(() -> CollectorState.findFirst());
     }
 
-    public static <T, R extends Collection<T>> Collector<T, R, RuntimeException> toCollection(final Supplier<R> factory) {
-        return new Collector<T, R, RuntimeException>(new Supplier<Collecting<T, R, RuntimeException>>() {
-            @Override
-            public Collecting<T, R, RuntimeException> get() {
-                return CollectorState.toCollection(factory.get());
-            }
-        });
+    public static <T, R extends Collection<? super T>> Collector<T, R> toCollection(Supplier<R> factory) {
+        return new Collector<>(() -> CollectorState.toCollection(factory.get()));
     }
 
-    public static <I, K, V, R extends Map<K, V>> Collector<I, R, RuntimeException> toMap(final Applicable<? super I, ? extends K> function, final Supplier<? extends Collecting<I, V, ? extends RuntimeException>> collector, final Supplier<R> factory) {
-        return new Collector<I, R, RuntimeException>(new Supplier<Collecting<I, R, RuntimeException>>() {
-            @Override
-            public Collecting<I, R, RuntimeException> get() {
-                return CollectorState.toMap(function, collector, factory);
-            }
-        });
+    public static <I, K, V, R extends Map<K, V>> Collector<I, R> toMap(
+            Function<? super I, ? extends K> function,
+            Supplier<? extends Collecting<I, V>> collector,
+            Supplier<R> factory) {
+        return new Collector<>(() -> CollectorState.toMap(function, collector, factory));
     }
 
-    public static <I, K, V> Collector<I, HashMap<K, V>, RuntimeException> toHashMap(final Applicable<? super I, ? extends K> function, final Supplier<? extends Collecting<I, V, ? extends RuntimeException>> collector) {
-        return new Collector<I, HashMap<K, V>, RuntimeException>(new Supplier<Collecting<I, HashMap<K, V>, RuntimeException>>() {
-            @Override
-            public Collecting<I, HashMap<K, V>, RuntimeException> get() {
-                return CollectorState.toHashMap(function, collector);
-            }
-        });
+    public static <I, K, V> Collector<I, HashMap<K, V>> toHashMap(
+            Function<? super I, ? extends K> function,
+            Supplier<? extends Collecting<I, V>> collector) {
+        return new Collector<>(() -> CollectorState.toHashMap(function, collector));
     }
 
-    public static <I, K, V> Collector<I, TreeMap<K, V>, RuntimeException> toTreeMap(final Applicable<? super I, ? extends K> function, final Supplier<? extends Collecting<I, V, ? extends RuntimeException>> collector) {
-        return new Collector<I, TreeMap<K, V>, RuntimeException>(new Supplier<Collecting<I, TreeMap<K, V>, RuntimeException>>() {
-            @Override
-            public Collecting<I, TreeMap<K, V>, RuntimeException> get() {
-                return CollectorState.toTreeMap(function, collector);
-            }
-        });
+    public static <I, K, V> Collector<I, TreeMap<K, V>> toTreeMap(
+            Function<? super I, ? extends K> function,
+            Supplier<? extends Collecting<I, V>> collector) {
+        return new Collector<>(() -> CollectorState.toTreeMap(function, collector));
     }
 
-    public static <T> Collector<T, Integer, RuntimeException> counting() {
-        return new Collector<T, Integer, RuntimeException>(new Supplier<Collecting<T, Integer, RuntimeException>>() {
-            @Override
-            public Collecting<T, Integer, RuntimeException> get() {
-                return CollectorState.counting();
-            }
-        });
+    public static <T> Collector<T, Integer> counting() {
+        return new Collector<>(() -> CollectorState.counting());
     }
 
-    public static <T extends Comparable<? super T>, R, E extends Exception> Collector<T, R, E> maximum(final OptionalVisitor<T, R, E> optionalVisitor) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.<T, R, E>maximum(optionalVisitor);
-            }
-        });
+    public static <T extends Comparable<? super T>> Collector<T, Optional<T>> maximum() {
+        return new Collector<>(() -> CollectorState.<T>maximum());
     }
 
-    public static <T extends Comparable<? super T>, R, E extends Exception> Collector<T, R, E> minimum(final OptionalVisitor<T, R, E> optionalVisitor) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.<T, R, E>minimum(optionalVisitor);
-            }
-        });
+    public static <T extends Comparable<? super T>> Collector<T, Optional<T>> minimum() {
+        return new Collector<>(() -> CollectorState.<T>minimum());
     }
 
-    public static <T, R, E extends Exception> Collector<T, R, E> maximum(final Comparator<? super T> comparator, final OptionalVisitor<T, R, E> optionalVisitor) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.maximum(comparator, optionalVisitor);
-            }
-        });
+    public static <T> Collector<T, Optional<T>> maximum(Comparator<? super T> comparator) {
+        return new Collector<>(() -> CollectorState.maximum(comparator));
     }
 
-    public static <T, R, E extends Exception> Collector<T, R, E> minimum(final Comparator<? super T> comparator, final OptionalVisitor<T, R, E> optionalVisitor) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.minimum(comparator, optionalVisitor);
-            }
-        });
+    public static <T> Collector<T, Optional<T>> minimum(Comparator<? super T> comparator) {
+        return new Collector<>(() -> CollectorState.minimum(comparator));
     }
 
-    public static Collector<Integer, Integer, RuntimeException> summingInt() {
-        return new Collector<Integer, Integer, RuntimeException>(new Supplier<Collecting<Integer, Integer, RuntimeException>>() {
-            @Override
-            public Collecting<Integer, Integer, RuntimeException> get() {
-                return CollectorState.summingInt();
-            }
-        });
+    public static Collector<Integer, Integer> summingInt() {
+        return new Collector<>(() -> CollectorState.summingInt());
     }
 
-    public static Collector<Long, Long, RuntimeException> summingLong() {
-        return new Collector<Long, Long, RuntimeException>(new Supplier<Collecting<Long, Long, RuntimeException>>() {
-            @Override
-            public Collecting<Long, Long, RuntimeException> get() {
-                return CollectorState.summingLong();
-            }
-        });
+    public static Collector<Long, Long> summingLong() {
+        return new Collector<>(() -> CollectorState.summingLong());
     }
 
-    public static Collector<Double, Double, RuntimeException> summingDouble() {
-        return new Collector<Double, Double, RuntimeException>(new Supplier<Collecting<Double, Double, RuntimeException>>() {
-            @Override
-            public Collecting<Double, Double, RuntimeException> get() {
-                return CollectorState.summingDouble();
-            }
-        });
+    public static Collector<Double, Double> summingDouble() {
+        return new Collector<>(() -> CollectorState.summingDouble());
     }
 
-    public static Collector<Integer, Integer, RuntimeException> productingInt() {
-        return new Collector<Integer, Integer, RuntimeException>(new Supplier<Collecting<Integer, Integer, RuntimeException>>() {
-            @Override
-            public Collecting<Integer, Integer, RuntimeException> get() {
-                return CollectorState.productingInt();
-            }
-        });
+    public static Collector<Integer, Integer> productingInt() {
+        return new Collector<>(() -> CollectorState.productingInt());
     }
 
-    public static Collector<Long, Long, RuntimeException> productingLong() {
-        return new Collector<Long, Long, RuntimeException>(new Supplier<Collecting<Long, Long, RuntimeException>>() {
-            @Override
-            public Collecting<Long, Long, RuntimeException> get() {
-                return CollectorState.productingLong();
-            }
-        });
+    public static Collector<Long, Long> productingLong() {
+        return new Collector<>(() -> CollectorState.productingLong());
     }
 
-    public static Collector<Double, Double, RuntimeException> productingDouble() {
-        return new Collector<Double, Double, RuntimeException>(new Supplier<Collecting<Double, Double, RuntimeException>>() {
-            @Override
-            public Collecting<Double, Double, RuntimeException> get() {
-                return CollectorState.productingDouble();
-            }
-        });
+    public static Collector<Double, Double> productingDouble() {
+        return new Collector<>(() -> CollectorState.productingDouble());
     }
 
-    private final Supplier<? extends Collecting<T, R, E>> collector;
+    private final Supplier<? extends Collecting<T, R>> collector;
 
-    public Collector(Supplier<? extends Collecting<T, R, E>> collector) {
+    public Collector(Supplier<? extends Collecting<T, R>> collector) {
         this.collector = collector;
     }
 
     @Override
-    public Collecting<T, R, E> get() {
+    public Collecting<T, R> get() {
         return collector.get();
     }
 
-    public Collector<T, R, E> limiting(final int limit) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.of(collector.get()).limiting(limit);
-            }
-        });
+    public Collector<T, R> limiting(int limit) {
+        return new Collector<>(() -> CollectorState.of(collector.get()).limiting(limit));
     }
 
-    public Collector<T, R, E> skipping(final int offset) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.of(collector.get()).skipping(offset);
-            }
-        });
+    public Collector<T, R> skipping(int offset) {
+        return new Collector<>(() -> CollectorState.of(collector.get()).skipping(offset));
     }
 
-    public Collector<T, R, E> filtering(final Evaluatable<? super T> predicate) {
-        return new Collector<T, R, E>(new Supplier<Collecting<T, R, E>>() {
-            @Override
-            public Collecting<T, R, E> get() {
-                return CollectorState.of(collector.get()).filtering(predicate);
-            }
-        });
+    public Collector<T, R> filtering(Predicate<? super T> predicate) {
+        return new Collector<>(() -> CollectorState.of(collector.get()).filtering(predicate));
     }
 
-    public <U> Collector<U, R, E> mapping(final Applicable<U, ? extends T> function) {
-        return new Collector<U, R, E>(new Supplier<Collecting<U, R, E>>() {
-            @Override
-            public Collecting<U, R, E> get() {
-                return CollectorState.of(collector.get()).mapping(function);
-            }
-        });
+    public <U> Collector<U, R> mapping(Function<U, ? extends T> function) {
+        return new Collector<>(() -> CollectorState.of(collector.get()).mapping(function));
     }
 
-    public <U> Collector<T, U, E> finallyTransforming(final Applicable<? super R, U> function) {
-        return new Collector<T, U, E>(new Supplier<Collecting<T, U, E>>() {
-            @Override
-            public Collecting<T, U, E> get() {
-                return CollectorState.of(collector.get()).finallyTransforming(function);
-            }
-        });
+    public <U> Collector<T, U> finallyTransforming(Function<? super R, U> function) {
+        return new Collector<>(() -> CollectorState.of(collector.get()).finallyTransforming(function));
     }
 }

@@ -3,18 +3,9 @@
  */
 package com.github.sviperll.stream;
 
-import com.github.sviperll.stream.Streamable;
-import com.github.sviperll.stream.Stream;
-import com.github.sviperll.stream.CloseableIterator;
-import com.github.sviperll.stream.Arrays;
-import com.github.sviperll.stream.SaturableConsuming;
-import com.github.sviperll.stream.Collector;
-import com.github.sviperll.Applicable;
-import com.github.sviperll.Evaluatable;
-import com.github.sviperll.Function;
-import com.github.sviperll.OptionalVisitors;
-import com.github.sviperll.Predicate;
 import java.io.IOException;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -51,15 +42,12 @@ public class StreamTest {
 
     @Test
     public void testDrainingAll() throws IOException {
-        Stream<Integer> test = Stream.of(new Streamable<Integer>() {
-            @Override
-            public void forEach(SaturableConsuming<? super Integer> consumer) {
-                isOpened = true;
-                consumer.accept(1);
-                consumer.accept(2);
-                consumer.accept(3);
-                isOpened = false;
-            }
+        Stream<Integer> test = Stream.of((SaturableConsuming<? super Integer> consumer) -> {
+            isOpened = true;
+            consumer.accept(1);
+            consumer.accept(2);
+            consumer.accept(3);
+            isOpened = false;
         });
         assert(!isOpened);
         CloseableIterator<Integer> iterator = test.openIterator();
@@ -76,17 +64,14 @@ public class StreamTest {
 
     @Test
     public void testDrainingPart() throws IOException {
-        Stream<Integer> test = Stream.of(new Streamable<Integer>() {
-            @Override
-            public void forEach(SaturableConsuming<? super Integer> consumer) {
-                isOpened = true;
-                consumer.accept(1);
-                consumer.accept(2);
-                consumer.accept(3);
-                consumer.accept(4);
-                consumer.accept(5);
-                isOpened = false;
-            }
+        Stream<Integer> test = Stream.of((SaturableConsuming<? super Integer> consumer) -> {
+            isOpened = true;
+            consumer.accept(1);
+            consumer.accept(2);
+            consumer.accept(3);
+            consumer.accept(4);
+            consumer.accept(5);
+            isOpened = false;
         });
         assert(!isOpened);
         CloseableIterator<Integer> iterator = test.openIterator();
@@ -103,18 +88,15 @@ public class StreamTest {
 
     @Test
     public void testDrainingWithException() throws IOException {
-        Stream<Integer> test = Stream.of(new Streamable<Integer>() {
-            @Override
-            public void forEach(SaturableConsuming<? super Integer> consumer) {
-                isOpened = true;
-                try {
-                    consumer.accept(1);
-                    consumer.accept(2);
-                    throw new ExpectedException();
-                    // consumer.accept(3);
-                } finally {
-                    isOpened = false;
-                }
+        Stream<Integer> test = Stream.of((SaturableConsuming<? super Integer> consumer) -> {
+            isOpened = true;
+            try {
+                consumer.accept(1);
+                consumer.accept(2);
+                throw new ExpectedException();
+                // consumer.accept(3);
+            } finally {
+                isOpened = false;
             }
         });
         assert(!isOpened);
@@ -138,11 +120,11 @@ public class StreamTest {
 
     @Test
     public void testBasicPipeline() throws IOException {
-        Predicate<Integer> mod2 = Predicate.of(new IsEven());
+        Predicate<Integer> mod2 = i -> i % 2 == 0;
 
-        Predicate<Integer> mod3 = Predicate.of(new IsMultipleOf3());
+        Predicate<Integer> mod3 = i -> i % 3 == 0;
 
-        Function<Integer, Integer> doubleIt = Function.of(new DoubleIt());
+        Function<Integer, Integer> doubleIt = i -> i * 2;
 
         Stream<Integer> stream = Arrays.asStream(new Integer[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
         int sum = stream.collect(Collector.summingInt());
@@ -167,45 +149,13 @@ public class StreamTest {
         assertEquals("abc", stream.collect(Collector.joiningStrings()));
         assertEquals("", Stream.<String>empty().collect(Collector.joiningStrings()));
 
-        Collector<String, String, RuntimeException> collector = Collector.joiningStrings(", ", OptionalVisitors.returnDefault("<empty>"));
+        Collector<String, String> collector =
+                Collector.joiningStrings(", ").finallyTransforming(optional -> optional.orElse("<empty>"));
         assertEquals("a, b, c", stream.collect(collector));
         assertEquals("<empty>", Stream.<String>empty().collect(collector));
     }
 
     @SuppressWarnings("serial")
     private static class ExpectedException extends RuntimeException {
-    }
-
-    private static class IsEven implements Evaluatable<Integer> {
-
-        public IsEven() {
-        }
-
-        @Override
-        public boolean evaluate(Integer t) {
-            return t % 2 == 0;
-        }
-    }
-
-    private static class IsMultipleOf3 implements Evaluatable<Integer> {
-
-        public IsMultipleOf3() {
-        }
-
-        @Override
-        public boolean evaluate(Integer t) {
-            return t % 3 == 0;
-        }
-    }
-
-    private static class DoubleIt implements Applicable<Integer, Integer> {
-
-        public DoubleIt() {
-        }
-
-        @Override
-        public Integer apply(Integer t) {
-            return t * 2;
-        }
     }
 }

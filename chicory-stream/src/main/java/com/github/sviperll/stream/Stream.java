@@ -26,15 +26,14 @@
  */
 package com.github.sviperll.stream;
 
-import com.github.sviperll.Applicable;
-import com.github.sviperll.BiApplicable;
-import com.github.sviperll.BinaryOperatorDefinition;
-import com.github.sviperll.Consumer;
-import com.github.sviperll.Evaluatable;
-import com.github.sviperll.Function;
-import com.github.sviperll.OptionalVisitor;
-import com.github.sviperll.Supplier;
-import com.github.sviperll.UnaryOperatorDefinition;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * Objects that provides stream processing.
@@ -48,19 +47,16 @@ public class Stream<T> implements Streamable<T> {
         if (streamable instanceof Stream)
             return (Stream<T>)streamable;
         else
-            return new Stream<T>(streamable);
+            return new Stream<>(streamable);
     }
 
-    public static <T> Stream<T> generate(final Supplier<T> supplier) {
-        return new Stream<T>(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                consumer.accept(supplier.get());
-            }
+    public static <T> Stream<T> generate(Supplier<T> supplier) {
+        return new Stream<>((SaturableConsuming<? super T> consumer) -> {
+            consumer.accept(supplier.get());
         });
     }
 
-    public static <T> Stream<T> iterate(final T seed, final UnaryOperatorDefinition<T> function) {
+    public static <T> Stream<T> iterate(final T seed, final UnaryOperator<T> function) {
         return new Stream<T>(new Streamable<T>() {
             private T value = seed;
             @Override
@@ -75,85 +71,64 @@ public class Stream<T> implements Streamable<T> {
         return typedFlatten(stream);
     }
 
-    private static <T, S extends Streamable<T>> Stream<T> typedFlatten(final Streamable<S> stream) {
-        return new Stream<T>(new Streamable<T>() {
-            @Override
-            public void forEach(final SaturableConsuming<? super T> consumer) {
-                stream.forEach(new SaturableConsuming<S>() {
-                    @Override
-                    public void accept(S substream) {
-                        substream.forEach(consumer);
-                    }
-
-                    @Override
-                    public boolean needsMore() {
-                        return consumer.needsMore();
-                    }
-                });
-            }
-        });
-    }
-
     public static <T> Stream<T> empty() {
-        return Stream.of(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-            }
+        return Stream.of((SaturableConsuming<? super T> consumer) -> {
         });
     }
 
     public static <T> Stream<T> ofElements(final T element1) {
-        return Stream.of(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                consumer.accept(element1);
-            }
+        return Stream.of((SaturableConsuming<? super T> consumer) -> {
+            consumer.accept(element1);
         });
     }
 
     public static <T> Stream<T> ofElements(final T element1, final T element2) {
-        return Stream.of(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                consumer.accept(element1);
-                consumer.accept(element2);
-            }
+        return Stream.of((SaturableConsuming<? super T> consumer) -> {
+            consumer.accept(element1);
+            consumer.accept(element2);
         });
     }
 
     public static <T> Stream<T> ofElements(final T element1, final T element2, final T element3) {
-        return Stream.of(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                consumer.accept(element1);
-                consumer.accept(element2);
-                consumer.accept(element3);
-            }
+        return Stream.of((SaturableConsuming<? super T> consumer) -> {
+            consumer.accept(element1);
+            consumer.accept(element2);
+            consumer.accept(element3);
         });
     }
 
     public static <T> Stream<T> ofElements(final T element1, final T element2, final T element3, final T element4) {
-        return Stream.of(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                consumer.accept(element1);
-                consumer.accept(element2);
-                consumer.accept(element3);
-                consumer.accept(element4);
-            }
+        return Stream.of((SaturableConsuming<? super T> consumer) -> {
+            consumer.accept(element1);
+            consumer.accept(element2);
+            consumer.accept(element3);
+            consumer.accept(element4);
         });
     }
 
     public static <T> Stream<T> ofElements(final T element1, final T element2, final T element3, final T element4, final T element5) {
-        return Stream.of(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                consumer.accept(element1);
-                consumer.accept(element2);
-                consumer.accept(element3);
-                consumer.accept(element4);
-                consumer.accept(element5);
-            }
+        return Stream.of((SaturableConsuming<? super T> consumer) -> {
+            consumer.accept(element1);
+            consumer.accept(element2);
+            consumer.accept(element3);
+            consumer.accept(element4);
+            consumer.accept(element5);
+        });
+    }
+
+    private static <T, S extends Streamable<T>> Stream<T> typedFlatten(Streamable<S> stream) {
+        return new Stream<T>((final SaturableConsuming<? super T> consumer) -> {
+            stream.forEach(new SaturableConsuming<S>() {
+                @Override
+                public void accept(S substream) {
+                    substream.forEach(consumer);
+                }
+                
+                @Override
+                public boolean needsMore() {
+                    return consumer.needsMore();
+                }
+            });
         });
     }
 
@@ -171,7 +146,7 @@ public class Stream<T> implements Streamable<T> {
         streamable.forEach(consumer);
     }
 
-    public void forEach(final Consumer<? super T> consumer) {
+    public void forEach(Consumer<? super T> consumer) {
         streamable.forEach(new SaturableConsuming<T>() {
             @Override
             public void accept(T value) {
@@ -185,63 +160,50 @@ public class Stream<T> implements Streamable<T> {
         });
     }
 
-    public <U> Stream<U> map(final Applicable<? super T, U> function) {
-        return new Stream<U>(new Streamable<U>() {
-            @Override
-            public void forEach(SaturableConsuming<? super U> consumer) {
-                streamable.forEach(SaturableConsumer.of(consumer).mapping(function));
-            }
+    public <U> Stream<U> map(Function<? super T, U> function) {
+        return new Stream<>((SaturableConsuming<? super U> consumer) -> {
+            streamable.forEach(SaturableConsumer.of(consumer).mapping(function));
         });
     }
 
-    public Stream<T> filter(final Evaluatable<? super T> predicate) {
-        return new Stream<T>(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.of(consumer).mapping(Function.<T>identity()).filtering(predicate));
-            }
-
+    public Stream<T> filter(Predicate<? super T> predicate) {
+        return new Stream<>((SaturableConsuming<? super T> consumer) -> {
+            streamable.forEach(SaturableConsumer.of(consumer).mapping(Function.<T>identity()).filtering(predicate));
         });
     }
 
-    public <U> U reduce(final U seed, final BiApplicable<U, ? super T, U> function) {
+    public <U> U reduce(final U seed, final BiFunction<U, ? super T, U> function) {
         return collect(Collector.reducing(seed, function));
     }
 
-    public <R, E extends Exception> R reduce(final BinaryOperatorDefinition<T> operator, OptionalVisitor<? super T, R, E> visitor) throws E {
-        return collect(Collector.reducing(operator, visitor));
+    public Optional<T> reduce(BinaryOperator<T> operator) {
+        return collect(Collector.reducing(operator));
     }
 
-    public <R> Stream<R> flatMap(Applicable<? super T, ? extends Streamable<R>> function) {
+    public <R> Stream<R> flatMap(Function<? super T, ? extends Streamable<R>> function) {
         return flatten(map(function));
     }
 
     public Stream<T> skip(final int offset) {
-        return new Stream<T>(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.of(consumer).skipping(offset));
-            }
+        return new Stream<>((SaturableConsuming<? super T> consumer) -> {
+            streamable.forEach(SaturableConsumer.of(consumer).skipping(offset));
         });
     }
 
     public Stream<T> limit(final int size) {
-        return new Stream<T>(new Streamable<T>() {
-            @Override
-            public void forEach(SaturableConsuming<? super T> consumer) {
-                streamable.forEach(SaturableConsumer.of(consumer).limiting(size));
-            }
+        return new Stream<>((SaturableConsuming<? super T> consumer) -> {
+            streamable.forEach(SaturableConsumer.of(consumer).limiting(size));
         });
     }
 
-    public <R, E extends Exception> R collect(Supplier<? extends Collecting<? super T, R, E>> collector) throws E {
-        Collecting<? super T, R, E> state = collector.get();
+    public <R> R collect(Supplier<? extends Collecting<? super T, R>> collector) {
+        Collecting<? super T, R> state = collector.get();
         streamable.forEach(state);
         return state.get();
     }
 
-    public <R, E extends Exception> R findFirst(OptionalVisitor<? super T, R, E> visitor) throws E {
-        return collect(Collector.findFirst(visitor));
+    public Optional<T> findFirst() {
+        return collect(Collector.findFirst());
     }
 
     public int count() {

@@ -35,8 +35,8 @@ import java.util.concurrent.SynchronousQueue;
  */
 class Drainer<T> implements Runnable, SaturableConsuming<T> {
     private final Streamable<T> streamable;
-    private final BlockingQueue<DrainerRequest> requestQueue = new SynchronousQueue<DrainerRequest>();
-    private final BlockingQueue<DrainerResponse<T>> responseQueue = new SynchronousQueue<DrainerResponse<T>>();
+    private final BlockingQueue<DrainerRequest> requestQueue = new SynchronousQueue<>();
+    private final BlockingQueue<DrainerResponse<T>> responseQueue = new SynchronousQueue<>();
     private DrainerState<T> state = new CommunicatingState();
 
     Drainer(Streamable<T> streamable) {
@@ -63,20 +63,20 @@ class Drainer<T> implements Runnable, SaturableConsuming<T> {
         return state.needsMore();
     }
 
-    private void setExceptionCaughtState(RuntimeException ex) {
-        state = new ExceptionCaughtState(ex);
-    }
-
-    private void setClosedState() {
-        state = new ClosedState();
-    }
-
     public DrainerResponse<T> fetch() {
         return request(DrainerRequest.fetch());
     }
 
     public DrainerResponse<T> close() {
         return request(DrainerRequest.close());
+    }
+
+    private void setExceptionCaughtState(RuntimeException ex) {
+        state = new ExceptionCaughtState(ex);
+    }
+
+    private void setClosedState() {
+        state = new ClosedState();
     }
 
     private DrainerResponse<T> request(DrainerRequest request) {

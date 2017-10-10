@@ -34,11 +34,6 @@ abstract class DrainerResponse<T> {
     @SuppressWarnings("rawtypes")
     private static final DrainerResponseFactory FACTORY = new DrainerResponseFactory();
 
-    @SuppressWarnings({"unchecked"})
-    private static <T> DrainerResponseVisitor<T, DrainerResponse<T>> factory() {
-        return FACTORY;
-    }
-
     public static <T> DrainerResponse<T> fetched(T value) {
         return DrainerResponse.<T>factory().fetched(value);
     }
@@ -49,6 +44,11 @@ abstract class DrainerResponse<T> {
 
     public static <T> DrainerResponse<T> error(RuntimeException exception) {
         return DrainerResponse.<T>factory().error(exception);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private static <T> DrainerResponseVisitor<T, DrainerResponse<T>> factory() {
+        return FACTORY;
     }
 
     private DrainerResponse() {
@@ -62,7 +62,7 @@ abstract class DrainerResponse<T> {
 
         @Override
         public DrainerResponse<T> fetched(final T value) {
-            return new FetchedDrainerResponse<T>(value);
+            return new FetchedDrainerResponse<>(value);
         }
 
         @Override
@@ -73,14 +73,14 @@ abstract class DrainerResponse<T> {
 
         @Override
         public DrainerResponse<T> error(final RuntimeException exception) {
-            return new ErrorDrainerResponse<T>(exception);
+            return new ErrorDrainerResponse<>(exception);
         }
 
         private static class FetchedDrainerResponse<T> extends DrainerResponse<T> {
 
             private final T value;
 
-            public FetchedDrainerResponse(T value) {
+            FetchedDrainerResponse(T value) {
                 this.value = value;
             }
 
@@ -92,7 +92,7 @@ abstract class DrainerResponse<T> {
 
         private static class ClosedDrainerResponse<T> extends DrainerResponse<T> {
 
-            public ClosedDrainerResponse() {
+            ClosedDrainerResponse() {
             }
 
             @Override
@@ -105,7 +105,7 @@ abstract class DrainerResponse<T> {
 
             private final RuntimeException exception;
 
-            public ErrorDrainerResponse(RuntimeException exception) {
+            ErrorDrainerResponse(RuntimeException exception) {
                 this.exception = exception;
             }
 

@@ -31,7 +31,7 @@ package com.github.sviperll.stream;
  * @author Victor Nazarov &lt;asviraspossible@gmail.com&gt;
  */
 abstract class DrainerRequest {
-    private static DrainerRequestFactory FACTORY = new DrainerRequestFactory();
+    private static final DrainerRequestFactory FACTORY = new DrainerRequestFactory();
 
     public static DrainerRequestVisitor<DrainerRequest> factory() {
         return FACTORY;
@@ -64,7 +64,7 @@ abstract class DrainerRequest {
 
         private static class FetchDrainerRequest extends DrainerRequest {
 
-            public FetchDrainerRequest() {
+            FetchDrainerRequest() {
             }
 
             @Override
@@ -75,7 +75,7 @@ abstract class DrainerRequest {
 
         private static class CloseDrainerRequest extends DrainerRequest {
 
-            public CloseDrainerRequest() {
+            CloseDrainerRequest() {
             }
 
             @Override
