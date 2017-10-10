@@ -29,7 +29,7 @@
  */
 package com.github.sviperll.meta;
 
-import com.github.sviperll.Throwables;
+import com.github.sviperll.exception.Exceptions;
 import com.helger.jcodemodel.AbstractCodeWriter;
 import com.helger.jcodemodel.JPackage;
 import java.io.IOException;
@@ -94,11 +94,11 @@ public class FilerCodeWriter extends AbstractCodeWriter {
                 stream.close();
             } catch (IOException ex) {
                 if (exception != null)
-                    messager.printMessage(Diagnostic.Kind.WARNING, Throwables.render(exception));
+                    messager.printMessage(Diagnostic.Kind.WARNING, Exceptions.render(exception));
                 exception = ex;
             } catch (RuntimeException ex) {
                 if (exception != null)
-                    messager.printMessage(Diagnostic.Kind.WARNING, Throwables.render(exception));
+                    messager.printMessage(Diagnostic.Kind.WARNING, Exceptions.render(exception));
                 exception = ex;
             }
         }
