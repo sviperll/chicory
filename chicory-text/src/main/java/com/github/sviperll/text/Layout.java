@@ -29,7 +29,7 @@
  */
 package com.github.sviperll.text;
 
-import com.github.sviperll.Applicable;
+import java.util.function.Function;
 
 /**
  * Can be used as layout.
@@ -56,7 +56,7 @@ public class Layout<T> implements Layoutable<T> {
             return new Layout<T>(layoutable);
     }
 
-    public static <T> Layout<T> of(Applicable<Appendable, Renderer> header, Applicable<Appendable, Renderer> footer) {
+    public static <T> Layout<T> of(Function<Appendable, Renderer> header, Function<Appendable, Renderer> footer) {
         return new Layout<T>(new FunctionLayoutable<T>(header, footer));
     }
 
@@ -80,10 +80,10 @@ public class Layout<T> implements Layoutable<T> {
     }
 
     private static class FunctionLayoutable<T> implements Layoutable<T> {
-        private final Applicable<Appendable, Renderer> header;
-        private final Applicable<Appendable, Renderer> footer;
+        private final Function<Appendable, Renderer> header;
+        private final Function<Appendable, Renderer> footer;
 
-        public FunctionLayoutable(Applicable<Appendable, Renderer> header, Applicable<Appendable, Renderer> footer) {
+        FunctionLayoutable(Function<Appendable, Renderer> header, Function<Appendable, Renderer> footer) {
             this.header = header;
             this.footer = footer;
         }
@@ -115,7 +115,7 @@ public class Layout<T> implements Layoutable<T> {
         private final Layoutable<T> enclosing;
         private final Layoutable<T> enclosed;
 
-        public EnclosedLayoutable(Layoutable<T> enclosing, Layoutable<T> enclosed) {
+        EnclosedLayoutable(Layoutable<T> enclosing, Layoutable<T> enclosed) {
             this.enclosing = enclosing;
             this.enclosed = enclosed;
         }
