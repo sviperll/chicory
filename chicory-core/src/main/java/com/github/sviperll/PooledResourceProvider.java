@@ -100,6 +100,10 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
         }
     }
 
+    private enum WorkerState {
+        UNALLOCATED, UNCONSUMED, CONSUMED, UNCONSUMED_ALLOCATION_ERROR;
+    }
+
     private static class Worker<T> implements Runnable {
         private final ResourceProviderDefinition<T> provider;
         private final long maxIdleTimeMillis;
@@ -142,8 +146,8 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
                 }
             }
         }
-
-
+        
+        
         private synchronized void switchToState(WorkerState state) {
             logger.log(Level.FINE, "[Worker {0}]: switching to {1} state", new Object[]{this, state});
             this.state = state;
@@ -183,7 +187,11 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
                 now = System.currentTimeMillis();
             }
         }
-        
+
+        synchronized boolean isAllocated() {
+            return state != WorkerState.UNALLOCATED;
+        }
+
         void provideResourceTo(Consumer<? super T> consumer) {
             logger.log(Level.FINE, "[Worker {0}]: consumer found: trying to provide resources", this);
             T initializedValue;
@@ -207,13 +215,5 @@ public class PooledResourceProvider<T> implements ResourceProviderDefinition<T> 
                 }
             }
         }
-
-        private synchronized boolean isAllocated() {
-            return state != WorkerState.UNALLOCATED;
-        }
-    }
-
-    private enum WorkerState {
-        UNALLOCATED, UNCONSUMED, CONSUMED, UNCONSUMED_ALLOCATION_ERROR;
     }
 }
